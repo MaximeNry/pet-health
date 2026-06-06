@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.next/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+# client Prisma généré (on le régénère, on ne le versionne pas)
+**/generated/prisma/
