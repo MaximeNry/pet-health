@@ -1,0 +1,31 @@
+FROM node:24-alpine
+
+# Corepack est livré avec Node — on active pnpm
+RUN corepack enable pnpm
+
+WORKDIR /app
+
+# ── Couche 1 : config workspace (change quasi jamais) ──────────────
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# ── Couche 2 : les package.json de chaque package du workspace ─────
+# On copie SEULEMENT les manifestes, pas le code source.
+# pnpm a besoin de tous les package.json du workspace pour résoudre
+# le graphe de dépendances, même si on ne lance qu'une seule app.
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+COPY packages/shared/package.json packages/shared/
+
+# ── Couche 3 : installation des deps ──────────────────────────────
+# --frozen-lockfile = pnpm échoue si le lockfile est désynchronisé
+# avec les package.json. C'est ce qu'on veut en Docker : des builds
+# reproductibles, jamais de lockfile modifié silencieusement.
+# Cette couche est recalculée UNIQUEMENT quand un package.json ou
+# le lockfile change → c'est là que tu gagnes du temps au quotidien.
+RUN pnpm install --frozen-lockfile
+
+# ── Couche 4 : le code source (change à chaque modif) ─────────────
+# En dev, cette couche est largement court-circuitée par les bind
+# mounts de docker-compose (on y vient). Elle sert de fallback si
+# tu lances le container sans mount.
+COPY . .

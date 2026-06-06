@@ -1,0 +1,76 @@
+services:
+  # ── Base de données ──────────────────────────────────────────────
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    # Volume nommé = les données survivent aux docker compose down.
+    # Sans ça, chaque restart repart d'une DB vide.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Healthcheck : compose attend que Postgres soit PRÊT, pas juste
+    # que le container soit démarré. Sans ça, l'API crash au boot
+    # parce qu'elle essaie de se connecter avant que PG accepte.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── API NestJS ───────────────────────────────────────────────────
+  api:
+    build:
+      context: .                # context = racine du monorepo (pnpm a besoin
+      dockerfile: Dockerfile.dev # de pnpm-lock.yaml + tous les package.json)
+    command: ["pnpm", "--filter", "api", "start:dev"]
+    ports:
+      - "3000:3000"
+    environment:
+      # "postgres" ici = le nom du service ci-dessus. Docker Compose
+      # crée un réseau interne où chaque service est joignable par son nom.
+      # C'est LE concept réseau à retenir : pas de localhost entre containers,
+      # on utilise le nom du service comme hostname.
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      NODE_ENV: development
+    # Bind mounts : le code source de l'host est monté dans le container.
+    # Quand tu modifies un fichier sur ton Mac, le container le voit
+    # instantanément → hot reload. OrbStack gère ça très bien via VirtioFS.
+    # On monte UNIQUEMENT les dossiers source, pas tout le monorepo,
+    # pour ne pas écraser le node_modules installé dans le container.
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./packages/shared/src:/app/packages/shared/src
+    depends_on:
+      postgres:
+        # condition: service_healthy → attend le healthcheck, pas juste
+        # le démarrage du container. C'est la bonne pratique.
+        condition: service_healthy
+
+  # ── Frontend Next.js ─────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # -H 0.0.0.0 : par défaut next dev écoute sur localhost, qui dans
+    # un container = inaccessible depuis l'extérieur. On bind sur toutes
+    # les interfaces pour que le port mapping fonctionne.
+    command: ["pnpm", "--filter", "web", "exec", "next", "dev", "--turbopack", "-H", "0.0.0.0"]
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+      - ./packages/shared/src:/app/packages/shared/src
+    depends_on:
+      - api
+
+# Volume nommé déclaré au top-level : Docker le gère (création, stockage).
+# Il persiste même après docker compose down. Pour le supprimer :
+# docker compose down -v (le -v détruit les volumes nommés).
+volumes:
+  pgdata:
