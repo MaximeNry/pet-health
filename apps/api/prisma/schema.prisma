@@ -19,14 +19,15 @@ enum Species {
 }
 
 model Pet {
-  id        String   @id @default(uuid())
-  name      String
-  species   Species
-  birthDate DateTime @map("birth_date")
-  householdId String @map("household_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String
+  species     Species
+  birthDate   DateTime @map("birth_date")
+  householdId String   @map("household_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
+  @@index([householdId])
   @@map("pets")
 }
 
@@ -36,14 +37,14 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  firstName String   @map("first_name")
-  lastName  String   @map("last_name")
-  password  String   @map("password")
-  role      Role     @default(USER) @map("role")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  email        String   @unique
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  passwordHash String   @map("password_hash")
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -66,6 +67,8 @@ model HealthDocument {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
+  @@index([petId])
+  @@index([householdId])
   @@map("health_documents")
 }
 
@@ -92,5 +95,6 @@ model HouseholdMember {
   household   Household     @relation(fields: [householdId], references: [id])
 
   @@id([householdId, userId])
+  @@index([userId])
   @@map("household_members")
 }
