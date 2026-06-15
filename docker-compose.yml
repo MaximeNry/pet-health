@@ -26,6 +26,7 @@ services:
     build:
       context: .                # context = racine du monorepo (pnpm a besoin
       dockerfile: Dockerfile.dev # de pnpm-lock.yaml + tous les package.json)
+    # Prisma client is generated at build time (see Dockerfile.dev, layer 5).
     command: ["pnpm", "--filter", "api", "start:dev"]
     ports:
       - "3000:3000"

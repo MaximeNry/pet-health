@@ -29,3 +29,8 @@ RUN pnpm install --frozen-lockfile
 # mounts de docker-compose (on y vient). Elle sert de fallback si
 # tu lances le container sans mount.
 COPY . .
+
+# ── Couche 5 : client Prisma (gitignored, régénéré à chaque build) ─
+# generate n'a pas besoin d'une DB joignable ; une URL factice suffit.
+ENV DATABASE_URL=postgresql://pethealth:pethealth_dev@postgres:5432/pethealth
+RUN pnpm --filter api exec prisma generate
