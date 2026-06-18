@@ -1,9 +1,9 @@
 /**
  * Domain business error. Independent of any HTTP framework: the presentation
- * layer translates these errors into responses (400/404/...). We distinguish
- * two families via `kind` to enable that mapping without coupling the domain.
+ * layer translates these errors into responses (400/404/409/...). We distinguish
+ * families via `kind` to enable that mapping without coupling the domain.
  */
-export type DomainErrorKind = 'validation' | 'not-found';
+export type DomainErrorKind = 'validation' | 'not-found' | 'conflict';
 
 export abstract class DomainError extends Error {
   abstract readonly kind: DomainErrorKind;

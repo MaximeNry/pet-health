@@ -10,6 +10,7 @@ import { DomainError, DomainErrorKind } from '../domain/domain-error';
 const STATUS_BY_KIND: Record<DomainErrorKind, number> = {
   validation: HttpStatus.BAD_REQUEST,
   'not-found': HttpStatus.NOT_FOUND,
+  conflict: HttpStatus.CONFLICT,
 };
 
 /**

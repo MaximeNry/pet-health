@@ -4,6 +4,7 @@ packages:
 allowBuilds:
   '@nestjs/core': false
   '@prisma/engines': true
+  argon2: true
   esbuild: true
   prisma: true
   sharp: false
