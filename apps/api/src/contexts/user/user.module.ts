@@ -1,5 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CreateUserUseCase } from './application/create-user.use-case';
+import { DeleteUserUseCase } from './application/delete-user.use-case';
+import { GetUserUseCase } from './application/get-user.use-case';
+import { ListUsersUseCase } from './application/list-users.use-case';
+import { UpdateUserUseCase } from './application/update-user.use-case';
 import { PASSWORD_HASHER } from './domain/password-hasher.port';
 import { USER_REPOSITORY } from './domain/user.repository';
 import { Argon2PasswordHasher } from './infrastructure/argon2-password-hasher.adapter';
@@ -16,6 +20,10 @@ import { UserController } from './presentation/user.controller';
   controllers: [UserController],
   providers: [
     CreateUserUseCase,
+    GetUserUseCase,
+    ListUsersUseCase,
+    UpdateUserUseCase,
+    DeleteUserUseCase,
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: PASSWORD_HASHER, useClass: Argon2PasswordHasher },
   ],

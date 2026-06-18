@@ -21,6 +21,14 @@ export interface CreateUserProps {
   role: Role;
 }
 
+/** Editable profile fields of a user (all optional). Password and role are
+ * changed through dedicated flows, not this partial update. */
+export interface UpdateUserProps {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
 export interface UserSnapshot {
   id: string;
   email: string;
@@ -68,6 +76,20 @@ export class User extends Entity {
 
   static fromSnapshot(snapshot: UserSnapshot): User {
     return new User(snapshot);
+  }
+
+  /** Applies a partial profile update while enforcing the invariants. */
+  update(changes: UpdateUserProps): void {
+    if (changes.firstName !== undefined) {
+      this._firstName = User.normalizeName(changes.firstName);
+    }
+    if (changes.lastName !== undefined) {
+      this._lastName = User.normalizeName(changes.lastName);
+    }
+    if (changes.email !== undefined) {
+      this._email = changes.email;
+    }
+    this._updatedAt = new Date();
   }
 
   /**
