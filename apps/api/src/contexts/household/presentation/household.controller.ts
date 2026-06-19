@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import { AddMemberUseCase } from '../application/add-member.use-case';
+import { ChangeMemberRoleUseCase } from '../application/change-member-role.use-case';
 import { CreateHouseholdUseCase } from '../application/create-household.use-case';
 import { DeleteHouseholdUseCase } from '../application/delete-household.use-case';
 import { GetHouseholdUseCase } from '../application/get-household.use-case';
@@ -21,6 +22,7 @@ import { ListHouseholdsByUserUseCase } from '../application/list-households-by-u
 import { RemoveMemberUseCase } from '../application/remove-member.use-case';
 import { RenameHouseholdUseCase } from '../application/rename-household.use-case';
 import type { AddMemberDto } from './dto/add-member.dto';
+import type { ChangeMemberRoleDto } from './dto/change-member-role.dto';
 import type { CreateHouseholdDto } from './dto/create-household.dto';
 import {
   HouseholdResponse,
@@ -45,6 +47,7 @@ export class HouseholdController {
     private readonly deleteHousehold: DeleteHouseholdUseCase,
     private readonly addMember: AddMemberUseCase,
     private readonly removeMember: RemoveMemberUseCase,
+    private readonly changeMemberRole: ChangeMemberRoleUseCase,
   ) {}
 
   @Post()
@@ -99,6 +102,20 @@ export class HouseholdController {
     const household = await this.addMember.execute({
       householdId: id,
       userId: dto.userId,
+      role: dto.role,
+    });
+    return toHouseholdResponse(household);
+  }
+
+  @Patch(':id/members/:userId')
+  async changeMemberRoleInHousehold(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+    @Body() dto: ChangeMemberRoleDto,
+  ): Promise<HouseholdResponse> {
+    const household = await this.changeMemberRole.execute({
+      householdId: id,
+      userId,
       role: dto.role,
     });
     return toHouseholdResponse(household);

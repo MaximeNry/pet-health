@@ -105,6 +105,21 @@ export class Household extends Entity {
     this.touch();
   }
 
+  /** Changes a member's role; refuses to demote the household's last owner. */
+  changeMemberRole(userId: string, role: HouseholdRole): void {
+    const member = this.findMember(userId);
+    if (member === undefined) {
+      throw new MemberNotFoundError(userId);
+    }
+    if (member.isOwner() && !role.isOwner() && this.owners().length === 1) {
+      throw new InvalidHouseholdError(
+        'Cannot demote the last owner of the household.',
+      );
+    }
+    member.changeRole(role);
+    this.touch();
+  }
+
   get name(): string {
     return this._name;
   }

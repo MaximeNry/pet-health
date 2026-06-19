@@ -92,6 +92,42 @@ describe('Household', () => {
     });
   });
 
+  describe('changeMemberRole', () => {
+    const roleOf = (h: Household, userId: string) =>
+      h.members.find((m) => m.userId === userId)?.role.toString();
+
+    it('promotes a member to owner', () => {
+      const household = make();
+      household.addMember('user-2');
+      household.changeMemberRole('user-2', HouseholdRole.owner());
+
+      expect(roleOf(household, 'user-2')).toBe('OWNER');
+    });
+
+    it('demotes an owner when another owner remains', () => {
+      const household = make();
+      household.addMember('user-2', HouseholdRole.owner());
+      household.changeMemberRole(OWNER, HouseholdRole.member());
+
+      expect(roleOf(household, OWNER)).toBe('MEMBER');
+    });
+
+    it('refuses to demote the last owner', () => {
+      const household = make();
+      household.addMember('user-2');
+      expect(() =>
+        household.changeMemberRole(OWNER, HouseholdRole.member()),
+      ).toThrow(InvalidHouseholdError);
+    });
+
+    it('rejects an unknown member', () => {
+      const household = make();
+      expect(() =>
+        household.changeMemberRole('ghost', HouseholdRole.owner()),
+      ).toThrow(MemberNotFoundError);
+    });
+  });
+
   describe('rename', () => {
     it('changes the name and bumps updatedAt', () => {
       jest.useFakeTimers().setSystemTime(new Date('2020-01-01T00:00:00Z'));

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AddMemberUseCase } from './application/add-member.use-case';
+import { ChangeMemberRoleUseCase } from './application/change-member-role.use-case';
 import { CreateHouseholdUseCase } from './application/create-household.use-case';
 import { DeleteHouseholdUseCase } from './application/delete-household.use-case';
 import { GetHouseholdUseCase } from './application/get-household.use-case';
@@ -25,6 +26,7 @@ import { HouseholdController } from './presentation/household.controller';
     DeleteHouseholdUseCase,
     AddMemberUseCase,
     RemoveMemberUseCase,
+    ChangeMemberRoleUseCase,
     { provide: HOUSEHOLD_REPOSITORY, useClass: PrismaHouseholdRepository },
   ],
 })
