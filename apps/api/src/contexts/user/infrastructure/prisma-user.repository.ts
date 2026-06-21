@@ -17,6 +17,7 @@ export class PrismaUserRepository implements UserRepository {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
+        googleId: data.googleId,
         passwordHash: data.passwordHash,
       },
     });
@@ -29,6 +30,11 @@ export class PrismaUserRepository implements UserRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     const record = await this.prisma.user.findUnique({ where: { email } });
+    return record ? UserMapper.toDomain(record) : null;
+  }
+
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    const record = await this.prisma.user.findUnique({ where: { googleId } });
     return record ? UserMapper.toDomain(record) : null;
   }
 

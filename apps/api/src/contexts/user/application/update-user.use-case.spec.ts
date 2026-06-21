@@ -13,6 +13,7 @@ const makeUser = (id: string, email: string): User =>
     email,
     firstName: 'Old',
     lastName: 'Name',
+    googleId: null,
     passwordHash: 'h',
     role: Role.create('USER'),
     createdAt: new Date('2020-01-01T00:00:00Z'),
@@ -30,6 +31,7 @@ describe('UpdateUserUseCase', () => {
       save: jest.fn().mockResolvedValue(undefined),
       findById: jest.fn().mockResolvedValue(existing),
       findByEmail: jest.fn().mockResolvedValue(null),
+      findByGoogleId: jest.fn(),
       findAll: jest.fn(),
       delete: jest.fn(),
     };

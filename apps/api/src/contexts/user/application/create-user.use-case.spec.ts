@@ -26,6 +26,7 @@ describe('CreateUserUseCase', () => {
       save: jest.fn().mockResolvedValue(undefined),
       findById: jest.fn(),
       findByEmail: jest.fn().mockResolvedValue(null),
+      findByGoogleId: jest.fn(),
       findAll: jest.fn(),
       delete: jest.fn(),
     };

@@ -7,18 +7,29 @@ export interface UserProps {
   email: string;
   firstName: string;
   lastName: string;
-  passwordHash: string;
+  googleId: string | null;
+  passwordHash: string | null;
   role: Role;
   createdAt: Date;
   updatedAt: Date;
 }
 
+/** Local (password) creation path — kept for the dormant argon2 flow. */
 export interface CreateUserProps {
   email: string;
   firstName: string;
   lastName: string;
   passwordHash: string;
   role: Role;
+}
+
+/** Google creation path (active): identity comes from the verified id_token. */
+export interface CreateGoogleUserProps {
+  googleId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role?: Role;
 }
 
 /** Editable profile fields of a user (all optional). Password and role are
@@ -34,7 +45,8 @@ export interface UserSnapshot {
   email: string;
   firstName: string;
   lastName: string;
-  passwordHash: string;
+  googleId: string | null;
+  passwordHash: string | null;
   role: Role;
   createdAt: Date;
   updatedAt: Date;
@@ -44,7 +56,8 @@ export class User extends Entity {
   private _email: string;
   private _firstName: string;
   private _lastName: string;
-  private _passwordHash: string;
+  private _googleId: string | null;
+  private _passwordHash: string | null;
   private _role: Role;
   private _createdAt: Date;
   private _updatedAt: Date;
@@ -54,12 +67,14 @@ export class User extends Entity {
     this._email = props.email;
     this._firstName = props.firstName;
     this._lastName = props.lastName;
+    this._googleId = props.googleId;
     this._passwordHash = props.passwordHash;
     this._role = Role.create(props.role.toString());
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
   }
 
+  /** Local (password) creation — dormant argon2 path, no Google identity. */
   static create(props: CreateUserProps): User {
     const now = new Date();
     return new User({
@@ -67,8 +82,25 @@ export class User extends Entity {
       firstName: User.normalizeName(props.firstName),
       lastName: User.normalizeName(props.lastName),
       email: props.email,
+      googleId: null,
       passwordHash: props.passwordHash,
       role: props.role,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  /** Google creation (active path): no password, identity keyed by googleId. */
+  static createFromGoogle(props: CreateGoogleUserProps): User {
+    const now = new Date();
+    return new User({
+      id: globalThis.crypto.randomUUID(),
+      firstName: User.normalizeName(props.firstName),
+      lastName: User.normalizeName(props.lastName),
+      email: props.email,
+      googleId: User.requireGoogleId(props.googleId),
+      passwordHash: null,
+      role: props.role ?? Role.create('USER'),
       createdAt: now,
       updatedAt: now,
     });
@@ -103,6 +135,7 @@ export class User extends Entity {
       email: this._email,
       firstName: this._firstName,
       lastName: this._lastName,
+      googleId: this._googleId,
       passwordHash: this._passwordHash,
       role: this._role,
       createdAt: this._createdAt,
@@ -120,6 +153,10 @@ export class User extends Entity {
 
   get email(): string {
     return this._email;
+  }
+
+  get googleId(): string | null {
+    return this._googleId;
   }
 
   get role(): Role {
@@ -140,5 +177,12 @@ export class User extends Entity {
       throw new InvalidUserError('The user name is required.');
     }
     return trimmed;
+  }
+
+  private static requireGoogleId(googleId: string): string {
+    if (!googleId || googleId.trim().length === 0) {
+      throw new InvalidUserError('A Google identifier is required.');
+    }
+    return googleId;
   }
 }

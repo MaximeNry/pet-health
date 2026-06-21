@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CreateUserUseCase } from './application/create-user.use-case';
 import { DeleteUserUseCase } from './application/delete-user.use-case';
+import { FindOrCreateGoogleUserUseCase } from './application/find-or-create-google-user.use-case';
 import { GetUserUseCase } from './application/get-user.use-case';
 import { ListUsersUseCase } from './application/list-users.use-case';
 import { UpdateUserUseCase } from './application/update-user.use-case';
@@ -24,8 +25,11 @@ import { UserController } from './presentation/user.controller';
     ListUsersUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
+    FindOrCreateGoogleUserUseCase,
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: PASSWORD_HASHER, useClass: Argon2PasswordHasher },
   ],
+  // Exposed so the (upcoming) `auth` module can resolve users from Google.
+  exports: [FindOrCreateGoogleUserUseCase],
 })
 export class UserModule {}

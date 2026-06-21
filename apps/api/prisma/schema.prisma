@@ -42,7 +42,11 @@ model User {
   email        String   @unique
   firstName    String   @map("first_name")
   lastName     String   @map("last_name")
-  passwordHash String   @map("password_hash")
+  // Google `sub`: stable identity for Google login. Nullable so the dormant
+  // local-auth path stays possible; unique so it keys find-or-create.
+  googleId     String?  @unique @map("google_id")
+  // Nullable: Google users have no password (local argon2 path is dormant).
+  passwordHash String?  @map("password_hash")
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")

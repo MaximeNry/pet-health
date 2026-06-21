@@ -1,7 +1,4 @@
-import type {
-  User as PrismaUser,
-  Role as PrismaRole,
-} from '../../../../generated/prisma/client';
+import type { User as PrismaUser } from '../../../../generated/prisma/client';
 import { Role } from '../domain/role.vo';
 import { User } from '../domain/user.entity';
 
@@ -17,6 +14,7 @@ export class UserMapper {
       email: record.email,
       firstName: record.firstName,
       lastName: record.lastName,
+      googleId: record.googleId,
       passwordHash: record.passwordHash,
       role: Role.create(record.role),
       createdAt: record.createdAt,
@@ -32,9 +30,10 @@ export class UserMapper {
       email: snapshot.email,
       firstName: snapshot.firstName,
       lastName: snapshot.lastName,
+      googleId: snapshot.googleId,
       passwordHash: snapshot.passwordHash,
       // The domain already guarantees a valid role (Role value object).
-      role: snapshot.role.toString() as PrismaRole,
+      role: snapshot.role.toString(),
     };
   }
 }

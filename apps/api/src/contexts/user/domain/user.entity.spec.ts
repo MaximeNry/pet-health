@@ -29,6 +29,34 @@ describe('User', () => {
         InvalidUserError,
       );
     });
+
+    it('has no googleId on the local path', () => {
+      expect(User.create(baseProps()).googleId).toBeNull();
+    });
+  });
+
+  describe('createFromGoogle', () => {
+    const googleProps = () => ({
+      googleId: 'google-sub-123',
+      email: 'jane@example.com',
+      firstName: '  Jane  ',
+      lastName: '  Doe  ',
+    });
+
+    it('sets the googleId, defaults to USER and has no password', () => {
+      const user = User.createFromGoogle(googleProps());
+
+      expect(user.googleId).toBe('google-sub-123');
+      expect(user.firstName).toBe('Jane');
+      expect(user.role.toString()).toBe('USER');
+      expect(user.toSnapshot().passwordHash).toBeNull();
+    });
+
+    it('rejects an empty googleId', () => {
+      expect(() =>
+        User.createFromGoogle({ ...googleProps(), googleId: '  ' }),
+      ).toThrow(InvalidUserError);
+    });
   });
 
   describe('update', () => {
