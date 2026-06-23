@@ -37,6 +37,12 @@ services:
       # on utilise le nom du service comme hostname.
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       NODE_ENV: development
+      # Auth (Google OAuth + app session). Values come from the root .env.
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-http://localhost:3000/auth/google/callback}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3001}
     # Bind mounts : le code source de l'host est monté dans le container.
     # Quand tu modifies un fichier sur ton Mac, le container le voit
     # instantanément → hot reload. OrbStack gère ça très bien via VirtioFS.
