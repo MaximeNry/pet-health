@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../contexts/user/user.module';
 import { ACCESS_TOKEN_TTL } from './auth.constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -23,6 +25,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    // Secure by default: every route requires a valid session JWT unless
+    // marked `@Public()`.
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+  ],
 })
 export class AuthModule {}

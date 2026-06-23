@@ -6,14 +6,15 @@ import {
   type AuthenticatedUser,
 } from './auth.constants';
 import { AuthService } from './auth.service';
+import { Public } from './decorators/public.decorator';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   /** Starts the Google OAuth flow. The guard performs the redirect. */
+  @Public()
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   login(): void {}
@@ -23,6 +24,7 @@ export class AuthController {
    * Google strategy); we mint the app session JWT into an httpOnly cookie and
    * send the browser back to the frontend.
    */
+  @Public()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   callback(@Req() req: Request, @Res() res: Response): void {
@@ -38,14 +40,14 @@ export class AuthController {
     res.redirect(process.env.FRONTEND_URL ?? 'http://localhost:3001');
   }
 
-  /** Returns the currently authenticated user (from the session JWT). */
+  /** Returns the currently authenticated user. Protected by the global guard. */
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   me(@Req() req: Request): AuthenticatedUser {
     return req.user as AuthenticatedUser;
   }
 
   /** Clears the session cookie. */
+  @Public()
   @Post('logout')
   logout(@Res() res: Response): void {
     res.clearCookie(ACCESS_TOKEN_COOKIE);
