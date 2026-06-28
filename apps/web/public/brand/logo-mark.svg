@@ -1,0 +1,6 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PetHealth mark">
+  <circle cx="38" cy="36" r="11" fill="currentColor"></circle>
+  <circle cx="68" cy="28" r="11.5" fill="currentColor"></circle>
+  <circle cx="95" cy="44" r="10" fill="currentColor"></circle>
+  <path d="M60 99.5C60 99.5 30 80.8 30 60.6c0-10.2 7.9-17.1 16.7-17.1 6 0 10.6 3.3 13.3 7.9 2.7-4.6 7.3-7.9 13.3-7.9C82.1 43.5 90 50.4 90 60.6 90 80.8 60 99.5 60 99.5Z" fill="currentColor"></path>
+</svg>

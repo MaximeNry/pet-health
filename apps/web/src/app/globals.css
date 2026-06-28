@@ -1,26 +1,100 @@
 @import "tailwindcss";
 
+/* ============================================================
+   PetHealth design tokens — mapped into Tailwind v4 @theme so
+   utilities like `bg-brand`, `text-fg-1`, `rounded-xl`, `shadow-brand`
+   are generated. Source of truth: design/design-system/colors_and_type.css.
+   Fonts are provided by next/font (layout.tsx): --font-hanken / --font-instrument.
+   ============================================================ */
+@theme {
+  /* ---- Base color scales ---- */
+  --color-green-50:  #ECF7F1;
+  --color-green-100: #D2EDDF;
+  --color-green-200: #A6DBC0;
+  --color-green-300: #6FC39C;
+  --color-green-400: #3FA87B;
+  --color-green-500: #1F8A5B;
+  --color-green-600: #16704A;
+  --color-green-700: #105639;
+  --color-green-800: #0C422C;
+  --color-green-900: #08291C;
+
+  --color-coral-50:  #FDF1ED;
+  --color-coral-100: #FADCD2;
+  --color-coral-200: #F6C3B1;
+  --color-coral-300: #F3A78B;
+  --color-coral-400: #F08F6E;
+  --color-coral-500: #EC7A56;
+  --color-coral-600: #D55E3A;
+  --color-coral-700: #B24A2C;
+
+  --color-stone-0:   #FFFFFF;
+  --color-stone-50:  #FBFAF7;
+  --color-stone-100: #F4F2EC;
+  --color-stone-200: #ECEAE1;
+  --color-stone-300: #DEDBCF;
+  --color-stone-400: #C2BEB1;
+  --color-stone-500: #8A938D;
+  --color-stone-600: #5A655F;
+  --color-stone-700: #3A433D;
+  --color-stone-800: #232A26;
+  --color-stone-900: #16201B;
+
+  --color-amber-500: #E0A33B;
+  --color-red-500:   #D6483B;
+  --color-blue-500:  #3B82C4;
+
+  /* ---- Semantic colors ---- */
+  --color-fg-1: var(--color-stone-900);
+  --color-fg-2: var(--color-stone-600);
+  --color-fg-3: var(--color-stone-500);
+
+  --color-canvas:  var(--color-stone-50);
+  --color-surface: var(--color-stone-0);
+  --color-subtle:  var(--color-stone-100);
+  --color-sunken:  var(--color-stone-200);
+
+  --color-brand:       var(--color-green-500);
+  --color-brand-hover: var(--color-green-600);
+  --color-brand-press: var(--color-green-700);
+  --color-brand-tint:  var(--color-green-50);
+  --color-accent:       var(--color-coral-500);
+  --color-accent-hover: var(--color-coral-600);
+  --color-accent-tint:  var(--color-coral-50);
+
+  --color-border:        var(--color-stone-200);
+  --color-border-strong: var(--color-stone-300);
+
+  --color-success: var(--color-green-500);
+  --color-warning: var(--color-amber-500);
+  --color-danger:  var(--color-red-500);
+  --color-info:    var(--color-blue-500);
+
+  /* ---- Fonts (next/font variables set in layout.tsx) ---- */
+  --font-sans: var(--font-hanken), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-instrument), "Iowan Old Style", Georgia, serif;
+
+  /* ---- Radii ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 1px 2px rgba(22, 32, 27, 0.06), 0 1px 1px rgba(22, 32, 27, 0.04);
+  --shadow-md: 0 4px 16px rgba(22, 32, 27, 0.08), 0 1px 3px rgba(22, 32, 27, 0.05);
+  --shadow-lg: 0 12px 32px rgba(22, 32, 27, 0.12), 0 2px 8px rgba(22, 32, 27, 0.06);
+  --shadow-brand: 0 8px 24px rgba(31, 138, 91, 0.28);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Focus halo used on inputs (DS convention). */
+  --ring: color-mix(in oklch, var(--color-green-500) 35%, transparent);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-fg-1);
+  font-family: var(--font-sans);
 }

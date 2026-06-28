@@ -1,0 +1,15 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PetHealth app icon">
+  <defs>
+    <linearGradient id="ph-icon-bg" x1="0" y1="0" x2="0" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#27A36B"></stop>
+      <stop offset="1" stop-color="#16704A"></stop>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#ph-icon-bg)"></rect>
+  <g transform="translate(35,33) scale(0.92)" fill="#FFFFFF">
+    <circle cx="38" cy="36" r="11"></circle>
+    <circle cx="68" cy="28" r="11.5"></circle>
+    <circle cx="95" cy="44" r="10"></circle>
+    <path d="M60 99.5C60 99.5 30 80.8 30 60.6c0-10.2 7.9-17.1 16.7-17.1 6 0 10.6 3.3 13.3 7.9 2.7-4.6 7.3-7.9 13.3-7.9C82.1 43.5 90 50.4 90 60.6 90 80.8 60 99.5 60 99.5Z"></path>
+  </g>
+</svg>
