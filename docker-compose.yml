@@ -65,7 +65,10 @@ services:
     # -H 0.0.0.0 : par défaut next dev écoute sur localhost, qui dans
     # un container = inaccessible depuis l'extérieur. On bind sur toutes
     # les interfaces pour que le port mapping fonctionne.
-    command: ["pnpm", "--filter", "web", "exec", "next", "dev", "--turbopack", "-H", "0.0.0.0"]
+    # --webpack (et non --turbopack) : Turbopack 16.2.x plante en boucle sur
+    # ce montage pnpm+Docker (HMR: "Next.js package not found", car `next`
+    # n'est pas hissé dans /app/node_modules). Webpack résout correctement.
+    command: ["pnpm", "--filter", "web", "exec", "next", "dev", "--webpack", "-H", "0.0.0.0"]
     ports:
       - "3001:3000"
     environment:
