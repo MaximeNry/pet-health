@@ -8,6 +8,7 @@ export interface HouseholdMember {
 export interface Household {
   id: string;
   name: string;
+  documentTypes: string[];
   members: HouseholdMember[];
   createdAt: string;
   updatedAt: string;

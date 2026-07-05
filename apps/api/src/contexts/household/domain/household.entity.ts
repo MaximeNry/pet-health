@@ -13,10 +13,19 @@ export interface CreateHouseholdProps {
   ownerId: string;
 }
 
+/** Document categories a new household starts with; members adjust them later. */
+export const DEFAULT_DOCUMENT_TYPES = [
+  'Vaccination',
+  'Prescription',
+  'Lab result',
+  'Certificate',
+] as const;
+
 /** Full snapshot of a persisted household (aggregate root + members). */
 export interface HouseholdSnapshot {
   id: string;
   name: string;
+  documentTypes: string[];
   members: HouseholdMemberSnapshot[];
   createdAt: Date;
   updatedAt: Date;
@@ -25,6 +34,7 @@ export interface HouseholdSnapshot {
 interface HouseholdState {
   id: string;
   name: string;
+  documentTypes: string[];
   members: HouseholdMember[];
   createdAt: Date;
   updatedAt: Date;
@@ -37,6 +47,7 @@ interface HouseholdState {
  */
 export class Household extends Entity {
   private _name: string;
+  private _documentTypes: string[];
   private _members: HouseholdMember[];
   private readonly _createdAt: Date;
   private _updatedAt: Date;
@@ -44,6 +55,7 @@ export class Household extends Entity {
   private constructor(state: HouseholdState) {
     super(state.id);
     this._name = state.name;
+    this._documentTypes = state.documentTypes;
     this._members = state.members;
     this._createdAt = state.createdAt;
     this._updatedAt = state.updatedAt;
@@ -56,6 +68,7 @@ export class Household extends Entity {
     return new Household({
       id: globalThis.crypto.randomUUID(),
       name: Household.normalizeName(props.name),
+      documentTypes: [...DEFAULT_DOCUMENT_TYPES],
       members: [owner],
       createdAt: now,
       updatedAt: now,
@@ -67,6 +80,7 @@ export class Household extends Entity {
     return new Household({
       id: snapshot.id,
       name: snapshot.name,
+      documentTypes: [...snapshot.documentTypes],
       members: snapshot.members.map((m) => HouseholdMember.fromSnapshot(m)),
       createdAt: snapshot.createdAt,
       updatedAt: snapshot.updatedAt,
@@ -75,6 +89,30 @@ export class Household extends Entity {
 
   rename(name: string): void {
     this._name = Household.normalizeName(name);
+    this.touch();
+  }
+
+  /**
+   * Replaces the household's document categories. Labels are trimmed, empties
+   * dropped and duplicates removed case-insensitively (first spelling wins).
+   * An empty result is rejected: documents always need at least one category.
+   */
+  updateDocumentTypes(types: string[]): void {
+    const normalized: string[] = [];
+    for (const raw of types) {
+      const label = raw.trim();
+      if (label.length === 0) continue;
+      if (normalized.some((t) => t.toLowerCase() === label.toLowerCase())) {
+        continue;
+      }
+      normalized.push(label);
+    }
+    if (normalized.length === 0) {
+      throw new InvalidHouseholdError(
+        'A household needs at least one document type.',
+      );
+    }
+    this._documentTypes = normalized;
     this.touch();
   }
 
@@ -124,6 +162,11 @@ export class Household extends Entity {
     return this._name;
   }
 
+  /** Defensive copy: callers can't mutate the aggregate's type list. */
+  get documentTypes(): readonly string[] {
+    return [...this._documentTypes];
+  }
+
   /** Defensive copy: callers can't mutate the aggregate's member list. */
   get members(): readonly HouseholdMember[] {
     return [...this._members];
@@ -141,6 +184,7 @@ export class Household extends Entity {
     return {
       id: this.id,
       name: this._name,
+      documentTypes: [...this._documentTypes],
       members: this._members.map((m) => m.toSnapshot()),
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,

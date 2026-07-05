@@ -10,6 +10,7 @@ export interface HouseholdMemberResponse {
 export interface HouseholdResponse {
   id: string;
   name: string;
+  documentTypes: string[];
   members: HouseholdMemberResponse[];
   createdAt: string;
   updatedAt: string;
@@ -20,6 +21,7 @@ export function toHouseholdResponse(household: Household): HouseholdResponse {
   return {
     id: household.id,
     name: household.name,
+    documentTypes: [...household.documentTypes],
     members: household.members.map((member) => ({
       userId: member.userId,
       role: member.role.toString(),

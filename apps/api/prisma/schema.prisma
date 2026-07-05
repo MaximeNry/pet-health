@@ -83,11 +83,14 @@ enum HouseholdRole {
 }
 
 model Household {
-  id        String            @id @default(uuid())
-  name      String
-  createdAt DateTime          @default(now()) @map("created_at")
-  updatedAt DateTime          @updatedAt @map("updated_at")
-  members   HouseholdMember[]
+  id            String            @id @default(uuid())
+  name          String
+  // Free-form document categories owned by the household. The column default
+  // also backfills pre-existing rows when the migration runs.
+  documentTypes String[]          @default(["Vaccination", "Prescription", "Lab result", "Certificate"]) @map("document_types")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+  members       HouseholdMember[]
 
   @@map("households")
 }

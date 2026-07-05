@@ -21,7 +21,7 @@ export class PrismaHouseholdRepository implements HouseholdRepository {
       this.prisma.household.upsert({
         where: { id: root.id },
         create: root,
-        update: { name: root.name },
+        update: { name: root.name, documentTypes: root.documentTypes },
       }),
       this.prisma.householdMember.deleteMany({
         where: { householdId: root.id },

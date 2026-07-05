@@ -6,7 +6,7 @@ import { DeleteHouseholdUseCase } from './application/delete-household.use-case'
 import { GetHouseholdUseCase } from './application/get-household.use-case';
 import { ListHouseholdsByUserUseCase } from './application/list-households-by-user.use-case';
 import { RemoveMemberUseCase } from './application/remove-member.use-case';
-import { RenameHouseholdUseCase } from './application/rename-household.use-case';
+import { UpdateHouseholdUseCase } from './application/update-household.use-case';
 import { HOUSEHOLD_REPOSITORY } from './domain/household.repository';
 import { PrismaHouseholdRepository } from './infrastructure/prisma-household.repository';
 import { HouseholdController } from './presentation/household.controller';
@@ -22,7 +22,7 @@ import { HouseholdController } from './presentation/household.controller';
     CreateHouseholdUseCase,
     GetHouseholdUseCase,
     ListHouseholdsByUserUseCase,
-    RenameHouseholdUseCase,
+    UpdateHouseholdUseCase,
     DeleteHouseholdUseCase,
     AddMemberUseCase,
     RemoveMemberUseCase,

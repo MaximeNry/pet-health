@@ -19,6 +19,7 @@ export class HouseholdMapper {
     return Household.fromSnapshot({
       id: record.id,
       name: record.name,
+      documentTypes: record.documentTypes,
       members: record.members.map((member) => ({
         userId: member.userId,
         role: member.role,
@@ -36,7 +37,11 @@ export class HouseholdMapper {
   static toPersistence(household: Household) {
     const snapshot = household.toSnapshot();
     return {
-      household: { id: snapshot.id, name: snapshot.name },
+      household: {
+        id: snapshot.id,
+        name: snapshot.name,
+        documentTypes: snapshot.documentTypes,
+      },
       members: snapshot.members.map((member) => ({
         householdId: snapshot.id,
         userId: member.userId,

@@ -20,7 +20,7 @@ import { DeleteHouseholdUseCase } from '../application/delete-household.use-case
 import { GetHouseholdUseCase } from '../application/get-household.use-case';
 import { ListHouseholdsByUserUseCase } from '../application/list-households-by-user.use-case';
 import { RemoveMemberUseCase } from '../application/remove-member.use-case';
-import { RenameHouseholdUseCase } from '../application/rename-household.use-case';
+import { UpdateHouseholdUseCase } from '../application/update-household.use-case';
 import type { AddMemberDto } from './dto/add-member.dto';
 import type { ChangeMemberRoleDto } from './dto/change-member-role.dto';
 import type { CreateHouseholdDto } from './dto/create-household.dto';
@@ -43,7 +43,7 @@ export class HouseholdController {
     private readonly createHousehold: CreateHouseholdUseCase,
     private readonly getHousehold: GetHouseholdUseCase,
     private readonly listHouseholdsByUser: ListHouseholdsByUserUseCase,
-    private readonly renameHousehold: RenameHouseholdUseCase,
+    private readonly updateHousehold: UpdateHouseholdUseCase,
     private readonly deleteHousehold: DeleteHouseholdUseCase,
     private readonly addMember: AddMemberUseCase,
     private readonly removeMember: RemoveMemberUseCase,
@@ -77,13 +77,14 @@ export class HouseholdController {
   }
 
   @Patch(':id')
-  async rename(
+  async update(
     @Param('id') id: string,
     @Body() dto: UpdateHouseholdDto,
   ): Promise<HouseholdResponse> {
-    const household = await this.renameHousehold.execute({
+    const household = await this.updateHousehold.execute({
       id,
       name: dto.name,
+      documentTypes: dto.documentTypes,
     });
     return toHouseholdResponse(household);
   }
