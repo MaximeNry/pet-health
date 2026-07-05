@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 // Hanken Grotesk drives all UI; Instrument Serif is reserved for the wordmark
 // and welcome/marketing headlines (`font-display`). See design/design-system/.
@@ -30,7 +31,9 @@ export default function RootLayout({
       lang="fr"
       className={`${hankenGrotesk.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

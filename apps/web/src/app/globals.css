@@ -98,3 +98,76 @@ body {
   color: var(--color-fg-1);
   font-family: var(--font-sans);
 }
+
+/* ============================================================
+   Dashboard component interactions — hover/focus states that go
+   beyond Tailwind utilities. Ported from the design system spec
+   (Tableau de bord PetHealth). Token names match @theme above.
+   ============================================================ */
+
+/* Interactive card that lifts on hover and reveals its scan action. */
+.pet-card {
+  transition:
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pet-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.pet-card .scan-btn {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.pet-card:hover .scan-btn,
+.pet-card:focus-within .scan-btn {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* Dashed "add" tile that adopts the brand tint on hover. */
+.add-tile {
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+.add-tile:hover {
+  border-color: var(--color-brand);
+  background: var(--color-brand-tint);
+  color: var(--color-brand);
+}
+
+/* Buttons. */
+.ph-btn {
+  transition:
+    background 0.15s,
+    box-shadow 0.2s,
+    transform 0.12s;
+  cursor: pointer;
+}
+.ph-btn-primary:hover {
+  background: var(--color-brand-hover);
+}
+.ph-btn-primary:active {
+  background: var(--color-brand-press);
+  transform: scale(0.98);
+}
+.ph-btn-secondary:hover {
+  background: var(--color-subtle);
+  border-color: var(--color-border-strong);
+}
+
+/* Text input focus halo. */
+.ph-input:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+.ph-input::placeholder {
+  color: var(--color-fg-3);
+}
