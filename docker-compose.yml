@@ -77,6 +77,9 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
     volumes:
       - ./apps/web/src:/app/apps/web/src
+      # i18n messages are loaded at runtime by next-intl; mount them so new
+      # keys hot-reload like source files instead of requiring a rebuild.
+      - ./apps/web/messages:/app/apps/web/messages
       - ./packages/shared/src:/app/packages/shared/src
     depends_on:
       - api

@@ -74,6 +74,40 @@
     "scanDocument": "Scan a document",
     "addPet": "Add a pet",
     "editPet": "Edit {name}",
+    "viewPet": "View {name}'s profile",
+    "sex": {
+      "MALE": "Male",
+      "FEMALE": "Female"
+    },
+    "detail": {
+      "back": "Back",
+      "menu": "More actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "weightValue": "{weight} kg",
+      "tabs": {
+        "documents": "Documents",
+        "history": "History",
+        "reminders": "Reminders"
+      },
+      "documents": {
+        "emptyTitle": "No documents yet",
+        "emptyDescription": "Scan the vaccination record or a prescription to get started."
+      },
+      "comingSoon": "Coming soon",
+      "historySoon": "{name}'s care, visits and treatments will appear here.",
+      "remindersSoon": "{name}'s vaccine and treatment reminders will show up here.",
+      "loadError": "We couldn't load this pet.",
+      "backToDashboard": "Back to dashboard",
+      "deleteModal": {
+        "title": "Delete {name}?",
+        "description": "{name}'s profile will be removed for the whole household. This can't be undone.",
+        "error": "Deleting failed. Please try again.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "confirmPending": "Deleting…"
+      }
+    },
     "empty": {
       "title": "Add your first pet",
       "description": "Create a profile to track their health, vaccines and every document in one place."

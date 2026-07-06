@@ -74,6 +74,40 @@
     "scanDocument": "Escanear un documento",
     "addPet": "Añadir una mascota",
     "editPet": "Editar a {name}",
+    "viewPet": "Ver el perfil de {name}",
+    "sex": {
+      "MALE": "Macho",
+      "FEMALE": "Hembra"
+    },
+    "detail": {
+      "back": "Volver",
+      "menu": "Más acciones",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "weightValue": "{weight} kg",
+      "tabs": {
+        "documents": "Documentos",
+        "history": "Historial",
+        "reminders": "Recordatorios"
+      },
+      "documents": {
+        "emptyTitle": "Aún no hay documentos",
+        "emptyDescription": "Escanea la cartilla de vacunación o una receta para empezar."
+      },
+      "comingSoon": "Muy pronto",
+      "historySoon": "Los cuidados, visitas y tratamientos de {name} aparecerán aquí.",
+      "remindersSoon": "Los recordatorios de vacunas y tratamientos de {name} se mostrarán aquí.",
+      "loadError": "No se pudo cargar esta mascota.",
+      "backToDashboard": "Volver al inicio",
+      "deleteModal": {
+        "title": "¿Eliminar a {name}?",
+        "description": "La ficha de {name} se eliminará para todo el hogar. Esta acción no se puede deshacer.",
+        "error": "No se pudo eliminar. Inténtalo de nuevo.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "confirmPending": "Eliminando…"
+      }
+    },
     "empty": {
       "title": "Añade tu primera mascota",
       "description": "Crea una ficha para seguir su salud, sus vacunas y todos sus documentos en un solo lugar."

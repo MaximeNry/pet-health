@@ -32,8 +32,12 @@ export const petsAdapter = {
       `/pets?householdId=${encodeURIComponent(householdId)}`,
     ),
 
+  getById: (petId: string) => apiClient.get<Pet>(`/pets/${petId}`),
+
   create: (input: CreatePetInput) => apiClient.post<Pet>('/pets', input),
 
   update: (petId: string, input: UpdatePetInput) =>
     apiClient.patch<Pet>(`/pets/${petId}`, input),
+
+  remove: (petId: string) => apiClient.delete<void>(`/pets/${petId}`),
 };

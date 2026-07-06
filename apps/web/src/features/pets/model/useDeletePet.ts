@@ -1,19 +1,18 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UpdatePetInput } from '../api/petsAdapter';
 import { petsAdapter } from '../api/petsAdapter';
 import { petQueryKey } from './usePet';
 import { petsQueryKey } from './usePets';
 
-/** Updates a pet, then refreshes its detail and its household's pet list. */
-export function useUpdatePet(petId: string, householdId: string) {
+/** Deletes a pet, drops its detail query and refreshes the household list. */
+export function useDeletePet(petId: string, householdId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdatePetInput) => petsAdapter.update(petId, input),
+    mutationFn: () => petsAdapter.remove(petId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: petQueryKey(petId) });
+      queryClient.removeQueries({ queryKey: petQueryKey(petId) });
       queryClient.invalidateQueries({ queryKey: petsQueryKey(householdId) });
     },
   });
