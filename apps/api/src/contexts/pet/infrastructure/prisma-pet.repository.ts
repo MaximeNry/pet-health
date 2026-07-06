@@ -21,6 +21,9 @@ export class PrismaPetRepository implements PetRepository {
       update: {
         name: data.name,
         species: data.species,
+        breed: data.breed,
+        sex: data.sex,
+        weightKg: data.weightKg,
         birthDate: data.birthDate,
       },
     });

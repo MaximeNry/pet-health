@@ -8,6 +8,9 @@ export interface CreatePetCommand {
   species: string;
   birthDate: Date;
   householdId: string;
+  breed?: string | null;
+  sex?: string | null;
+  weightKg?: number | null;
 }
 
 /** Creates a pet and persists it. Invariants are carried by the entity. */

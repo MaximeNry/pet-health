@@ -65,15 +65,43 @@
     "species": {
       "DOG": "Perro",
       "CAT": "Gato",
-      "OTHER": "Mascota"
+      "RABBIT": "Conejo",
+      "BIRD": "Pájaro",
+      "OTHER": "Otro"
     },
     "ageYears": "{count, plural, one {# año} other {# años}}",
     "ageMonths": "{count, plural, one {# mes} other {# meses}}",
     "scanDocument": "Escanear un documento",
     "addPet": "Añadir una mascota",
+    "editPet": "Editar a {name}",
     "empty": {
       "title": "Añade tu primera mascota",
       "description": "Crea una ficha para seguir su salud, sus vacunas y todos sus documentos en un solo lugar."
+    },
+    "modal": {
+      "createTitle": "Añadir una mascota",
+      "createSubtitle": "Cuéntanos sobre tu compañero.",
+      "editTitle": "Editar a {name}",
+      "editSubtitle": "Actualiza la ficha de tu compañero.",
+      "close": "Cerrar",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "p. ej. Mochi",
+      "speciesLabel": "Especie",
+      "speciesPlaceholder": "Seleccionar",
+      "breedLabel": "Raza",
+      "breedPlaceholder": "p. ej. Border Collie",
+      "sexLabel": "Sexo",
+      "sexMale": "Macho",
+      "sexFemale": "Hembra",
+      "birthDateLabel": "Fecha de nacimiento",
+      "weightLabel": "Peso",
+      "optional": "· opcional",
+      "weightPlaceholder": "—",
+      "weightUnit": "kg",
+      "error": "No se pudo guardar. Inténtalo de nuevo.",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "savePending": "Guardando…"
     }
   },
   "reminders": {

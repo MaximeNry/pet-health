@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { PetIcon, PlusIcon } from '@/shared/ui/icons';
 
 /** Shown when a household has no pets yet: invites adding the first one. */
-export function EmptyPetsState() {
+export function EmptyPetsState({ onAddPet }: { onAddPet: () => void }) {
   const t = useTranslations('pets');
   return (
     <div className="mb-9 flex flex-col items-center rounded-lg border border-border bg-surface px-10 py-14 text-center">
@@ -19,6 +19,7 @@ export function EmptyPetsState() {
       </p>
       <button
         type="button"
+        onClick={onAddPet}
         className="ph-btn ph-btn-primary flex items-center gap-2.5 rounded-md bg-brand px-6 py-3.5 text-[15.5px] font-semibold text-white shadow-brand"
       >
         <PlusIcon className="h-[19px] w-[19px]" />

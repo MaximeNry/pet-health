@@ -9,6 +9,9 @@ export interface UpdatePetCommand {
   name?: string;
   species?: string;
   birthDate?: Date;
+  breed?: string | null;
+  sex?: string | null;
+  weightKg?: number | null;
 }
 
 /** Loads a pet, applies the changes through the entity, then persists. */
@@ -25,6 +28,9 @@ export class UpdatePetUseCase {
       name: command.name,
       species: command.species,
       birthDate: command.birthDate,
+      breed: command.breed,
+      sex: command.sex,
+      weightKg: command.weightKg,
     });
     await this.pets.save(pet);
     return pet;

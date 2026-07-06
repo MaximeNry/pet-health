@@ -1,7 +1,7 @@
 import { InvalidPetError } from './pet.errors';
 
 /** Species handled by the domain. Aligned with the Prisma enum, but without depending on it. */
-export const SPECIES = ['DOG', 'CAT', 'OTHER'] as const;
+export const SPECIES = ['DOG', 'CAT', 'RABBIT', 'BIRD', 'OTHER'] as const;
 
 export type SpeciesValue = (typeof SPECIES)[number];
 

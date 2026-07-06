@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Household } from '@/entities/household';
+import type { Pet } from '@/entities/pet';
 import { AccountMenu, useSession } from '@/features/auth';
 import {
   CreateHouseholdCard,
@@ -11,7 +12,7 @@ import {
   RemindersCard,
   useHouseholds,
 } from '@/features/household';
-import { EmptyPetsState, PetGrid, usePets } from '@/features/pets';
+import { EmptyPetsState, PetFormModal, PetGrid, usePets } from '@/features/pets';
 import { AppHeader } from '@/shared/ui/AppHeader';
 
 /**
@@ -60,10 +61,14 @@ export default function DashboardPage() {
   );
 }
 
+/** State of the pet dialog: closed, blank create form, or edit of a pet. */
+type PetModalState = { mode: 'create' } | { mode: 'edit'; pet: Pet } | null;
+
 function DashboardBody({ household }: { household: Household }) {
   const t = useTranslations('dashboard');
   const pets = usePets(household.id);
   const petList = pets.data ?? [];
+  const [petModal, setPetModal] = useState<PetModalState>(null);
 
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-10 pt-9 md:px-20">
@@ -81,9 +86,21 @@ function DashboardBody({ household }: { household: Household }) {
       {pets.isLoading ? (
         <p className="mb-9 text-sm text-fg-3">{t('loadingPets')}</p>
       ) : petList.length > 0 ? (
-        <PetGrid pets={petList} />
+        <PetGrid
+          pets={petList}
+          onAddPet={() => setPetModal({ mode: 'create' })}
+          onEditPet={(pet) => setPetModal({ mode: 'edit', pet })}
+        />
       ) : (
-        <EmptyPetsState />
+        <EmptyPetsState onAddPet={() => setPetModal({ mode: 'create' })} />
+      )}
+
+      {petModal !== null && (
+        <PetFormModal
+          householdId={household.id}
+          pet={petModal.mode === 'edit' ? petModal.pet : null}
+          onClose={() => setPetModal(null)}
+        />
       )}
 
       <div className="mb-[18px]">

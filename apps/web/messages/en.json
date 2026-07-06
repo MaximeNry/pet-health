@@ -65,15 +65,43 @@
     "species": {
       "DOG": "Dog",
       "CAT": "Cat",
-      "OTHER": "Pet"
+      "RABBIT": "Rabbit",
+      "BIRD": "Bird",
+      "OTHER": "Other"
     },
     "ageYears": "{count, plural, one {# year} other {# years}}",
     "ageMonths": "{count, plural, one {# month} other {# months}}",
     "scanDocument": "Scan a document",
     "addPet": "Add a pet",
+    "editPet": "Edit {name}",
     "empty": {
       "title": "Add your first pet",
       "description": "Create a profile to track their health, vaccines and every document in one place."
+    },
+    "modal": {
+      "createTitle": "Add a pet",
+      "createSubtitle": "Tell us about your companion.",
+      "editTitle": "Edit {name}",
+      "editSubtitle": "Update your companion's profile.",
+      "close": "Close",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Mochi",
+      "speciesLabel": "Species",
+      "speciesPlaceholder": "Select",
+      "breedLabel": "Breed",
+      "breedPlaceholder": "e.g. Border Collie",
+      "sexLabel": "Sex",
+      "sexMale": "Male",
+      "sexFemale": "Female",
+      "birthDateLabel": "Birth date",
+      "weightLabel": "Weight",
+      "optional": "· optional",
+      "weightPlaceholder": "—",
+      "weightUnit": "kg",
+      "error": "Saving failed. Please try again.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "savePending": "Saving…"
     }
   },
   "reminders": {

@@ -1,5 +1,6 @@
 import type {
   Pet as PrismaPet,
+  Sex as PrismaSex,
   Species as PrismaSpecies,
 } from '../../../../generated/prisma/client';
 import { Pet } from '../domain/pet.entity';
@@ -15,6 +16,9 @@ export class PetMapper {
       id: record.id,
       name: record.name,
       species: record.species,
+      breed: record.breed,
+      sex: record.sex,
+      weightKg: record.weightKg,
       birthDate: record.birthDate,
       householdId: record.householdId,
       createdAt: record.createdAt,
@@ -28,8 +32,11 @@ export class PetMapper {
     return {
       id: snapshot.id,
       name: snapshot.name,
-      // The domain already guarantees a valid species (Species value object).
+      // The domain already guarantees valid values (Species / Sex value objects).
       species: snapshot.species as PrismaSpecies,
+      breed: snapshot.breed,
+      sex: snapshot.sex as PrismaSex | null,
+      weightKg: snapshot.weightKg,
       birthDate: snapshot.birthDate,
       householdId: snapshot.householdId,
     };

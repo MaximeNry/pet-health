@@ -4,4 +4,7 @@ export interface CreatePetDto {
   species: string;
   birthDate: string;
   householdId: string;
+  breed?: string | null;
+  sex?: string | null;
+  weightKg?: number | null;
 }

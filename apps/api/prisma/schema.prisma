@@ -16,13 +16,23 @@ datasource db {
 enum Species {
   DOG
   CAT
+  RABBIT
+  BIRD
   OTHER
+}
+
+enum Sex {
+  MALE
+  FEMALE
 }
 
 model Pet {
   id          String   @id @default(uuid())
   name        String
   species     Species
+  breed       String?
+  sex         Sex?
+  weightKg    Float?   @map("weight_kg")
   birthDate   DateTime @map("birth_date")
   householdId String   @map("household_id")
   createdAt   DateTime @default(now()) @map("created_at")

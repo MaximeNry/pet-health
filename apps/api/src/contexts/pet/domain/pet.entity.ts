@@ -1,13 +1,17 @@
 import { Entity } from '../../../shared/domain/entity.base';
 import { InvalidPetError } from './pet.errors';
+import { Sex } from './sex.vo';
 import { Species } from './species.vo';
 
-/** Data required to create a new pet. */
+/** Data required to create a new pet. Profile extras are optional. */
 export interface CreatePetProps {
   name: string;
   species: string;
   birthDate: Date;
   householdId: string;
+  breed?: string | null;
+  sex?: string | null;
+  weightKg?: number | null;
 }
 
 /** Full snapshot of a persisted pet, used to rebuild it. */
@@ -15,27 +19,39 @@ export interface PetSnapshot {
   id: string;
   name: string;
   species: string;
+  breed: string | null;
+  sex: string | null;
+  weightKg: number | null;
   birthDate: Date;
   householdId: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-/** Editable fields of a pet (all optional). */
+/**
+ * Editable fields of a pet. `undefined` leaves a field untouched; `null`
+ * clears an optional field (breed, sex, weight).
+ */
 export interface UpdatePetProps {
   name?: string;
   species?: string;
   birthDate?: Date;
+  breed?: string | null;
+  sex?: string | null;
+  weightKg?: number | null;
 }
 
 /**
  * Rich `Pet` entity: carries its own invariants (non-empty name, plausible
- * birth date) and its behavior. `householdId` is just an id reference to the
- * `household` context — no cross-context import.
+ * birth date, positive weight) and its behavior. `householdId` is just an id
+ * reference to the `household` context — no cross-context import.
  */
 export class Pet extends Entity {
   private _name: string;
   private _species: Species;
+  private _breed: string | null;
+  private _sex: Sex | null;
+  private _weightKg: number | null;
   private _birthDate: Date;
   private readonly _householdId: string;
   private readonly _createdAt: Date;
@@ -45,6 +61,9 @@ export class Pet extends Entity {
     super(props.id);
     this._name = props.name;
     this._species = Species.create(props.species);
+    this._breed = props.breed;
+    this._sex = props.sex === null ? null : Sex.create(props.sex);
+    this._weightKg = props.weightKg;
     this._birthDate = props.birthDate;
     this._householdId = props.householdId;
     this._createdAt = props.createdAt;
@@ -58,6 +77,9 @@ export class Pet extends Entity {
       id: globalThis.crypto.randomUUID(),
       name: Pet.normalizeName(props.name),
       species: props.species,
+      breed: Pet.normalizeBreed(props.breed),
+      sex: props.sex ?? null,
+      weightKg: Pet.normalizeWeight(props.weightKg),
       birthDate: props.birthDate,
       householdId: Pet.requireHouseholdId(props.householdId),
       createdAt: now,
@@ -84,6 +106,15 @@ export class Pet extends Entity {
       this.assertBirthDate(changes.birthDate);
       this._birthDate = changes.birthDate;
     }
+    if (changes.breed !== undefined) {
+      this._breed = Pet.normalizeBreed(changes.breed);
+    }
+    if (changes.sex !== undefined) {
+      this._sex = changes.sex === null ? null : Sex.create(changes.sex);
+    }
+    if (changes.weightKg !== undefined) {
+      this._weightKg = Pet.normalizeWeight(changes.weightKg);
+    }
     this._updatedAt = new Date();
   }
 
@@ -92,6 +123,9 @@ export class Pet extends Entity {
       id: this.id,
       name: this._name,
       species: this._species.toString(),
+      breed: this._breed,
+      sex: this._sex === null ? null : this._sex.toString(),
+      weightKg: this._weightKg,
       birthDate: this._birthDate,
       householdId: this._householdId,
       createdAt: this._createdAt,
@@ -105,6 +139,18 @@ export class Pet extends Entity {
 
   get species(): string {
     return this._species.toString();
+  }
+
+  get breed(): string | null {
+    return this._breed;
+  }
+
+  get sex(): string | null {
+    return this._sex === null ? null : this._sex.toString();
+  }
+
+  get weightKg(): number | null {
+    return this._weightKg;
   }
 
   get birthDate(): Date {
@@ -129,6 +175,28 @@ export class Pet extends Entity {
       throw new InvalidPetError('The pet name is required.');
     }
     return trimmed;
+  }
+
+  /** Optional free text: an empty or blank breed collapses to null. */
+  private static normalizeBreed(
+    breed: string | null | undefined,
+  ): string | null {
+    const trimmed = breed?.trim() ?? '';
+    return trimmed.length === 0 ? null : trimmed;
+  }
+
+  private static normalizeWeight(
+    weightKg: number | null | undefined,
+  ): number | null {
+    if (weightKg === undefined || weightKg === null) {
+      return null;
+    }
+    if (!Number.isFinite(weightKg) || weightKg <= 0) {
+      throw new InvalidPetError(
+        'The weight must be a positive number of kilograms.',
+      );
+    }
+    return weightKg;
   }
 
   private static requireHouseholdId(householdId: string): string {

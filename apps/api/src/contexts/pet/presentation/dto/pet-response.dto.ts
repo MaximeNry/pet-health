@@ -5,6 +5,9 @@ export interface PetResponse {
   id: string;
   name: string;
   species: string;
+  breed: string | null;
+  sex: string | null;
+  weightKg: number | null;
   birthDate: string;
   householdId: string;
   createdAt: string;
@@ -17,6 +20,9 @@ export function toPetResponse(pet: Pet): PetResponse {
     id: pet.id,
     name: pet.name,
     species: pet.species,
+    breed: pet.breed,
+    sex: pet.sex,
+    weightKg: pet.weightKg,
     birthDate: pet.birthDate.toISOString(),
     householdId: pet.householdId,
     createdAt: pet.createdAt.toISOString(),

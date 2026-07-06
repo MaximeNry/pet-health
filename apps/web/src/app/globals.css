@@ -163,6 +163,32 @@ body {
   border-color: var(--color-border-strong);
 }
 
+/* Modal entrance (scrim fade + panel rise), from the design mockup. */
+@keyframes ph-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ph-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ph-scrim {
+  animation: ph-scrim-in 0.24s ease both;
+}
+.ph-modal {
+  animation: ph-modal-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Text input focus halo. */
 .ph-input:focus {
   border-color: var(--color-brand);

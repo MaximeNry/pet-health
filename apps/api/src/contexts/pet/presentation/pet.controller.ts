@@ -45,6 +45,9 @@ export class PetController {
       species: dto.species,
       birthDate: new Date(dto.birthDate),
       householdId: dto.householdId,
+      breed: dto.breed,
+      sex: dto.sex,
+      weightKg: dto.weightKg,
     });
     return toPetResponse(pet);
   }
@@ -79,6 +82,9 @@ export class PetController {
       species: dto.species,
       birthDate:
         dto.birthDate !== undefined ? new Date(dto.birthDate) : undefined,
+      breed: dto.breed,
+      sex: dto.sex,
+      weightKg: dto.weightKg,
     });
     return toPetResponse(pet);
   }
