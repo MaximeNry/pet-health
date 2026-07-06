@@ -129,6 +129,25 @@ body {
   transform: none;
   pointer-events: auto;
 }
+.pet-card .pet-edit-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.pet-card:hover .pet-edit-btn,
+.pet-card .pet-edit-btn:focus-visible {
+  opacity: 1;
+}
+/* Touch devices have no hover: keep the card actions always visible. */
+@media (hover: none) {
+  .pet-card .scan-btn {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .pet-card .pet-edit-btn {
+    opacity: 1;
+  }
+}
 
 /* Dashed "add" tile that adopts the brand tint on hover. */
 .add-tile {
