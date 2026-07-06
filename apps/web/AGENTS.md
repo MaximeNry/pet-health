@@ -131,6 +131,37 @@ export interface UploadProgressEvent {
 
 ---
 
+## Internationalisation (i18n)
+
+L'application est proposée en **anglais** (défaut) et en **espagnol**. L'i18n repose sur
+**next-intl** en mode cookie (pas de locale dans l'URL — l'app est derrière l'auth, pas
+d'enjeu SEO) : cookie `NEXT_LOCALE` posé par le `LanguageSwitcher`, sinon négociation
+`Accept-Language`, sinon `en`. Config dans `src/i18n/`, messages dans `messages/{en,es}.json`.
+
+### Règles Strictes
+
+1. **Aucun texte en dur dans les composants** : toute chaîne visible par l'utilisateur
+   (labels, placeholders, `aria-label`, messages d'erreur, états de chargement…) passe par
+   `useTranslations` (client et RSC synchrones) ou `getTranslations` (RSC async, metadata).
+2. **Chaque nouvelle clé est ajoutée dans TOUTES les langues** : `messages/en.json` **et**
+   `messages/es.json` doivent rester synchrones (mêmes clés, même structure). Une clé
+   manquante dans une langue est un bug.
+3. **Pluriels et interpolations en ICU** dans les messages, pas dans le code :
+   `"memberCount": "{count, plural, one {# member} other {# members}}"` — jamais de
+   `count > 1 ? 'members' : 'member'` dans un composant.
+4. **Les helpers ne retournent jamais de libellés** : une fonction de `entities/*/lib.ts`
+   retourne des données structurées (ex. `petAge()` → `{ unit, value }`), c'est le composant
+   qui traduit. Pour les enums, utiliser des clés dynamiques (`t(\`species.${species}\`)`).
+5. **Les données utilisateur ne se traduisent pas** : ce qui vient de l'API et a été saisi
+   par l'utilisateur (nom du foyer, types de documents…) s'affiche tel quel.
+6. **Nommage des clés par domaine** (`login.*`, `household.modal.*`, `pets.empty.*`…),
+   aligné sur les features — pas de clés fourre-tout.
+
+**Ajouter une langue** = créer `messages/<locale>.json` + ajouter la locale dans
+`src/i18n/config.ts` (`LOCALES`). Rien d'autre à toucher.
+
+---
+
 ## Organisation des Dossiers (Feature-Sliced Design)
 
 Organise ton `src/` par feature, chaque feature étant un domaine métier self-contained.
@@ -333,6 +364,7 @@ Quand tu crées une nouvelle feature :
 - [ ] Crée l'adapter dans `api/[name]Adapter.ts`
 - [ ] Crée les hooks métier dans `model/use*.ts`
 - [ ] Crée les composants UI dans `ui/`
+- [ ] Ajoute les textes dans `messages/en.json` ET `messages/es.json` (aucun texte en dur)
 - [ ] Exporte la public API dans `index.ts`
 - [ ] Documente tout comportement non évident dans le code
 
@@ -343,3 +375,4 @@ Quand tu crées une nouvelle feature :
 - [Feature-Sliced Design](https://feature-sliced.design/)
 - [TanStack Query Docs](https://tanstack.com/query/latest)
 - [Zustand Docs](https://github.com/pmndrs/zustand)
+- [next-intl Docs](https://next-intl.dev)

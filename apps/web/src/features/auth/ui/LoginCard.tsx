@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/shared/ui/LanguageSwitcher';
 import { PawMark } from '@/shared/ui/icons';
 import { googleLoginUrl } from '../api/authAdapter';
 
@@ -8,8 +10,9 @@ import { googleLoginUrl } from '../api/authAdapter';
  * navigation to the API, which redirects to Google.
  */
 export function LoginCard({ hasError }: { hasError: boolean }) {
+  const t = useTranslations('login');
   return (
-    <main className="flex flex-1 items-center justify-center bg-canvas px-4 py-12">
+    <main className="flex flex-1 flex-col items-center justify-center gap-5 bg-canvas px-4 py-12">
       <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-8 text-center shadow-md">
         {/* Heart-paw brand mark — tinted to brand green via currentColor. */}
         <span className="mx-auto flex h-14 w-14 items-center justify-center text-brand">
@@ -17,10 +20,10 @@ export function LoginCard({ hasError }: { hasError: boolean }) {
         </span>
 
         <h1 className="mt-6 font-display text-4xl leading-tight tracking-tight text-fg-1">
-          Des jours plus sains, ensemble.
+          {t('title')}
         </h1>
         <p className="mx-auto mt-3 max-w-xs text-base leading-normal text-fg-2">
-          Suivez la santé de vos animaux et gardez chaque document au même endroit.
+          {t('subtitle')}
         </p>
 
         {hasError && (
@@ -29,9 +32,7 @@ export function LoginCard({ hasError }: { hasError: boolean }) {
             className="mt-6 flex w-full items-center gap-2.5 rounded-md border border-coral-100 bg-accent-tint px-3.5 py-2.5 text-left text-coral-700"
           >
             <AlertIcon />
-            <span className="text-sm font-medium">
-              La connexion a échoué. Réessayez.
-            </span>
+            <span className="text-sm font-medium">{t('error')}</span>
           </div>
         )}
 
@@ -40,13 +41,15 @@ export function LoginCard({ hasError }: { hasError: boolean }) {
           className={`${hasError ? 'mt-3' : 'mt-7'} flex w-full items-center justify-center gap-3 rounded-md border border-border-strong bg-surface px-4 py-3 text-base font-semibold text-fg-1 shadow-sm transition hover:bg-subtle`}
         >
           <GoogleG />
-          Continuer avec Google
+          {t('googleCta')}
         </a>
 
         <p className="mx-auto mt-5 max-w-xs text-xs font-medium leading-normal text-fg-3">
-          Nous accédons uniquement aux fichiers que l’app crée dans votre Drive.
+          {t('privacyNote')}
         </p>
       </div>
+
+      <LanguageSwitcher />
     </main>
   );
 }

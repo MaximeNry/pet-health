@@ -1,2 +1,3 @@
 export type { Pet, Species } from './types';
-export { speciesLabel, petAge } from './lib';
+export type { PetAge } from './lib';
+export { petAge } from './lib';

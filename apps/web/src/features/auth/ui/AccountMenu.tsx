@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { AuthUser } from '@/entities/user';
 import { displayName, initials } from '@/entities/user';
@@ -14,6 +15,7 @@ import { useLogout } from '../model/useLogout';
 
 /** Account dropdown: shows the current user and offers profile/logout actions. */
 export function AccountMenu({ user }: { user: AuthUser }) {
+  const t = useTranslations('account');
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -78,7 +80,7 @@ export function AccountMenu({ user }: { user: AuthUser }) {
             className="flex w-full items-center gap-2.5 rounded-sm p-2.5 text-left text-sm font-medium text-fg-1 transition hover:bg-subtle"
           >
             <UserIcon className="h-[18px] w-[18px] text-fg-2" />
-            Mon profil
+            {t('profile')}
           </button>
           <button
             type="button"
@@ -88,7 +90,7 @@ export function AccountMenu({ user }: { user: AuthUser }) {
             className="flex w-full items-center gap-2.5 rounded-sm p-2.5 text-left text-sm font-medium text-coral-600 transition hover:bg-subtle disabled:opacity-60"
           >
             <LogoutIcon className="h-[18px] w-[18px]" />
-            Déconnexion
+            {t('logout')}
           </button>
         </div>
       )}

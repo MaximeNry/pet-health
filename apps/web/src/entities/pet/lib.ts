@@ -1,22 +1,13 @@
-import type { Pet, Species } from './types';
+import type { Pet } from './types';
 
-/** French label for a domain species. */
-export function speciesLabel(species: Species): string {
-  switch (species) {
-    case 'DOG':
-      return 'Chien';
-    case 'CAT':
-      return 'Chat';
-    default:
-      return 'Animal';
-  }
+/** Age split into a unit + value, so the UI can localize the label. */
+export interface PetAge {
+  unit: 'years' | 'months';
+  value: number;
 }
 
-/**
- * Age from a birth date, as a short French label (`« 1 an »` / `« 3 ans »`).
- * Under a year, falls back to months.
- */
-export function petAge(pet: Pet, now: Date = new Date()): string {
+/** Age from a birth date: whole years, or months under a year. */
+export function petAge(pet: Pet, now: Date = new Date()): PetAge {
   const birth = new Date(pet.birthDate);
   let years = now.getFullYear() - birth.getFullYear();
   const monthDelta = now.getMonth() - birth.getMonth();
@@ -24,11 +15,11 @@ export function petAge(pet: Pet, now: Date = new Date()): string {
     years -= 1;
   }
   if (years >= 1) {
-    return `${years} ${years > 1 ? 'ans' : 'an'}`;
+    return { unit: 'years', value: years };
   }
   const months = Math.max(
     0,
     monthDelta + 12 * (now.getFullYear() - birth.getFullYear()),
   );
-  return `${months} mois`;
+  return { unit: 'months', value: months };
 }

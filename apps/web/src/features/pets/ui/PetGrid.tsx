@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import type { Pet } from '@/entities/pet';
 import { PlusIcon } from '@/shared/ui/icons';
 import { PetCard } from './PetCard';
@@ -15,6 +18,7 @@ export function PetGrid({ pets }: { pets: Pet[] }) {
 }
 
 function AddPetTile() {
+  const t = useTranslations('pets');
   return (
     <button
       type="button"
@@ -23,7 +27,7 @@ function AddPetTile() {
       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-subtle">
         <PlusIcon className="h-6 w-6" />
       </span>
-      <span className="text-[15px] font-semibold">Ajouter un animal</span>
+      <span className="text-[15px] font-semibold">{t('addPet')}</span>
     </button>
   );
 }

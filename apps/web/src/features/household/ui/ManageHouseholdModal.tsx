@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Household } from '@/entities/household';
 import { CloseIcon } from '@/shared/ui/icons';
 import { useUpdateHousehold } from '../model/useUpdateHousehold';
@@ -17,6 +18,7 @@ export function ManageHouseholdModal({
   household: Household;
   onClose: () => void;
 }) {
+  const t = useTranslations('household.modal');
   const [name, setName] = useState(household.name);
   const [types, setTypes] = useState(household.documentTypes);
   const [draft, setDraft] = useState('');
@@ -62,18 +64,18 @@ export function ManageHouseholdModal({
       <form
         role="dialog"
         aria-modal="true"
-        aria-label="Modifier le foyer"
+        aria-label={t('title')}
         onSubmit={handleSubmit}
         className="w-96 max-w-full overflow-hidden rounded-[24px] bg-surface shadow-lg"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 pb-1 pt-[22px]">
           <h2 className="text-xl font-semibold tracking-tight text-fg-1">
-            Modifier le foyer
+            {t('title')}
           </h2>
           <button
             type="button"
-            aria-label="Fermer"
+            aria-label={t('close')}
             onClick={onClose}
             className="-mr-1.5 flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full text-fg-3 transition hover:bg-subtle hover:text-fg-1"
           >
@@ -85,20 +87,20 @@ export function ManageHouseholdModal({
         <div className="flex flex-col gap-[22px] px-6 pb-1 pt-3.5">
           <label className="flex flex-col gap-2">
             <span className="text-[13px] font-semibold text-fg-2">
-              Nom du foyer
+              {t('nameLabel')}
             </span>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nom du foyer"
+              placeholder={t('namePlaceholder')}
               className="ph-input w-full rounded-md border border-border-strong bg-surface px-3.5 py-3 text-base text-fg-1 outline-none transition"
             />
           </label>
 
           <div className="flex flex-col gap-2.5">
             <span className="text-[13px] font-semibold text-fg-2">
-              Types de documents
+              {t('typesLabel')}
             </span>
             <div className="flex flex-wrap gap-2">
               {types.map((type, index) => (
@@ -109,7 +111,7 @@ export function ManageHouseholdModal({
                   {type}
                   <button
                     type="button"
-                    aria-label="Retirer ce type"
+                    aria-label={t('removeType')}
                     onClick={() => removeType(index)}
                     className="flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-full text-green-600 transition hover:bg-green-100"
                   >
@@ -129,7 +131,7 @@ export function ManageHouseholdModal({
                     addType();
                   }
                 }}
-                placeholder="Ajouter un type…"
+                placeholder={t('addPlaceholder')}
                 className="ph-input min-w-0 flex-1 rounded-[12px] border border-border bg-surface px-[13px] py-2.5 text-[15px] text-fg-1 outline-none transition"
               />
               <button
@@ -137,14 +139,14 @@ export function ManageHouseholdModal({
                 onClick={addType}
                 className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-[12px] border border-green-100 bg-brand-tint px-[15px] text-[15px] font-semibold text-brand transition hover:bg-green-100"
               >
-                + Ajouter
+                {t('addButton')}
               </button>
             </div>
           </div>
 
           {updateHousehold.isError && (
             <p role="alert" className="text-sm font-medium text-coral-700">
-              L&apos;enregistrement a échoué. Réessayez.
+              {t('error')}
             </p>
           )}
         </div>
@@ -156,7 +158,7 @@ export function ManageHouseholdModal({
             onClick={onClose}
             className="ph-btn flex-1 rounded-md border border-border-strong bg-surface px-4 py-3 text-[15px] font-semibold text-fg-2 transition hover:bg-subtle"
           >
-            Annuler
+            {t('cancel')}
           </button>
           <button
             type="submit"
@@ -167,7 +169,7 @@ export function ManageHouseholdModal({
             }
             className="ph-btn ph-btn-primary flex-[1.4] rounded-md bg-brand px-4 py-3 text-[15px] font-semibold text-white shadow-brand disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {updateHousehold.isPending ? 'Enregistrement…' : 'Enregistrer'}
+            {updateHousehold.isPending ? t('savePending') : t('save')}
           </button>
         </div>
       </form>

@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "description": "Your pets' health record."
+  },
+  "common": {
+    "loading": "Loading…"
+  },
+  "login": {
+    "title": "Healthier days, together.",
+    "subtitle": "Track your pets' health and keep every document in one place.",
+    "error": "Sign-in failed. Please try again.",
+    "googleCta": "Continue with Google",
+    "privacyNote": "We only access the files the app creates in your Drive."
+  },
+  "account": {
+    "profile": "My profile",
+    "logout": "Log out"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español"
+  },
+  "dashboard": {
+    "myPets": "My pets",
+    "loadingPets": "Loading pets…",
+    "upcomingReminders": "Upcoming reminders"
+  },
+  "household": {
+    "kicker": "Your household",
+    "memberCount": "{count, plural, one {# member} other {# members}}",
+    "manage": "Manage household",
+    "create": {
+      "brandHeadline": "One household for the whole four-legged family.",
+      "featurePets": "Bring all your pets together",
+      "featureMembers": "Invite the people who care for them",
+      "featureReminders": "Never miss a vaccine reminder",
+      "kicker": "New household",
+      "title": "Create your household",
+      "intro": "Give it a name to get started. You can adjust everything later.",
+      "nameLabel": "Household name",
+      "namePlaceholder": "E.g. The Smith family",
+      "nameHint": "Often the family or home name.",
+      "error": "Creating the household failed. Please try again.",
+      "submit": "Create my household",
+      "submitPending": "Creating…",
+      "membersNote": "You can invite members right after."
+    },
+    "modal": {
+      "title": "Edit household",
+      "close": "Close",
+      "nameLabel": "Household name",
+      "namePlaceholder": "Household name",
+      "typesLabel": "Document types",
+      "removeType": "Remove this type",
+      "addPlaceholder": "Add a type…",
+      "addButton": "+ Add",
+      "error": "Saving failed. Please try again.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "savePending": "Saving…"
+    }
+  },
+  "pets": {
+    "species": {
+      "DOG": "Dog",
+      "CAT": "Cat",
+      "OTHER": "Pet"
+    },
+    "ageYears": "{count, plural, one {# year} other {# years}}",
+    "ageMonths": "{count, plural, one {# month} other {# months}}",
+    "scanDocument": "Scan a document",
+    "addPet": "Add a pet",
+    "empty": {
+      "title": "Add your first pet",
+      "description": "Create a profile to track their health, vaccines and every document in one place."
+    }
+  },
+  "reminders": {
+    "title": "Vaccine reminders are coming soon",
+    "withPets": "We'll let you know as soon as a reminder is due for one of your pets.",
+    "withoutPets": "Add a pet to start receiving their vaccine reminders."
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again in a moment.",
+    "retry": "Try again"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page doesn't exist or has been moved.",
+    "backHome": "Back to home"
+  }
+}

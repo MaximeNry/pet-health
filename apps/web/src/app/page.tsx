@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Household } from '@/entities/household';
 import { AccountMenu, useSession } from '@/features/auth';
@@ -18,6 +19,7 @@ import { AppHeader } from '@/shared/ui/AppHeader';
  * features together; all data flows through their TanStack Query hooks.
  */
 export default function DashboardPage() {
+  const t = useTranslations('common');
   const router = useRouter();
   const session = useSession();
   const user = session.data ?? null;
@@ -35,7 +37,7 @@ export default function DashboardPage() {
   if (session.isLoading || (user !== null && households.isLoading)) {
     return (
       <main className="flex flex-1 items-center justify-center bg-canvas">
-        <p className="text-sm text-fg-3">Chargement…</p>
+        <p className="text-sm text-fg-3">{t('loading')}</p>
       </main>
     );
   }
@@ -59,6 +61,7 @@ export default function DashboardPage() {
 }
 
 function DashboardBody({ household }: { household: Household }) {
+  const t = useTranslations('dashboard');
   const pets = usePets(household.id);
   const petList = pets.data ?? [];
 
@@ -68,7 +71,7 @@ function DashboardBody({ household }: { household: Household }) {
 
       <div className="mb-[18px] flex items-baseline gap-2.5">
         <h2 className="text-2xl font-bold tracking-tight text-fg-1">
-          Mes animaux
+          {t('myPets')}
         </h2>
         {petList.length > 0 && (
           <span className="text-sm text-fg-3">{petList.length}</span>
@@ -76,7 +79,7 @@ function DashboardBody({ household }: { household: Household }) {
       </div>
 
       {pets.isLoading ? (
-        <p className="mb-9 text-sm text-fg-3">Chargement des animaux…</p>
+        <p className="mb-9 text-sm text-fg-3">{t('loadingPets')}</p>
       ) : petList.length > 0 ? (
         <PetGrid pets={petList} />
       ) : (
@@ -85,7 +88,7 @@ function DashboardBody({ household }: { household: Household }) {
 
       <div className="mb-[18px]">
         <h2 className="text-2xl font-bold tracking-tight text-fg-1">
-          Rappels à venir
+          {t('upcomingReminders')}
         </h2>
       </div>
       <RemindersCard hasPets={petList.length > 0} />

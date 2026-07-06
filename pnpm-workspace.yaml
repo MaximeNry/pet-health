@@ -3,7 +3,9 @@ packages:
   - 'packages/*'
 allowBuilds:
   '@nestjs/core': false
+  '@parcel/watcher': false
   '@prisma/engines': true
+  '@swc/core': false
   argon2: true
   esbuild: true
   prisma: true

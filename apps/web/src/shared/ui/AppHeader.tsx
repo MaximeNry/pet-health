@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { PawMark } from './icons';
 
 /**
- * App shell header: PetHealth wordmark on the left, a caller-provided action
- * slot (e.g. the account menu) on the right. Purely presentational.
+ * App shell header: PetHealth wordmark on the left, the language switcher and
+ * a caller-provided action slot (e.g. the account menu) on the right.
  */
 export function AppHeader({ children }: { children?: ReactNode }) {
   return (
@@ -14,7 +15,10 @@ export function AppHeader({ children }: { children?: ReactNode }) {
           Pet<span className="text-brand">Health</span>
         </span>
       </div>
-      {children}
+      <div className="flex items-center gap-3">
+        <LanguageSwitcher />
+        {children}
+      </div>
     </header>
   );
 }

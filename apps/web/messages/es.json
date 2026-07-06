@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "description": "La cartilla de salud de tus mascotas."
+  },
+  "common": {
+    "loading": "Cargando…"
+  },
+  "login": {
+    "title": "Días más sanos, juntos.",
+    "subtitle": "Sigue la salud de tus mascotas y guarda cada documento en un solo lugar.",
+    "error": "No se pudo iniciar sesión. Inténtalo de nuevo.",
+    "googleCta": "Continuar con Google",
+    "privacyNote": "Solo accedemos a los archivos que la app crea en tu Drive."
+  },
+  "account": {
+    "profile": "Mi perfil",
+    "logout": "Cerrar sesión"
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "es": "Español"
+  },
+  "dashboard": {
+    "myPets": "Mis mascotas",
+    "loadingPets": "Cargando mascotas…",
+    "upcomingReminders": "Próximos recordatorios"
+  },
+  "household": {
+    "kicker": "Tu hogar",
+    "memberCount": "{count, plural, one {# miembro} other {# miembros}}",
+    "manage": "Gestionar hogar",
+    "create": {
+      "brandHeadline": "Un hogar para toda la familia de cuatro patas.",
+      "featurePets": "Reúne a todas tus mascotas",
+      "featureMembers": "Invita a quienes las cuidan",
+      "featureReminders": "No te pierdas ningún recordatorio de vacunas",
+      "kicker": "Nuevo hogar",
+      "title": "Crea tu hogar",
+      "intro": "Ponle un nombre para empezar. Podrás ajustarlo todo más tarde.",
+      "nameLabel": "Nombre del hogar",
+      "namePlaceholder": "P. ej. Familia García",
+      "nameHint": "Suele ser el apellido o el nombre de la casa.",
+      "error": "No se pudo crear el hogar. Inténtalo de nuevo.",
+      "submit": "Crear mi hogar",
+      "submitPending": "Creando…",
+      "membersNote": "Podrás invitar a miembros justo después."
+    },
+    "modal": {
+      "title": "Editar hogar",
+      "close": "Cerrar",
+      "nameLabel": "Nombre del hogar",
+      "namePlaceholder": "Nombre del hogar",
+      "typesLabel": "Tipos de documentos",
+      "removeType": "Quitar este tipo",
+      "addPlaceholder": "Añadir un tipo…",
+      "addButton": "+ Añadir",
+      "error": "No se pudo guardar. Inténtalo de nuevo.",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "savePending": "Guardando…"
+    }
+  },
+  "pets": {
+    "species": {
+      "DOG": "Perro",
+      "CAT": "Gato",
+      "OTHER": "Mascota"
+    },
+    "ageYears": "{count, plural, one {# año} other {# años}}",
+    "ageMonths": "{count, plural, one {# mes} other {# meses}}",
+    "scanDocument": "Escanear un documento",
+    "addPet": "Añadir una mascota",
+    "empty": {
+      "title": "Añade tu primera mascota",
+      "description": "Crea una ficha para seguir su salud, sus vacunas y todos sus documentos en un solo lugar."
+    }
+  },
+  "reminders": {
+    "title": "Los recordatorios de vacunas llegan pronto",
+    "withPets": "Te avisaremos en cuanto se acerque un recordatorio de una de tus mascotas.",
+    "withoutPets": "Añade una mascota para empezar a recibir sus recordatorios de vacunas."
+  },
+  "errors": {
+    "title": "Algo salió mal",
+    "description": "Ocurrió un error inesperado. Inténtalo de nuevo en un momento.",
+    "retry": "Reintentar"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "Esta página no existe o se ha movido.",
+    "backHome": "Volver al inicio"
+  }
+}
