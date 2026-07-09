@@ -26,6 +26,13 @@ export class PrismaHealthDocumentRepository implements HealthDocumentRepository 
     });
   }
 
+  async findById(id: string): Promise<HealthDocument | null> {
+    const record = await this.prisma.healthDocument.findUnique({
+      where: { id },
+    });
+    return record ? HealthDocumentMapper.toDomain(record) : null;
+  }
+
   async findByPetId(petId: string): Promise<HealthDocument[]> {
     const records = await this.prisma.healthDocument.findMany({
       where: { petId },
@@ -33,5 +40,9 @@ export class PrismaHealthDocumentRepository implements HealthDocumentRepository 
       orderBy: { documentDate: 'desc' },
     });
     return records.map((record) => HealthDocumentMapper.toDomain(record));
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await this.prisma.healthDocument.delete({ where: { id } });
   }
 }

@@ -547,6 +547,68 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/** Downward arrow into a tray. */
+export function DownloadIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M4 21h16" />
+    </svg>
+  );
+}
+
+/** Three linked nodes (share). */
+export function ShareIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <circle cx="17" cy="5" r="2.6" />
+      <circle cx="6" cy="12" r="2.6" />
+      <circle cx="17" cy="19" r="2.6" />
+      <path d="m8.4 10.7 6.2-3.4M8.4 13.3l6.2 3.4" />
+    </svg>
+  );
+}
+
+/** Two outward arrows (expand to fullscreen). */
+export function ExpandIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M14 4h6v6" />
+      <path d="M10 20H4v-6" />
+      <path d="m20 4-7 7" />
+      <path d="m4 20 7-7" />
+    </svg>
+  );
+}
+
 /** Google Drive brand mark (multicolor — does not tint). */
 export function GoogleDriveIcon(props: IconProps) {
   return (

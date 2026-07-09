@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { join, normalize, sep } from 'node:path';
 import { Injectable, Logger } from '@nestjs/common';
+import { HealthDocumentNotFoundError } from '../domain/health-document.errors';
 import type {
   DocumentStorage,
   StoredFile,
+  StoredFileRef,
   UploadFileParams,
 } from '../domain/document-storage.port';
 
@@ -30,5 +32,31 @@ export class LocalDiskStorageAdapter implements DocumentStorage {
     await writeFile(join(this.baseDir, fileId), params.content);
     this.logger.log(`Stored document on local disk: ${fileId}`);
     return { fileId };
+  }
+
+  async download(ref: StoredFileRef): Promise<Uint8Array> {
+    try {
+      return await readFile(this.resolvePath(ref.fileId));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        throw new HealthDocumentNotFoundError(ref.fileId);
+      }
+      throw error;
+    }
+  }
+
+  async delete(ref: StoredFileRef): Promise<void> {
+    // `force` swallows ENOENT: deleting an already-gone file must succeed.
+    await rm(this.resolvePath(ref.fileId), { force: true });
+    this.logger.log(`Deleted document from local disk: ${ref.fileId}`);
+  }
+
+  /** Local file ids embed a path segment — refuse anything escaping baseDir. */
+  private resolvePath(fileId: string): string {
+    const path = normalize(join(this.baseDir, fileId));
+    if (!path.startsWith(this.baseDir + sep)) {
+      throw new HealthDocumentNotFoundError(fileId);
+    }
+    return path;
   }
 }

@@ -151,6 +151,39 @@
       "filterAll": "Todos",
       "filterLabel": "Filtrar por tipo de documento"
     },
+    "detail": {
+      "subtitle": "{name} · Documento",
+      "menu": "Acciones del documento",
+      "backToPet": "Volver a {name}",
+      "loadError": "No se pudo cargar este documento.",
+      "download": "Descargar",
+      "share": "Compartir",
+      "categoryLabel": "Categoría",
+      "changeCategory": "Cambiar categoría",
+      "dateLabel": "Fecha del documento",
+      "addedOn": "Añadido el {date}",
+      "petLabel": "Mascota",
+      "deleteDocument": "Eliminar documento",
+      "closeViewer": "Cerrar el visor",
+      "preview": {
+        "loading": "Cargando la vista previa…",
+        "expand": "Abrir el documento a pantalla completa",
+        "error": "No se pudo cargar la vista previa."
+      },
+      "picker": {
+        "title": "Cambiar categoría",
+        "subtitle": "Elige dónde vive este documento.",
+        "error": "No se pudo cambiar la categoría. Inténtalo de nuevo."
+      },
+      "deleteModal": {
+        "title": "¿Eliminar este documento?",
+        "description": "“{title}” y su archivo se eliminarán definitivamente.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "confirmPending": "Eliminando…",
+        "error": "No se pudo eliminar el documento. Inténtalo de nuevo."
+      }
+    },
     "scan": {
       "petLoadError": "No se pudo cargar esta mascota.",
       "backToDashboard": "Volver al panel",

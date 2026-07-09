@@ -128,6 +128,12 @@ export class HealthDocument extends Entity {
     };
   }
 
+  /** Recategorizes the document (invalid types are rejected by the VO). */
+  changeDocumentType(raw: string): void {
+    this._documentType = DocumentType.create(raw);
+    this._updatedAt = new Date();
+  }
+
   get petId(): string {
     return this._petId;
   }

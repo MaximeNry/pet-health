@@ -4,43 +4,9 @@ import { useState, type CSSProperties, type ReactNode } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { DocumentType, HealthDocument } from '@/entities/document';
-import { DOCUMENT_TYPES } from '@/entities/document';
+import { DOCUMENT_TYPES, DOCUMENT_TYPE_PALETTE } from '@/entities/document';
 import { ScanIcon } from '@/shared/ui/icons';
 import { usePetDocuments } from '../model/usePetDocuments';
-
-/**
- * Per-type colors of the document cards (badge + paper strip), from the
- * design mockup "Variantes Documents" (variant A). Hues outside the brand
- * palette (blue, gold, violet, rose) have no @theme token, hence raw hex.
- */
-const TYPE_PALETTE: Record<
-  DocumentType,
-  { badgeBg: string; badgeFg: string; strip: string }
-> = {
-  VACCINATION: {
-    badgeBg: 'var(--color-green-50)',
-    badgeFg: 'var(--color-green-600)',
-    strip: 'var(--color-green-400)',
-  },
-  PRESCRIPTION: {
-    badgeBg: 'var(--color-coral-50)',
-    badgeFg: 'var(--color-coral-700)',
-    strip: 'var(--color-coral-400)',
-  },
-  LAB_RESULT: { badgeBg: '#EAF1F9', badgeFg: '#2E6BA8', strip: '#6AA0D8' },
-  CERTIFICATE: {
-    badgeBg: '#FBF1DE',
-    badgeFg: '#946212',
-    strip: 'var(--color-amber-500)',
-  },
-  IDENTIFICATION: { badgeBg: '#F0EBF9', badgeFg: '#5F45A8', strip: '#9C82D8' },
-  SURGERY: { badgeBg: '#FBEDF3', badgeFg: '#AD3A68', strip: '#DD7BA8' },
-  OTHER: {
-    badgeBg: 'var(--color-stone-100)',
-    badgeFg: 'var(--color-stone-600)',
-    strip: 'var(--color-stone-400)',
-  },
-};
 
 type Filter = DocumentType | 'ALL';
 
@@ -132,42 +98,50 @@ export function DocumentList({
   );
 }
 
-/** Grid card: stylized paper thumbnail, type badge, title, date and tags. */
+/**
+ * Grid card: stylized paper thumbnail, type badge, title, date and tags.
+ * The whole card links to the document detail page.
+ */
 function DocumentCard({ document }: { document: HealthDocument }) {
   const tTypes = useTranslations('documents.types');
   const format = useFormatter();
-  const palette = TYPE_PALETTE[document.documentType];
+  const palette = DOCUMENT_TYPE_PALETTE[document.documentType];
 
   return (
-    <li className="flex flex-col overflow-hidden rounded-[18px] border border-border bg-surface shadow-sm">
-      <div className="flex h-[92px] items-center justify-center bg-subtle">
-        <PaperThumbnail strip={palette.strip} />
-      </div>
-      <div className="flex flex-col gap-1.5 px-3 pb-[13px] pt-[11px]">
-        <span
-          className="self-start rounded-pill px-[9px] py-[3px] text-[11px] font-semibold"
-          style={{ background: palette.badgeBg, color: palette.badgeFg }}
-        >
-          {tTypes(document.documentType)}
-        </span>
-        <p className="text-sm font-semibold leading-[1.25] text-fg-1">
-          {document.title}
-        </p>
-        <p className="text-xs text-fg-3">
-          {format.dateTime(new Date(document.documentDate), {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-          })}
-        </p>
-        {document.tags.length > 0 && (
-          <div className="mt-px">
-            <span className="inline-block rounded-pill bg-brand-tint px-2 py-0.5 text-[10.5px] font-semibold text-brand-hover">
-              {document.tags.join(' · ')}
-            </span>
-          </div>
-        )}
-      </div>
+    <li>
+      <Link
+        href={`/pets/${document.petId}/documents/${document.id}`}
+        className="pet-card flex flex-col overflow-hidden rounded-[18px] border border-border bg-surface shadow-sm"
+      >
+        <div className="flex h-[92px] items-center justify-center bg-subtle">
+          <PaperThumbnail strip={palette.strip} />
+        </div>
+        <div className="flex flex-col gap-1.5 px-3 pb-[13px] pt-[11px]">
+          <span
+            className="self-start rounded-pill px-[9px] py-[3px] text-[11px] font-semibold"
+            style={{ background: palette.badgeBg, color: palette.badgeFg }}
+          >
+            {tTypes(document.documentType)}
+          </span>
+          <p className="text-sm font-semibold leading-[1.25] text-fg-1">
+            {document.title}
+          </p>
+          <p className="text-xs text-fg-3">
+            {format.dateTime(new Date(document.documentDate), {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </p>
+          {document.tags.length > 0 && (
+            <div className="mt-px">
+              <span className="inline-block rounded-pill bg-brand-tint px-2 py-0.5 text-[10.5px] font-semibold text-brand-hover">
+                {document.tags.join(' · ')}
+              </span>
+            </div>
+          )}
+        </div>
+      </Link>
     </li>
   );
 }

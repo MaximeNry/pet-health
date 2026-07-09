@@ -2,20 +2,33 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  Header,
+  HttpCode,
   Param,
+  Patch,
   Post,
+  Query,
   Req,
+  Res,
+  StreamableFile,
   UploadedFile,
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import type { AuthenticatedUser } from '../../../auth/auth.constants';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
+import { ChangeDocumentTypeUseCase } from '../application/change-document-type.use-case';
+import { DeleteDocumentUseCase } from '../application/delete-document.use-case';
+import { DownloadDocumentUseCase } from '../application/download-document.use-case';
+import { extensionForMime } from '../application/file-extension';
+import { GetPetDocumentUseCase } from '../application/get-pet-document.use-case';
 import { ListPetDocumentsUseCase } from '../application/list-pet-documents.use-case';
 import { UploadDocumentUseCase } from '../application/upload-document.use-case';
+import type { UpdateDocumentDto } from './dto/update-document.dto';
 import type { UploadDocumentDto } from './dto/upload-document.dto';
 import {
   HealthDocumentResponse,
@@ -52,6 +65,10 @@ export class HealthDocumentController {
   constructor(
     private readonly uploadDocument: UploadDocumentUseCase,
     private readonly listPetDocuments: ListPetDocumentsUseCase,
+    private readonly getPetDocument: GetPetDocumentUseCase,
+    private readonly downloadDocument: DownloadDocumentUseCase,
+    private readonly changeDocumentType: ChangeDocumentTypeUseCase,
+    private readonly deleteDocument: DeleteDocumentUseCase,
   ) {}
 
   @Post()
@@ -95,6 +112,87 @@ export class HealthDocumentController {
   async list(@Param('petId') petId: string): Promise<HealthDocumentResponse[]> {
     const documents = await this.listPetDocuments.execute(petId);
     return documents.map(toHealthDocumentResponse);
+  }
+
+  @Get(':documentId')
+  async get(
+    @Param('petId') petId: string,
+    @Param('documentId') documentId: string,
+  ): Promise<HealthDocumentResponse> {
+    const document = await this.getPetDocument.execute(petId, documentId);
+    return toHealthDocumentResponse(document);
+  }
+
+  /**
+   * Raw file bytes, served inline for the in-app preview; `?download=1`
+   * switches to an attachment so the browser saves the file instead.
+   */
+  @Get(':documentId/content')
+  @Header('Cache-Control', 'private, max-age=300')
+  async content(
+    @Param('petId') petId: string,
+    @Param('documentId') documentId: string,
+    @Query('download') download: string | undefined,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const user = req.user as AuthenticatedUser;
+    const { document, content } = await this.downloadDocument.execute({
+      petId,
+      documentId,
+      userId: user.userId,
+    });
+
+    const disposition = download === '1' ? 'attachment' : 'inline';
+    res.setHeader('Content-Type', document.mimeType);
+    res.setHeader(
+      'Content-Disposition',
+      `${disposition}; filename*=UTF-8''${this.encodeFileName(document)}`,
+    );
+    return new StreamableFile(content);
+  }
+
+  @Patch(':documentId')
+  async update(
+    @Param('petId') petId: string,
+    @Param('documentId') documentId: string,
+    @Body() dto: UpdateDocumentDto,
+  ): Promise<HealthDocumentResponse> {
+    if (!dto.documentType) {
+      throw new BadRequestException('The « documentType » field is required.');
+    }
+    const document = await this.changeDocumentType.execute({
+      petId,
+      documentId,
+      documentType: dto.documentType,
+    });
+    return toHealthDocumentResponse(document);
+  }
+
+  @Delete(':documentId')
+  @HttpCode(204)
+  async remove(
+    @Param('petId') petId: string,
+    @Param('documentId') documentId: string,
+    @Req() req: Request,
+  ): Promise<void> {
+    const user = req.user as AuthenticatedUser;
+    await this.deleteDocument.execute({
+      petId,
+      documentId,
+      userId: user.userId,
+    });
+  }
+
+  /** RFC 5987 file name ("Carnet.pdf" → percent-encoded UTF-8). */
+  private encodeFileName(document: {
+    title: string;
+    mimeType: string;
+  }): string {
+    const safeTitle = document.title.trim().replace(/[\\/:*?"<>|]/g, ' ');
+    return encodeURIComponent(
+      `${safeTitle}.${extensionForMime(document.mimeType)}`,
+    );
   }
 
   /** `tags` travels as a JSON array string inside the multipart form. */

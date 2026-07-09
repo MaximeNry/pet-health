@@ -208,6 +208,39 @@ body {
   animation: ph-modal-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Bottom sheet entrance (document detail mockup). */
+@keyframes ph-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.ph-sheet {
+  animation: ph-sheet-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Loading shimmer used by the document preview. */
+@keyframes ph-shimmer {
+  from {
+    background-position: -240px 0;
+  }
+  to {
+    background-position: 240px 0;
+  }
+}
+.ph-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-subtle) 25%,
+    var(--color-surface) 50%,
+    var(--color-subtle) 75%
+  );
+  background-size: 480px 100%;
+  animation: ph-shimmer 1.4s linear infinite;
+}
+
 /* Text input focus halo. */
 .ph-input:focus {
   border-color: var(--color-brand);

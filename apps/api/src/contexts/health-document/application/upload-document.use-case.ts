@@ -4,6 +4,7 @@ import type { DocumentStorage } from '../domain/document-storage.port';
 import { HealthDocument } from '../domain/health-document.entity';
 import { HEALTH_DOCUMENT_REPOSITORY } from '../domain/health-document.repository';
 import type { HealthDocumentRepository } from '../domain/health-document.repository';
+import { extensionForMime } from './file-extension';
 
 export interface UploadDocumentCommand {
   petId: string;
@@ -17,14 +18,6 @@ export interface UploadDocumentCommand {
   mimeType: string;
   content: Uint8Array;
 }
-
-/** File extension by accepted mime type, for a readable stored file name. */
-const EXTENSION_BY_MIME: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'application/pdf': 'pdf',
-};
 
 /**
  * Uploads a scanned document: stores the bytes behind the `DocumentStorage`
@@ -75,7 +68,7 @@ export class UploadDocumentUseCase {
   /** e.g. "2026-06-12 Rabies booster.jpg" — sortable and human-readable. */
   private buildFileName(command: UploadDocumentCommand): string {
     const date = command.documentDate.toISOString().slice(0, 10);
-    const extension = EXTENSION_BY_MIME[command.mimeType] ?? 'bin';
+    const extension = extensionForMime(command.mimeType);
     // Strip characters that are risky in file names across storages.
     const safeTitle = command.title.trim().replace(/[\\/:*?"<>|]/g, ' ');
     return `${date} ${safeTitle}.${extension}`;

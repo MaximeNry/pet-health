@@ -19,6 +19,28 @@ export const documentsAdapter = {
       `/pets/${encodeURIComponent(petId)}/documents`,
     ),
 
+  getById: (petId: string, documentId: string) =>
+    apiClient.get<HealthDocument>(
+      `/pets/${encodeURIComponent(petId)}/documents/${encodeURIComponent(documentId)}`,
+    ),
+
+  /** Raw file bytes (image or PDF), for the preview / download / share. */
+  getContent: (petId: string, documentId: string) =>
+    apiClient.getBlob(
+      `/pets/${encodeURIComponent(petId)}/documents/${encodeURIComponent(documentId)}/content`,
+    ),
+
+  changeType: (petId: string, documentId: string, documentType: DocumentType) =>
+    apiClient.patch<HealthDocument>(
+      `/pets/${encodeURIComponent(petId)}/documents/${encodeURIComponent(documentId)}`,
+      { documentType },
+    ),
+
+  remove: (petId: string, documentId: string) =>
+    apiClient.delete<void>(
+      `/pets/${encodeURIComponent(petId)}/documents/${encodeURIComponent(documentId)}`,
+    ),
+
   /**
    * Multipart upload with progress reporting. `fetch` (and thus `apiClient`)
    * cannot observe upload progress, so this one call drops down to

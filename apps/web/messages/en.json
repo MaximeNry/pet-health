@@ -151,6 +151,39 @@
       "filterAll": "All",
       "filterLabel": "Filter by document type"
     },
+    "detail": {
+      "subtitle": "{name} · Document",
+      "menu": "Document actions",
+      "backToPet": "Back to {name}",
+      "loadError": "This document could not be loaded.",
+      "download": "Download",
+      "share": "Share",
+      "categoryLabel": "Category",
+      "changeCategory": "Change category",
+      "dateLabel": "Document date",
+      "addedOn": "Added on {date}",
+      "petLabel": "Pet",
+      "deleteDocument": "Delete document",
+      "closeViewer": "Close the viewer",
+      "preview": {
+        "loading": "Loading preview…",
+        "expand": "Open the document fullscreen",
+        "error": "The preview could not be loaded."
+      },
+      "picker": {
+        "title": "Change category",
+        "subtitle": "Choose where this document lives.",
+        "error": "The category could not be changed. Please try again."
+      },
+      "deleteModal": {
+        "title": "Delete this document?",
+        "description": "“{title}” and its file will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "confirmPending": "Deleting…",
+        "error": "The document could not be deleted. Please try again."
+      }
+    },
     "scan": {
       "petLoadError": "This pet could not be loaded.",
       "backToDashboard": "Back to dashboard",

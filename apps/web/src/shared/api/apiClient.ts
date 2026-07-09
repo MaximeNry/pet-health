@@ -37,6 +37,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const apiClient = {
   get: <T>(path: string) => request<T>(path),
 
+  /** Binary endpoints (file previews/downloads) resolve to a `Blob`. */
+  getBlob: async (path: string): Promise<Blob> => {
+    const res = await fetch(`${API_URL}${path}`, { credentials: 'include' });
+    if (!res.ok) {
+      throw new ApiError(
+        res.status,
+        `Request to ${path} failed (${res.status})`,
+      );
+    }
+    return res.blob();
+  },
+
   post: <T>(path: string, body?: unknown) =>
     request<T>(path, {
       method: 'POST',

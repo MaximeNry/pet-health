@@ -10,5 +10,7 @@ export const HEALTH_DOCUMENT_REPOSITORY = 'HealthDocumentRepository';
  */
 export interface HealthDocumentRepository {
   save(document: HealthDocument): Promise<void>;
+  findById(id: string): Promise<HealthDocument | null>;
   findByPetId(petId: string): Promise<HealthDocument[]>;
+  deleteById(id: string): Promise<void>;
 }

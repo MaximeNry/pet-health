@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ChangeDocumentTypeUseCase } from './application/change-document-type.use-case';
+import { DeleteDocumentUseCase } from './application/delete-document.use-case';
+import { DownloadDocumentUseCase } from './application/download-document.use-case';
+import { GetPetDocumentUseCase } from './application/get-pet-document.use-case';
 import { ListPetDocumentsUseCase } from './application/list-pet-documents.use-case';
 import { UploadDocumentUseCase } from './application/upload-document.use-case';
 import { DOCUMENT_STORAGE } from './domain/document-storage.port';
@@ -30,6 +34,10 @@ const storageMode =
   providers: [
     UploadDocumentUseCase,
     ListPetDocumentsUseCase,
+    GetPetDocumentUseCase,
+    DownloadDocumentUseCase,
+    ChangeDocumentTypeUseCase,
+    DeleteDocumentUseCase,
     {
       provide: HEALTH_DOCUMENT_REPOSITORY,
       useClass: PrismaHealthDocumentRepository,

@@ -22,10 +22,16 @@ describe('UploadDocumentUseCase', () => {
   });
 
   beforeEach(() => {
-    storage = { upload: jest.fn().mockResolvedValue({ fileId: 'drive-42' }) };
+    storage = {
+      upload: jest.fn().mockResolvedValue({ fileId: 'drive-42' }),
+      download: jest.fn(),
+      delete: jest.fn(),
+    };
     repository = {
       save: jest.fn().mockResolvedValue(undefined),
+      findById: jest.fn(),
       findByPetId: jest.fn(),
+      deleteById: jest.fn(),
     };
     useCase = new UploadDocumentUseCase(storage, repository);
   });

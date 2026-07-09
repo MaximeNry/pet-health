@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { MissingDriveAccessError } from '../domain/health-document.errors';
+import {
+  HealthDocumentNotFoundError,
+  MissingDriveAccessError,
+} from '../domain/health-document.errors';
 import type {
   DocumentStorage,
   StoredFile,
+  StoredFileRef,
   UploadFileParams,
 } from '../domain/document-storage.port';
 
@@ -55,6 +59,39 @@ export class GoogleDriveStorageAdapter implements DocumentStorage {
     }
     const file = (await response.json()) as { id: string };
     return { fileId: file.id };
+  }
+
+  async download(ref: StoredFileRef): Promise<Uint8Array> {
+    const accessToken = await this.getAccessToken(ref.ownerUserId);
+    const response = await fetch(
+      `${DRIVE_FILES_ENDPOINT}/${encodeURIComponent(ref.fileId)}?alt=media`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
+    if (response.status === 404) {
+      throw new HealthDocumentNotFoundError(ref.fileId);
+    }
+    if (!response.ok) {
+      this.logger.error(
+        `Drive download failed (${response.status}): ${await response.text()}`,
+      );
+      throw new Error('The download from Google Drive failed.');
+    }
+    return new Uint8Array(await response.arrayBuffer());
+  }
+
+  async delete(ref: StoredFileRef): Promise<void> {
+    const accessToken = await this.getAccessToken(ref.ownerUserId);
+    const response = await fetch(
+      `${DRIVE_FILES_ENDPOINT}/${encodeURIComponent(ref.fileId)}`,
+      { method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` } },
+    );
+    // 404 = already gone; deletion is idempotent from the domain's viewpoint.
+    if (!response.ok && response.status !== 404) {
+      this.logger.error(
+        `Drive deletion failed (${response.status}): ${await response.text()}`,
+      );
+      throw new Error('The deletion on Google Drive failed.');
+    }
   }
 
   /** Exchanges the user's refresh token for a short-lived access token. */
