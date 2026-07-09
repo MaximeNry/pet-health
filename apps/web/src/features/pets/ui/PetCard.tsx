@@ -54,13 +54,13 @@ export function PetCard({ pet, index, onEdit }: PetCardProps) {
           count: age.value,
         })}
       </span>
-      <button
-        type="button"
+      <Link
+        href={`/pets/${pet.id}/scan`}
         className="scan-btn ph-btn relative z-10 mt-[18px] flex w-full items-center justify-center gap-2 rounded-md bg-brand-tint p-[11px] text-sm font-semibold text-brand-hover"
       >
         <ScanIcon className="h-[17px] w-[17px]" />
         {t('scanDocument')}
-      </button>
+      </Link>
     </div>
   );
 }

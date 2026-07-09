@@ -433,3 +433,148 @@ export function UsersIcon(props: IconProps) {
     </svg>
   );
 }
+
+/** Circular arrows, for the camera switch control (scan flow). */
+export function SwitchCameraIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+      <path d="M3 21v-5h5" />
+    </svg>
+  );
+}
+
+/** Lightning bolt (filled), for the torch/flash toggle (scan flow). */
+export function FlashIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+    </svg>
+  );
+}
+
+/** Rotate arrow, for the crop step (scan flow). */
+export function RotateIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M21 12a9 9 0 1 1-3-6.7" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  );
+}
+
+/** Half-filled circle, for the contrast control (scan flow). */
+export function ContrastIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** Crossed-out camera, for the permission-denied screen (scan flow). */
+export function CameraOffIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M2 2l20 20" />
+      <path d="M7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h13" />
+      <path d="M9.5 4h5L16 6h3a2 2 0 0 1 2 2v7" />
+      <path d="M9.4 9.4a3 3 0 0 0 4.2 4.2" />
+    </svg>
+  );
+}
+
+/** Checkmark, for validated states (scan flow). */
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+/** Google Drive brand mark (multicolor — does not tint). */
+export function GoogleDriveIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 87.3 78" aria-hidden="true" {...props}>
+      <path
+        d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z"
+        fill="#0066da"
+      />
+      <path
+        d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0-1.2 4.5h27.5z"
+        fill="#00ac47"
+      />
+      <path
+        d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z"
+        fill="#ea4335"
+      />
+      <path
+        d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z"
+        fill="#00832d"
+      />
+      <path
+        d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z"
+        fill="#2684fc"
+      />
+      <path
+        d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z"
+        fill="#ffba00"
+      />
+    </svg>
+  );
+}

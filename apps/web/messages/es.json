@@ -52,9 +52,7 @@
       "nameLabel": "Nombre del hogar",
       "namePlaceholder": "Nombre del hogar",
       "typesLabel": "Tipos de documentos",
-      "removeType": "Quitar este tipo",
-      "addPlaceholder": "Añadir un tipo…",
-      "addButton": "+ Añadir",
+      "typesHint": "Las categorías de documentos son fijas y comunes a todos los hogares.",
       "error": "No se pudo guardar. Inténtalo de nuevo.",
       "cancel": "Cancelar",
       "save": "Guardar",
@@ -136,6 +134,96 @@
       "cancel": "Cancelar",
       "save": "Guardar",
       "savePending": "Guardando…"
+    }
+  },
+  "documents": {
+    "types": {
+      "VACCINATION": "Vacunación",
+      "PRESCRIPTION": "Receta",
+      "LAB_RESULT": "Análisis",
+      "CERTIFICATE": "Certificado",
+      "IDENTIFICATION": "Identificación",
+      "SURGERY": "Cirugía",
+      "OTHER": "Otro"
+    },
+    "list": {
+      "scan": "Escanear un documento",
+      "filterAll": "Todos",
+      "filterLabel": "Filtrar por tipo de documento"
+    },
+    "scan": {
+      "petLoadError": "No se pudo cargar esta mascota.",
+      "backToDashboard": "Volver al panel",
+      "camera": {
+        "cancel": "Cancelar el escaneo",
+        "title": "Documento de {name}",
+        "subtitle": "Encuadra la hoja A4",
+        "readyHint": "Listo para capturar",
+        "startingHint": "Iniciando la cámara…",
+        "switchCamera": "Cambiar de cámara",
+        "switchCameraLabel": "Cámara",
+        "capture": "Capturar el documento",
+        "flash": "Alternar el flash",
+        "flashOn": "Flash encendido",
+        "flashOff": "Flash apagado"
+      },
+      "denied": {
+        "cancel": "Cancelar el escaneo",
+        "denied": {
+          "title": "Acceso a la cámara denegado",
+          "description": "PetHealth necesita tu cámara para fotografiar los documentos de salud de {name}. Permite el acceso en los ajustes de tu navegador o teléfono para continuar."
+        },
+        "unavailable": {
+          "title": "Cámara no disponible",
+          "description": "No se pudo iniciar ninguna cámara en este dispositivo, así que el documento de {name} no puede escanearse aquí."
+        },
+        "steps": {
+          "1": "Abre los ajustes de tu navegador o teléfono para PetHealth",
+          "2": "Activa el permiso de Cámara"
+        },
+        "retry": "Reintentar",
+        "back": "Volver"
+      },
+      "crop": {
+        "title": "Recortar",
+        "autoDetected": "Detección automática",
+        "previewAlt": "Documento capturado",
+        "rotate": "Girar",
+        "contrast": "Contraste",
+        "retake": "Repetir",
+        "validate": "Confirmar"
+      },
+      "metadata": {
+        "cancel": "Cancelar el escaneo",
+        "title": "Detalles del documento",
+        "subtitle": "Para {name} · paso 3 de 3",
+        "thumbnailAlt": "Vista previa del documento escaneado",
+        "scannedDocument": "Documento escaneado",
+        "fileInfo": "1 página · JPEG · {size} MB",
+        "edit": "Editar",
+        "typeLabel": "Tipo de documento",
+        "titleLabel": "Título",
+        "titlePlaceholder": "p. ej. Refuerzo de la vacuna antirrábica",
+        "dateLabel": "Fecha del documento",
+        "tagsLabel": "Etiquetas",
+        "tagsOptional": "opcional",
+        "tagsPlaceholder": "Añadir…",
+        "removeTag": "Quitar la etiqueta {tag}",
+        "submit": "Guardar en Google Drive",
+        "submitHint": "Copia segura · carpeta PetHealth de {name}"
+      },
+      "upload": {
+        "sendingTitle": "Enviando a Google Drive…",
+        "sendingHint": "No salgas de esta página",
+        "sendingProgress": "Enviando… {pct} %",
+        "successTitle": "Documento guardado",
+        "successHint": "Disponible en Google Drive · carpeta PetHealth",
+        "done": "Listo",
+        "errorTitle": "Error al enviar",
+        "errorHint": "El documento no se pudo guardar. Comprueba tu conexión e inténtalo de nuevo.",
+        "retry": "Reintentar",
+        "back": "Volver al formulario"
+      }
     }
   },
   "reminders": {

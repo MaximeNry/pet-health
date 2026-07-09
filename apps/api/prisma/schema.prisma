@@ -57,6 +57,10 @@ model User {
   googleId     String?  @unique @map("google_id")
   // Nullable: Google users have no password (local argon2 path is dormant).
   passwordHash String?  @map("password_hash")
+  // Google OAuth refresh token (granted with the drive.file scope) used by the
+  // health-document context to upload files to the user's Drive. Null until
+  // the user goes through a login that returns one.
+  googleRefreshToken String? @map("google_refresh_token")
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -69,6 +73,8 @@ enum DocumentType {
   PRESCRIPTION
   LAB_RESULT
   CERTIFICATE
+  IDENTIFICATION
+  SURGERY
   OTHER
 }
 
@@ -78,7 +84,11 @@ model HealthDocument {
   householdId  String       @map("household_id")
   driveFileId  String       @map("drive_file_id")
   documentType DocumentType @map("document_type")
+  title        String
   documentDate DateTime     @map("document_date")
+  tags         String[]     @default([])
+  mimeType     String       @map("mime_type")
+  sizeBytes    Int          @map("size_bytes")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 

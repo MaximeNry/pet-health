@@ -6,9 +6,10 @@ import { FindOrCreateGoogleUserUseCase } from '../../contexts/user/application/f
 /**
  * Google OAuth strategy (Authorization Code flow). On the callback Passport
  * hands us the verified profile; we resolve the local `User` (find-or-create)
- * and expose it as `req.user`. Identity scopes only for now — the Drive
- * `drive.file` scope + refresh-token storage come with the health-document
- * context.
+ * and expose it as `req.user`. Besides identity, we request the non-sensitive
+ * `drive.file` scope so the health-document context can upload scans to the
+ * user's Drive; the refresh token Google returns (offline access, see
+ * `GoogleAuthGuard`) is persisted on the user for that purpose.
  */
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -25,13 +26,18 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       callbackURL:
         process.env.GOOGLE_CALLBACK_URL ??
         'http://localhost:3000/auth/google/callback',
-      scope: ['openid', 'email', 'profile'],
+      scope: [
+        'openid',
+        'email',
+        'profile',
+        'https://www.googleapis.com/auth/drive.file',
+      ],
     });
   }
 
   async validate(
     _accessToken: string,
-    _refreshToken: string,
+    refreshToken: string | undefined,
     profile: Profile,
   ): Promise<{ id: string; email: string }> {
     const email = profile.emails?.[0]?.value;
@@ -48,6 +54,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       email,
       firstName,
       lastName,
+      // Undefined when Google doesn't rotate it; the stored one is kept.
+      googleRefreshToken: refreshToken,
     });
 
     return { id: user.id, email: user.email };

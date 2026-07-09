@@ -8,6 +8,7 @@ export interface UserProps {
   firstName: string;
   lastName: string;
   googleId: string | null;
+  googleRefreshToken: string | null;
   passwordHash: string | null;
   role: Role;
   createdAt: Date;
@@ -29,6 +30,8 @@ export interface CreateGoogleUserProps {
   email: string;
   firstName: string;
   lastName: string;
+  /** Refresh token granted with the Drive scope; absent on some re-logins. */
+  googleRefreshToken?: string | null;
   role?: Role;
 }
 
@@ -46,6 +49,7 @@ export interface UserSnapshot {
   firstName: string;
   lastName: string;
   googleId: string | null;
+  googleRefreshToken: string | null;
   passwordHash: string | null;
   role: Role;
   createdAt: Date;
@@ -57,6 +61,7 @@ export class User extends Entity {
   private _firstName: string;
   private _lastName: string;
   private _googleId: string | null;
+  private _googleRefreshToken: string | null;
   private _passwordHash: string | null;
   private _role: Role;
   private _createdAt: Date;
@@ -68,6 +73,7 @@ export class User extends Entity {
     this._firstName = props.firstName;
     this._lastName = props.lastName;
     this._googleId = props.googleId;
+    this._googleRefreshToken = props.googleRefreshToken;
     this._passwordHash = props.passwordHash;
     this._role = Role.create(props.role.toString());
     this._createdAt = props.createdAt;
@@ -83,6 +89,7 @@ export class User extends Entity {
       lastName: User.normalizeName(props.lastName),
       email: props.email,
       googleId: null,
+      googleRefreshToken: null,
       passwordHash: props.passwordHash,
       role: props.role,
       createdAt: now,
@@ -99,6 +106,7 @@ export class User extends Entity {
       lastName: User.normalizeName(props.lastName),
       email: props.email,
       googleId: User.requireGoogleId(props.googleId),
+      googleRefreshToken: props.googleRefreshToken ?? null,
       passwordHash: null,
       role: props.role ?? Role.create('USER'),
       createdAt: now,
@@ -136,6 +144,7 @@ export class User extends Entity {
       firstName: this._firstName,
       lastName: this._lastName,
       googleId: this._googleId,
+      googleRefreshToken: this._googleRefreshToken,
       passwordHash: this._passwordHash,
       role: this._role,
       createdAt: this._createdAt,
@@ -157,6 +166,19 @@ export class User extends Entity {
 
   get googleId(): string | null {
     return this._googleId;
+  }
+
+  get googleRefreshToken(): string | null {
+    return this._googleRefreshToken;
+  }
+
+  /** Replaces the stored Drive refresh token when Google issues a new one. */
+  storeGoogleRefreshToken(token: string): void {
+    if (!token || token.trim().length === 0) {
+      throw new InvalidUserError('The Google refresh token cannot be empty.');
+    }
+    this._googleRefreshToken = token;
+    this._updatedAt = new Date();
   }
 
   get role(): Role {

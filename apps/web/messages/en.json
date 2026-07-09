@@ -52,9 +52,7 @@
       "nameLabel": "Household name",
       "namePlaceholder": "Household name",
       "typesLabel": "Document types",
-      "removeType": "Remove this type",
-      "addPlaceholder": "Add a type…",
-      "addButton": "+ Add",
+      "typesHint": "Document categories are fixed and shared by every household.",
       "error": "Saving failed. Please try again.",
       "cancel": "Cancel",
       "save": "Save",
@@ -136,6 +134,96 @@
       "cancel": "Cancel",
       "save": "Save",
       "savePending": "Saving…"
+    }
+  },
+  "documents": {
+    "types": {
+      "VACCINATION": "Vaccination",
+      "PRESCRIPTION": "Prescription",
+      "LAB_RESULT": "Lab result",
+      "CERTIFICATE": "Certificate",
+      "IDENTIFICATION": "Identification",
+      "SURGERY": "Surgery",
+      "OTHER": "Other"
+    },
+    "list": {
+      "scan": "Scan a document",
+      "filterAll": "All",
+      "filterLabel": "Filter by document type"
+    },
+    "scan": {
+      "petLoadError": "This pet could not be loaded.",
+      "backToDashboard": "Back to dashboard",
+      "camera": {
+        "cancel": "Cancel scanning",
+        "title": "{name}'s document",
+        "subtitle": "Frame the A4 page",
+        "readyHint": "Ready to capture",
+        "startingHint": "Starting the camera…",
+        "switchCamera": "Switch camera",
+        "switchCameraLabel": "Camera",
+        "capture": "Capture the document",
+        "flash": "Toggle flash",
+        "flashOn": "Flash on",
+        "flashOff": "Flash off"
+      },
+      "denied": {
+        "cancel": "Cancel scanning",
+        "denied": {
+          "title": "Camera access denied",
+          "description": "PetHealth needs your camera to photograph {name}'s health documents. Allow access in your browser or phone settings to continue."
+        },
+        "unavailable": {
+          "title": "Camera unavailable",
+          "description": "No camera could be started on this device, so {name}'s document cannot be scanned here."
+        },
+        "steps": {
+          "1": "Open your browser or phone settings for PetHealth",
+          "2": "Turn on the Camera permission"
+        },
+        "retry": "Try again",
+        "back": "Back"
+      },
+      "crop": {
+        "title": "Crop",
+        "autoDetected": "Auto-detected",
+        "previewAlt": "Captured document",
+        "rotate": "Rotate",
+        "contrast": "Contrast",
+        "retake": "Retake",
+        "validate": "Confirm"
+      },
+      "metadata": {
+        "cancel": "Cancel scanning",
+        "title": "Document details",
+        "subtitle": "For {name} · step 3 of 3",
+        "thumbnailAlt": "Scanned document preview",
+        "scannedDocument": "Scanned document",
+        "fileInfo": "1 page · JPEG · {size} MB",
+        "edit": "Edit",
+        "typeLabel": "Document type",
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g. Rabies booster shot",
+        "dateLabel": "Document date",
+        "tagsLabel": "Tags",
+        "tagsOptional": "optional",
+        "tagsPlaceholder": "Add…",
+        "removeTag": "Remove tag {tag}",
+        "submit": "Save to Google Drive",
+        "submitHint": "Secure backup · {name}'s PetHealth folder"
+      },
+      "upload": {
+        "sendingTitle": "Uploading to Google Drive…",
+        "sendingHint": "Please stay on this page",
+        "sendingProgress": "Uploading… {pct} %",
+        "successTitle": "Document saved",
+        "successHint": "Available in Google Drive · PetHealth folder",
+        "done": "Done",
+        "errorTitle": "Upload failed",
+        "errorHint": "The document could not be saved. Check your connection and try again.",
+        "retry": "Try again",
+        "back": "Back to the form"
+      }
     }
   },
   "reminders": {

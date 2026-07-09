@@ -14,6 +14,7 @@ const makeUser = (id: string, email: string): User =>
     firstName: 'Old',
     lastName: 'Name',
     googleId: null,
+    googleRefreshToken: null,
     passwordHash: 'h',
     role: Role.create('USER'),
     createdAt: new Date('2020-01-01T00:00:00Z'),

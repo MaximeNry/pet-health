@@ -18,6 +18,7 @@ export class PrismaUserRepository implements UserRepository {
         firstName: data.firstName,
         lastName: data.lastName,
         googleId: data.googleId,
+        googleRefreshToken: data.googleRefreshToken,
         passwordHash: data.passwordHash,
       },
     });

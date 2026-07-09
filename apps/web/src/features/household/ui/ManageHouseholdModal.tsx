@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { DOCUMENT_TYPES } from '@/entities/document';
 import type { Household } from '@/entities/household';
 import { CloseIcon } from '@/shared/ui/icons';
 import { useUpdateHousehold } from '../model/useUpdateHousehold';
 
 /**
- * "Modifier le foyer" dialog: edits the household name and its free-form
- * document types (chip list with add/remove). Saving patches the household
- * and closes on success; the households query refreshes via the mutation.
+ * "Modifier le foyer" dialog: edits the household name. Document categories
+ * are the app-wide fixed set (`DOCUMENT_TYPES`), shown read-only. Saving
+ * patches the household and closes on success; the households query refreshes
+ * via the mutation.
  */
 export function ManageHouseholdModal({
   household,
@@ -19,9 +21,8 @@ export function ManageHouseholdModal({
   onClose: () => void;
 }) {
   const t = useTranslations('household.modal');
+  const tTypes = useTranslations('documents.types');
   const [name, setName] = useState(household.name);
-  const [types, setTypes] = useState(household.documentTypes);
-  const [draft, setDraft] = useState('');
   const updateHousehold = useUpdateHousehold(household.id);
 
   useEffect(() => {
@@ -32,26 +33,11 @@ export function ManageHouseholdModal({
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
-  function addType() {
-    const label = draft.trim();
-    if (!label) return;
-    setDraft('');
-    if (types.some((t) => t.toLowerCase() === label.toLowerCase())) return;
-    setTypes([...types, label]);
-  }
-
-  function removeType(index: number) {
-    setTypes(types.filter((_, i) => i !== index));
-  }
-
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const trimmed = name.trim();
-    if (!trimmed || types.length === 0 || updateHousehold.isPending) return;
-    updateHousehold.mutate(
-      { name: trimmed, documentTypes: types },
-      { onSuccess: onClose },
-    );
+    if (!trimmed || updateHousehold.isPending) return;
+    updateHousehold.mutate({ name: trimmed }, { onSuccess: onClose });
   }
 
   return (
@@ -66,7 +52,7 @@ export function ManageHouseholdModal({
         aria-modal="true"
         aria-label={t('title')}
         onSubmit={handleSubmit}
-        className="w-96 max-w-full overflow-hidden rounded-[24px] bg-surface shadow-lg"
+        className="flex min-h-[440px] w-96 max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-lg"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 pb-1 pt-[22px]">
@@ -103,45 +89,18 @@ export function ManageHouseholdModal({
               {t('typesLabel')}
             </span>
             <div className="flex flex-wrap gap-2">
-              {types.map((type, index) => (
+              {DOCUMENT_TYPES.map((type) => (
                 <span
                   key={type}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-green-100 bg-brand-tint py-[7px] pl-[13px] pr-2 text-sm font-medium text-green-700"
+                  className="inline-flex items-center rounded-full border border-green-100 bg-brand-tint px-[13px] py-[7px] text-sm font-medium text-green-700"
                 >
-                  {type}
-                  <button
-                    type="button"
-                    aria-label={t('removeType')}
-                    onClick={() => removeType(index)}
-                    className="flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-full text-green-600 transition hover:bg-green-100"
-                  >
-                    <CloseIcon className="h-3 w-3" />
-                  </button>
+                  {tTypes(type)}
                 </span>
               ))}
             </div>
-            <div className="mt-0.5 flex gap-2">
-              <input
-                type="text"
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addType();
-                  }
-                }}
-                placeholder={t('addPlaceholder')}
-                className="ph-input min-w-0 flex-1 rounded-[12px] border border-border bg-surface px-[13px] py-2.5 text-[15px] text-fg-1 outline-none transition"
-              />
-              <button
-                type="button"
-                onClick={addType}
-                className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-[12px] border border-green-100 bg-brand-tint px-[15px] text-[15px] font-semibold text-brand transition hover:bg-green-100"
-              >
-                {t('addButton')}
-              </button>
-            </div>
+            <p className="text-[12.5px] leading-relaxed text-fg-3">
+              {t('typesHint')}
+            </p>
           </div>
 
           {updateHousehold.isError && (
@@ -152,7 +111,7 @@ export function ManageHouseholdModal({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-2.5 p-6 pt-[22px]">
+        <div className="mt-auto flex gap-2.5 p-6 pt-[22px]">
           <button
             type="button"
             onClick={onClose}
@@ -162,11 +121,7 @@ export function ManageHouseholdModal({
           </button>
           <button
             type="submit"
-            disabled={
-              updateHousehold.isPending ||
-              name.trim() === '' ||
-              types.length === 0
-            }
+            disabled={updateHousehold.isPending || name.trim() === ''}
             className="ph-btn ph-btn-primary flex-[1.4] rounded-md bg-brand px-4 py-3 text-[15px] font-semibold text-white shadow-brand disabled:cursor-not-allowed disabled:opacity-60"
           >
             {updateHousehold.isPending ? t('savePending') : t('save')}

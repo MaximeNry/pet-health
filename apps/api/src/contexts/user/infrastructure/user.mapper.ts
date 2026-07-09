@@ -15,6 +15,7 @@ export class UserMapper {
       firstName: record.firstName,
       lastName: record.lastName,
       googleId: record.googleId,
+      googleRefreshToken: record.googleRefreshToken,
       passwordHash: record.passwordHash,
       role: Role.create(record.role),
       createdAt: record.createdAt,
@@ -31,6 +32,7 @@ export class UserMapper {
       firstName: snapshot.firstName,
       lastName: snapshot.lastName,
       googleId: snapshot.googleId,
+      googleRefreshToken: snapshot.googleRefreshToken,
       passwordHash: snapshot.passwordHash,
       // The domain already guarantees a valid role (Role value object).
       role: snapshot.role.toString(),

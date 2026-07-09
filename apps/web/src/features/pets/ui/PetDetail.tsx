@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Pet } from '@/entities/pet';
 import { petAge } from '@/entities/pet';
+import { DocumentList } from '@/features/documents';
 import {
   BellIcon,
   CalendarIcon,
@@ -112,20 +113,25 @@ export function PetDetail({ petId }: { petId: string }) {
         </div>
 
         {tab === 'documents' && (
-          <TabPlaceholder
-            icon={<FileIcon className="h-9 w-9 text-brand" />}
-            iconBg="bg-brand-tint"
-            title={t('detail.documents.emptyTitle')}
-            description={t('detail.documents.emptyDescription')}
-          >
-            <button
-              type="button"
-              className="ph-btn ph-btn-primary mt-3.5 flex items-center gap-2 rounded-md bg-brand px-[22px] py-3.5 text-[15.5px] font-semibold text-white shadow-brand"
-            >
-              <ScanIcon className="h-[19px] w-[19px]" />
-              {t('scanDocument')}
-            </button>
-          </TabPlaceholder>
+          <DocumentList
+            petId={pet.id}
+            emptyState={
+              <TabPlaceholder
+                icon={<FileIcon className="h-9 w-9 text-brand" />}
+                iconBg="bg-brand-tint"
+                title={t('detail.documents.emptyTitle')}
+                description={t('detail.documents.emptyDescription')}
+              >
+                <Link
+                  href={`/pets/${pet.id}/scan`}
+                  className="ph-btn ph-btn-primary mt-3.5 flex items-center gap-2 rounded-md bg-brand px-[22px] py-3.5 text-[15.5px] font-semibold text-white shadow-brand"
+                >
+                  <ScanIcon className="h-[19px] w-[19px]" />
+                  {t('scanDocument')}
+                </Link>
+              </TabPlaceholder>
+            }
+          />
         )}
         {tab === 'history' && (
           <TabPlaceholder

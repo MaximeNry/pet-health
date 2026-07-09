@@ -4,7 +4,6 @@ import type { Household } from '@/entities/household';
 /** Fields of a household the user can edit from the manage modal. */
 export interface UpdateHouseholdInput {
   name: string;
-  documentTypes: string[];
 }
 
 /** Centralized access to the household endpoints. */
