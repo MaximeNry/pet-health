@@ -67,7 +67,9 @@
 
   --color-success: var(--color-green-500);
   --color-warning: var(--color-amber-500);
-  --color-danger:  var(--color-red-500);
+  --color-danger:       var(--color-red-500);
+  --color-danger-hover: #B83A2F;
+  --color-danger-tint:  #FBE9E7;
   --color-info:    var(--color-blue-500);
 
   /* ---- Fonts (next/font variables set in layout.tsx) ---- */
@@ -86,6 +88,7 @@
   --shadow-md: 0 4px 16px rgba(22, 32, 27, 0.08), 0 1px 3px rgba(22, 32, 27, 0.05);
   --shadow-lg: 0 12px 32px rgba(22, 32, 27, 0.12), 0 2px 8px rgba(22, 32, 27, 0.06);
   --shadow-brand: 0 8px 24px rgba(31, 138, 91, 0.28);
+  --shadow-danger: 0 8px 20px rgba(214, 72, 59, 0.28);
 }
 
 :root {
@@ -180,6 +183,12 @@ body {
 .ph-btn-secondary:hover {
   background: var(--color-subtle);
   border-color: var(--color-border-strong);
+}
+.ph-btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+}
+.ph-btn-danger:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 /* Modal entrance (scrim fade + panel rise), from the design mockup. */
