@@ -67,7 +67,7 @@ export function HouseholdMembersModal({
         role="dialog"
         aria-modal="true"
         aria-label={t('title')}
-        className="flex w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-lg @container"
+        className="flex w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-lg"
       >
         {/* Header */}
         <div className="flex items-start justify-between px-6 pt-[22px]">
@@ -94,70 +94,61 @@ export function HouseholdMembersModal({
             {household.members.map((member, index) => {
               const profile = memberProfiles[member.userId];
               const isYou = member.userId === currentUserId;
-              const isOwner = member.role === 'OWNER';
               return (
                 <div
                   key={member.userId}
-                  className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-border py-[13px]"
+                  className="flex items-center gap-2 border-b border-border py-[13px]"
                 >
                   <span
-                    className={`flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full text-sm font-bold ${accentAt(index).chip}`}
+                    className={`flex h-9 w-9 flex-none items-center justify-center rounded-full text-[13px] font-bold ${accentAt(index).chip}`}
                   >
                     {initials(profile)}
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="truncate text-[15px] font-semibold text-fg-1">
+                    <div className="flex items-center gap-1">
+                      <span className="truncate text-sm font-semibold text-fg-1">
                         {displayName(profile)}
                       </span>
-                      <span
-                        className={`flex-none whitespace-nowrap rounded-full px-[7px] py-0.5 text-[11px] font-semibold ${isOwner ? 'bg-coral-50 text-coral-600' : 'bg-subtle text-fg-2'}`}
-                      >
-                        {t(`roles.${member.role}`)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[13px] text-fg-3">
-                      <span className="truncate">{profile?.email}</span>
                       {isYou && (
-                        <span className="whitespace-nowrap font-semibold text-green-600">
+                        <span className="flex-none whitespace-nowrap text-[13px] font-semibold text-green-600">
                           {t('you')}
                         </span>
                       )}
                     </div>
+                    <span className="truncate text-[12.5px] text-fg-3">
+                      {profile?.email}
+                    </span>
                   </div>
-                  {/* Below ~400px of modal width the controls wrap to their
-                      own line, indented under the text (54px = avatar + gap),
-                      so the name never gets crushed on phones. */}
-                  <div className="flex w-full items-center justify-between gap-3 pl-[54px] @[400px]:w-auto @[400px]:pl-0">
-                    <select
-                      value={member.role}
-                      aria-label={t('roleLabel')}
-                      disabled={changeMemberRole.isPending}
-                      onChange={(e) =>
-                        changeMemberRole.mutate({
-                          userId: member.userId,
-                          role: e.target.value as HouseholdRole,
-                        })
-                      }
-                      className="flex-none cursor-pointer rounded-[12px] border border-border-strong bg-surface px-1.5 py-[9px] text-sm font-medium text-fg-1 outline-none"
-                    >
-                      {HOUSEHOLD_ROLES.map((role) => (
-                        <option key={role} value={role}>
-                          {t(`roles.${role}`)}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      aria-label={t('remove')}
-                      title={t('remove')}
-                      disabled={isYou || removeMember.isPending}
-                      onClick={() => removeMember.mutate(member.userId)}
-                      className="flex h-8 w-8 flex-none items-center justify-center rounded-full text-coral-500 transition enabled:cursor-pointer enabled:hover:bg-coral-50 enabled:hover:text-coral-600 disabled:opacity-35"
-                    >
-                      <TrashIcon className="h-[17px] w-[17px]" />
-                    </button>
-                  </div>
+                  {/* Role badge dropped on purpose: the select right beside it
+                      already shows the role. */}
+                  <select
+                    value={member.role}
+                    aria-label={t('roleLabel')}
+                    disabled={changeMemberRole.isPending}
+                    onChange={(e) =>
+                      changeMemberRole.mutate({
+                        userId: member.userId,
+                        role: e.target.value as HouseholdRole,
+                      })
+                    }
+                    className="flex-none cursor-pointer rounded-[10px] border border-border-strong bg-surface py-[7px] pl-2 pr-1 text-[13px] font-medium text-fg-1 outline-none"
+                  >
+                    {HOUSEHOLD_ROLES.map((role) => (
+                      <option key={role} value={role}>
+                        {t(`roles.${role}`)}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    aria-label={t('remove')}
+                    title={t('remove')}
+                    disabled={isYou || removeMember.isPending}
+                    onClick={() => removeMember.mutate(member.userId)}
+                    className="-mr-1 flex h-7 w-7 flex-none items-center justify-center rounded-full text-coral-500 transition enabled:cursor-pointer enabled:hover:bg-coral-50 enabled:hover:text-coral-600 disabled:opacity-35"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
                 </div>
               );
             })}
