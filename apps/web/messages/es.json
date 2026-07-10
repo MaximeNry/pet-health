@@ -30,6 +30,28 @@
     "kicker": "Tu hogar",
     "memberCount": "{count, plural, one {# miembro} other {# miembros}}",
     "manage": "Gestionar hogar",
+    "members": {
+      "open": "Gestionar los miembros del hogar",
+      "title": "Miembros del hogar",
+      "subtitle": "Gestiona quién puede consultar y actualizar los cuidados de tus mascotas.",
+      "close": "Cerrar",
+      "you": "· Tú",
+      "roleLabel": "Rol del miembro",
+      "roles": {
+        "OWNER": "Propietario",
+        "MEMBER": "Miembro"
+      },
+      "remove": "Quitar del hogar",
+      "error": "No se pudo aplicar el cambio. Inténtalo de nuevo.",
+      "inviteTitle": "Invitar a un miembro",
+      "inviteEmailLabel": "Dirección de correo",
+      "inviteEmailPlaceholder": "nombre@ejemplo.com",
+      "inviteRoleLabel": "Rol",
+      "inviteSubmit": "Enviar la invitación",
+      "invitePending": "Enviando…",
+      "inviteErrorNotFound": "Ninguna cuenta de PetHealth usa esta dirección de correo.",
+      "inviteError": "No se pudo enviar la invitación. Inténtalo de nuevo."
+    },
     "create": {
       "brandHeadline": "Un hogar para toda la familia de cuatro patas.",
       "featurePets": "Reúne a todas tus mascotas",

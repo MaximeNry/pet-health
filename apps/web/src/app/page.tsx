@@ -55,7 +55,7 @@ export default function DashboardPage() {
       {currentHousehold === null ? (
         <CreateHouseholdCard ownerId={user.userId} />
       ) : (
-        <DashboardBody household={currentHousehold} />
+        <DashboardBody household={currentHousehold} currentUserId={user.userId} />
       )}
     </main>
   );
@@ -64,7 +64,13 @@ export default function DashboardPage() {
 /** State of the pet dialog: closed, blank create form, or edit of a pet. */
 type PetModalState = { mode: 'create' } | { mode: 'edit'; pet: Pet } | null;
 
-function DashboardBody({ household }: { household: Household }) {
+function DashboardBody({
+  household,
+  currentUserId,
+}: {
+  household: Household;
+  currentUserId: string;
+}) {
   const t = useTranslations('dashboard');
   const pets = usePets(household.id);
   const petList = pets.data ?? [];
@@ -72,7 +78,7 @@ function DashboardBody({ household }: { household: Household }) {
 
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-10 pt-9 md:px-20">
-      <HouseholdHeader household={household} />
+      <HouseholdHeader household={household} currentUserId={currentUserId} />
 
       <div className="mb-[18px] flex items-baseline gap-2.5">
         <h2 className="text-2xl font-bold tracking-tight text-fg-1">

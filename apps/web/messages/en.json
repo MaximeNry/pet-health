@@ -30,6 +30,28 @@
     "kicker": "Your household",
     "memberCount": "{count, plural, one {# member} other {# members}}",
     "manage": "Manage household",
+    "members": {
+      "open": "Manage household members",
+      "title": "Household members",
+      "subtitle": "Manage who can view and update your pets' care.",
+      "close": "Close",
+      "you": "· You",
+      "roleLabel": "Member role",
+      "roles": {
+        "OWNER": "Owner",
+        "MEMBER": "Member"
+      },
+      "remove": "Remove from household",
+      "error": "The change failed. Please try again.",
+      "inviteTitle": "Invite a member",
+      "inviteEmailLabel": "Email address",
+      "inviteEmailPlaceholder": "name@example.com",
+      "inviteRoleLabel": "Role",
+      "inviteSubmit": "Send invitation",
+      "invitePending": "Sending…",
+      "inviteErrorNotFound": "No PetHealth account uses this email address.",
+      "inviteError": "The invitation failed. Please try again."
+    },
     "create": {
       "brandHeadline": "One household for the whole four-legged family.",
       "featurePets": "Bring all your pets together",

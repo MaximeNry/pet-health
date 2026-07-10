@@ -5,16 +5,27 @@ import { useTranslations } from 'next-intl';
 import type { Household } from '@/entities/household';
 import { initials } from '@/entities/user';
 import { accentAt } from '@/shared/lib/avatar';
-import { ManageIcon } from '@/shared/ui/icons';
+import { ChevronRightIcon, ManageIcon } from '@/shared/ui/icons';
 import { useHouseholdMembers } from '../model/useHouseholdMembers';
+import { HouseholdMembersModal } from './HouseholdMembersModal';
 import { ManageHouseholdModal } from './ManageHouseholdModal';
 
-/** Household header: label, name, member avatar stack and a manage action. */
-export function HouseholdHeader({ household }: { household: Household }) {
+/**
+ * Household header: label, name, a clickable member pill (opens the members
+ * dialog) and a manage action (opens the household settings dialog).
+ */
+export function HouseholdHeader({
+  household,
+  currentUserId,
+}: {
+  household: Household;
+  currentUserId: string;
+}) {
   const t = useTranslations('household');
   const memberProfiles = useHouseholdMembers(household.members);
   const count = household.members.length;
   const [isManageOpen, setIsManageOpen] = useState(false);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   return (
     <div className="mb-8 border-b border-border pb-7">
@@ -25,21 +36,27 @@ export function HouseholdHeader({ household }: { household: Household }) {
         {household.name}
       </div>
       <div className="flex items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="flex">
+        <button
+          type="button"
+          aria-label={t('members.open')}
+          onClick={() => setIsMembersOpen(true)}
+          className="group flex cursor-pointer items-center gap-3 rounded-full border border-border bg-surface py-[7px] pl-2 pr-3 transition hover:border-border-strong hover:bg-subtle hover:shadow-sm"
+        >
+          <span className="flex">
             {household.members.slice(0, 4).map((member, index) => (
               <span
                 key={member.userId}
-                className={`flex h-[34px] w-[34px] items-center justify-center rounded-full border-2 border-canvas text-[12.5px] font-bold ${accentAt(index).chip} ${index > 0 ? '-ml-2.5' : ''}`}
+                className={`flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-surface text-[11.5px] font-bold ${accentAt(index).chip} ${index > 0 ? '-ml-2.5' : ''}`}
               >
                 {initials(memberProfiles[member.userId])}
               </span>
             ))}
-          </div>
-          <span className="text-sm text-fg-2">
+          </span>
+          <span className="whitespace-nowrap text-sm font-semibold text-fg-1">
             {t('memberCount', { count })}
           </span>
-        </div>
+          <ChevronRightIcon className="h-4 w-4 text-fg-3 transition group-hover:translate-x-0.5 group-hover:text-fg-1" />
+        </button>
 
         <button
           type="button"
@@ -55,6 +72,13 @@ export function HouseholdHeader({ household }: { household: Household }) {
         <ManageHouseholdModal
           household={household}
           onClose={() => setIsManageOpen(false)}
+        />
+      )}
+      {isMembersOpen && (
+        <HouseholdMembersModal
+          household={household}
+          currentUserId={currentUserId}
+          onClose={() => setIsMembersOpen(false)}
         />
       )}
     </div>
