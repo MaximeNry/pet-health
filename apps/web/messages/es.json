@@ -266,12 +266,12 @@
   },
   "errors": {
     "title": "Algo salió mal",
-    "description": "Ocurrió un error inesperado. Inténtalo de nuevo en un momento.",
+    "description": "Algo salió mal de nuestro lado. Tus datos están a salvo; inténtalo de nuevo en un momento.",
     "retry": "Reintentar"
   },
   "notFound": {
     "title": "Página no encontrada",
-    "description": "Esta página no existe o se ha movido.",
+    "description": "La página que buscas no existe o se ha movido. No te preocupes: puedes volver atrás.",
     "backHome": "Volver al inicio"
   }
 }
