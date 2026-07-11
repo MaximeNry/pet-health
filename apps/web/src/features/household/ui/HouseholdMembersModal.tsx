@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import type { Household, HouseholdRole } from '@/entities/household';
 import { HOUSEHOLD_ROLES } from '@/entities/household';
 import { displayName, initials } from '@/entities/user';
@@ -9,14 +10,13 @@ import { accentAt } from '@/shared/lib/avatar';
 import { CloseIcon, TrashIcon } from '@/shared/ui/icons';
 import { useChangeMemberRole } from '../model/useChangeMemberRole';
 import { useHouseholdMembers } from '../model/useHouseholdMembers';
-import { useInviteMember, UnknownUserError } from '../model/useInviteMember';
 import { useRemoveMember } from '../model/useRemoveMember';
 
 /**
- * "Household members" dialog: lists members with their role (editable), lets
- * an existing account be added by email ("invite" — the MVP has no real
- * invitation flow, see `useInviteMember`) and members be removed. The current
- * user cannot remove themselves.
+ * "Household members" dialog: lists members with their role (editable) and
+ * lets members be removed. New members join through the invitation-link
+ * screen (`/household/invite`), which this dialog links to. The current user
+ * cannot remove themselves.
  */
 export function HouseholdMembersModal({
   household,
@@ -30,10 +30,6 @@ export function HouseholdMembersModal({
   const t = useTranslations('household.members');
   const memberProfiles = useHouseholdMembers(household.members);
 
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<HouseholdRole>('MEMBER');
-
-  const inviteMember = useInviteMember(household.id);
   const changeMemberRole = useChangeMemberRole(household.id);
   const removeMember = useRemoveMember(household.id);
 
@@ -44,17 +40,6 @@ export function HouseholdMembersModal({
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
-
-  const inviteReady = inviteEmail.trim().includes('@');
-
-  function handleInvite(event: React.FormEvent) {
-    event.preventDefault();
-    if (!inviteReady || inviteMember.isPending) return;
-    inviteMember.mutate(
-      { email: inviteEmail, role: inviteRole },
-      { onSuccess: () => setInviteEmail('') },
-    );
-  }
 
   return (
     <div
@@ -160,60 +145,21 @@ export function HouseholdMembersModal({
             </p>
           )}
 
-          {/* Invite section */}
-          <form onSubmit={handleInvite} className="flex flex-col gap-3.5 pt-5">
+          {/* Invite section: points to the invitation-link screen */}
+          <div className="flex flex-col gap-2.5 pt-5">
             <h3 className="text-base font-semibold tracking-tight text-fg-1">
               {t('inviteTitle')}
             </h3>
-            <label className="flex flex-col gap-2">
-              <span className="text-[13px] font-semibold text-fg-2">
-                {t('inviteEmailLabel')}
-              </span>
-              <input
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder={t('inviteEmailPlaceholder')}
-                className="ph-input w-full rounded-md border border-border-strong bg-surface px-3.5 py-3 text-[15px] text-fg-1 outline-none transition"
-              />
-            </label>
-            <div className="flex items-end gap-2.5">
-              <label className="flex flex-col gap-2">
-                <span className="text-[13px] font-semibold text-fg-2">
-                  {t('inviteRoleLabel')}
-                </span>
-                <select
-                  value={inviteRole}
-                  onChange={(e) =>
-                    setInviteRole(e.target.value as HouseholdRole)
-                  }
-                  className="cursor-pointer rounded-md border border-border-strong bg-surface px-3 py-3 text-[15px] font-medium text-fg-1 outline-none"
-                >
-                  {HOUSEHOLD_ROLES.map((role) => (
-                    <option key={role} value={role}>
-                      {t(`roles.${role}`)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="submit"
-                disabled={!inviteReady || inviteMember.isPending}
-                className="ph-btn ph-btn-primary flex-1 rounded-md bg-brand px-4 py-[13px] text-[15px] font-semibold text-white shadow-brand disabled:cursor-not-allowed disabled:bg-green-200 disabled:shadow-none"
-              >
-                {inviteMember.isPending
-                  ? t('invitePending')
-                  : t('inviteSubmit')}
-              </button>
-            </div>
-            {inviteMember.isError && (
-              <p role="alert" className="text-sm font-medium text-coral-700">
-                {inviteMember.error instanceof UnknownUserError
-                  ? t('inviteErrorNotFound')
-                  : t('inviteError')}
-              </p>
-            )}
-          </form>
+            <p className="text-sm leading-normal text-fg-3">
+              {t('inviteHint')}
+            </p>
+            <Link
+              href="/household/invite"
+              className="ph-btn ph-btn-primary flex items-center justify-center rounded-md bg-brand px-4 py-[13px] text-[15px] font-semibold text-white shadow-brand"
+            >
+              {t('inviteCta')}
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}

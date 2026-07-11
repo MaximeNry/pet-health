@@ -22,10 +22,18 @@ const SESSION_COOKIE = 'access_token';
 /** Routes reachable without a session. */
 const PUBLIC_ROUTES = ['/login'];
 
+/**
+ * Invitation links (`/invite/:token`) are landed on by definition without a
+ * session; the page itself routes anonymous visitors through Google OAuth
+ * and preserves the token. Signed-in visitors must reach it too (to redeem),
+ * so it is excluded from both redirects below.
+ */
+const isInviteRoute = (pathname: string) => pathname.startsWith('/invite/');
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = request.cookies.has(SESSION_COOKIE);
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isInviteRoute(pathname);
 
   // Signed-out visitor on a protected route → send to login.
   if (!hasSession && !isPublicRoute) {
@@ -33,7 +41,8 @@ export function proxy(request: NextRequest) {
   }
 
   // Already-signed-in visitor on a public route → send to the dashboard.
-  if (hasSession && isPublicRoute) {
+  // Invitation links stay reachable: the signed-in user redeems them there.
+  if (hasSession && isPublicRoute && !isInviteRoute(pathname)) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

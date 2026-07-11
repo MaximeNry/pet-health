@@ -29,5 +29,8 @@ import { HouseholdController } from './presentation/household.controller';
     ChangeMemberRoleUseCase,
     { provide: HOUSEHOLD_REPOSITORY, useClass: PrismaHouseholdRepository },
   ],
+  // Exported for the invitation context's accept flow — the one sanctioned
+  // crossing between the two contexts.
+  exports: [HOUSEHOLD_REPOSITORY],
 })
 export class HouseholdModule {}

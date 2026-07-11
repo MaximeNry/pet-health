@@ -19,7 +19,7 @@
   "language": {
     "label": "Language",
     "en": "English",
-    "es": "Español"
+    "es": "Spanish"
   },
   "dashboard": {
     "myPets": "My pets",
@@ -44,13 +44,8 @@
       "remove": "Remove from household",
       "error": "The change failed. Please try again.",
       "inviteTitle": "Invite a member",
-      "inviteEmailLabel": "Email address",
-      "inviteEmailPlaceholder": "name@example.com",
-      "inviteRoleLabel": "Role",
-      "inviteSubmit": "Send invitation",
-      "invitePending": "Sending…",
-      "inviteErrorNotFound": "No PetHealth account uses this email address.",
-      "inviteError": "The invitation failed. Please try again."
+      "inviteHint": "Share a personal invitation link. Only the invited Google account can use it.",
+      "inviteCta": "Invite with a link"
     },
     "create": {
       "brandHeadline": "One household for the whole four-legged family.",
@@ -79,6 +74,62 @@
       "cancel": "Cancel",
       "save": "Save",
       "savePending": "Saving…"
+    }
+  },
+  "invite": {
+    "title": "Invite a member",
+    "back": "Back",
+    "emailLabel": "Email allowed to join",
+    "emailPlaceholder": "name@gmail.com",
+    "emailHint": "Must match the Google account the person will sign in with. No email is sent — you share the link yourself.",
+    "submit": "Generate the invitation link",
+    "submitPending": "Generating…",
+    "createError": "Creating the invitation failed. A pending invitation may already exist for this email.",
+    "link": {
+      "ready": "Invitation link ready",
+      "copy": "Copy the link",
+      "copied": "Link copied!",
+      "whatsapp": "Share on WhatsApp",
+      "shareMessage": "Join the {household} household on PetHealth:",
+      "restrictedTo": "Reserved for <strong>{email}</strong> · expires {expires}",
+      "inviteAnother": "Invite someone else"
+    },
+    "list": {
+      "title": "Invitations",
+      "loading": "Loading invitations…",
+      "error": "The invitations could not be loaded.",
+      "empty": "No invitations yet.",
+      "expiresIn": "Expires {relative}",
+      "acceptedOn": "Accepted on {date}",
+      "invitedOn": "Invited on {date}",
+      "revoke": "Revoke",
+      "status": {
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REVOKED": "Revoked",
+        "EXPIRED": "Expired"
+      }
+    },
+    "accept": {
+      "pendingTitle": "One moment…",
+      "pending": "We are checking your invitation.",
+      "signInTitle": "You've been invited!",
+      "signInText": "Sign in with the invited Google account to join the household on PetHealth.",
+      "signInCta": "Continue with Google",
+      "successTitle": "Welcome to {household}!",
+      "successText": "You now share the pets' health record. Taking you to the dashboard…",
+      "goToHousehold": "Go to the household",
+      "wrongAccountTitle": "Wrong Google account",
+      "wrongAccountText": "This invitation was issued for {invitedEmail}, but you are signed in as {signedInEmail}. Switch accounts to accept it.",
+      "wrongAccountTextNoEmail": "This invitation was issued for another email address, but you are signed in as {signedInEmail}. Switch accounts to accept it.",
+      "switchAccount": "Switch Google account",
+      "alreadyUsedTitle": "Invitation already used",
+      "alreadyUsedText": "This invitation has already been accepted or revoked. Ask for a new link if you still need access.",
+      "expiredTitle": "Invitation expired",
+      "expiredText": "This invitation link has expired. Ask the household to send you a new one.",
+      "invalidTitle": "Invalid invitation",
+      "invalidText": "This invitation link is not valid. Check that the full link was copied.",
+      "goHome": "Go to PetHealth"
     }
   },
   "pets": {

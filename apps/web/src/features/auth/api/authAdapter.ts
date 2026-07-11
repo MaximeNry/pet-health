@@ -23,3 +23,11 @@ export const authAdapter = {
 
 /** URL that starts the Google OAuth flow (full navigation, not client-side). */
 export const googleLoginUrl = `${API_URL}/auth/google`;
+
+/**
+ * Same flow, but the API sends the browser back to `returnTo` (an in-app
+ * path, e.g. an invitation link) after the Google round-trip.
+ */
+export function googleLoginUrlFor(returnTo: string): string {
+  return `${googleLoginUrl}?returnTo=${encodeURIComponent(returnTo)}`;
+}

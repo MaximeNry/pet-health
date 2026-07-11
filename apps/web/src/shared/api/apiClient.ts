@@ -12,9 +12,36 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    /** `message` from the API error body, when the response carried one. */
+    readonly serverMessage?: string,
+    /** `details` from the API error body (machine-readable error context). */
+    readonly details?: Record<string, unknown>,
   ) {
     super(message);
     this.name = 'ApiError';
+  }
+}
+
+/** Extracts the API error body ({ message, details? }) when parseable. */
+async function parseErrorBody(
+  res: Response,
+): Promise<{ message?: string; details?: Record<string, unknown> }> {
+  try {
+    const body: unknown = await res.json();
+    if (typeof body !== 'object' || body === null) return {};
+    const { message, details } = body as {
+      message?: unknown;
+      details?: unknown;
+    };
+    return {
+      message: typeof message === 'string' ? message : undefined,
+      details:
+        typeof details === 'object' && details !== null
+          ? (details as Record<string, unknown>)
+          : undefined,
+    };
+  } catch {
+    return {};
   }
 }
 
@@ -24,7 +51,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
   if (!res.ok) {
-    throw new ApiError(res.status, `Request to ${path} failed (${res.status})`);
+    const { message, details } = await parseErrorBody(res);
+    throw new ApiError(
+      res.status,
+      `Request to ${path} failed (${res.status})`,
+      message,
+      details,
+    );
   }
   // 204 No Content and empty bodies resolve to `undefined`.
   if (res.status === 204) {

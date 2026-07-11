@@ -25,6 +25,8 @@ describe('DomainExceptionFilter', () => {
     ['validation', 400],
     ['not-found', 404],
     ['conflict', 409],
+    ['forbidden', 403],
+    ['gone', 410],
   ])('maps a %s error to HTTP %d', (kind, code) => {
     const { host, status, json } = makeHost();
 
@@ -35,6 +37,25 @@ describe('DomainExceptionFilter', () => {
       statusCode: code,
       error: 'TestError',
       message: 'boom',
+    });
+  });
+
+  it('serializes the error details when present', () => {
+    class DetailedError extends DomainError {
+      readonly kind: DomainErrorKind = 'forbidden';
+      constructor() {
+        super('boom', { invitedEmail: 'a@b.c' });
+      }
+    }
+    const { host, json } = makeHost();
+
+    filter.catch(new DetailedError(), host);
+
+    expect(json).toHaveBeenCalledWith({
+      statusCode: 403,
+      error: 'DetailedError',
+      message: 'boom',
+      details: { invitedEmail: 'a@b.c' },
     });
   });
 });

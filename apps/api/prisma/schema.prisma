@@ -65,6 +65,9 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  invitationsSent     Invitation[] @relation("InvitationsSent")
+  invitationsAccepted Invitation[] @relation("InvitationsAccepted")
+
   @@map("users")
 }
 
@@ -111,6 +114,7 @@ model Household {
   createdAt     DateTime          @default(now()) @map("created_at")
   updatedAt     DateTime          @updatedAt @map("updated_at")
   members       HouseholdMember[]
+  invitations   Invitation[]
 
   @@map("households")
 }
@@ -125,4 +129,35 @@ model HouseholdMember {
   @@id([householdId, userId])
   @@index([userId])
   @@map("household_members")
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+}
+
+// Household invitation redeemed via a shareable link. No "EXPIRED" status on
+// purpose: expiration is derived from `expiresAt < now()`; `status` only
+// carries decided transitions (accepted, revoked). The raw invitation token is
+// never stored — only its SHA-256 hash. A partial unique index (added by raw
+// SQL in the migration, Prisma can't express it) guarantees at most one
+// PENDING invitation per (household, email).
+model Invitation {
+  id           String           @id @default(uuid())
+  householdId  String           @map("household_id")
+  invitedEmail String           @map("invited_email")
+  tokenHash    String           @unique @map("token_hash")
+  status       InvitationStatus @default(PENDING)
+  invitedBy    String           @map("invited_by")
+  expiresAt    DateTime         @map("expires_at")
+  acceptedBy   String?          @map("accepted_by")
+  acceptedAt   DateTime?        @map("accepted_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  household    Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  inviter      User             @relation("InvitationsSent", fields: [invitedBy], references: [id])
+  accepter     User?            @relation("InvitationsAccepted", fields: [acceptedBy], references: [id])
+
+  @@index([householdId])
+  @@map("invitations")
 }

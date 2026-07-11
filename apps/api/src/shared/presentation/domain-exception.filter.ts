@@ -11,6 +11,8 @@ const STATUS_BY_KIND: Record<DomainErrorKind, number> = {
   validation: HttpStatus.BAD_REQUEST,
   'not-found': HttpStatus.NOT_FOUND,
   conflict: HttpStatus.CONFLICT,
+  forbidden: HttpStatus.FORBIDDEN,
+  gone: HttpStatus.GONE,
 };
 
 /**
@@ -29,6 +31,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
       statusCode: status,
       error: exception.name,
       message: exception.message,
+      ...(exception.details !== undefined && { details: exception.details }),
     });
   }
 }

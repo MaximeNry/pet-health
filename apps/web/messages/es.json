@@ -18,7 +18,7 @@
   },
   "language": {
     "label": "Idioma",
-    "en": "English",
+    "en": "Inglés",
     "es": "Español"
   },
   "dashboard": {
@@ -44,13 +44,8 @@
       "remove": "Quitar del hogar",
       "error": "No se pudo aplicar el cambio. Inténtalo de nuevo.",
       "inviteTitle": "Invitar a un miembro",
-      "inviteEmailLabel": "Dirección de correo",
-      "inviteEmailPlaceholder": "nombre@ejemplo.com",
-      "inviteRoleLabel": "Rol",
-      "inviteSubmit": "Enviar la invitación",
-      "invitePending": "Enviando…",
-      "inviteErrorNotFound": "Ninguna cuenta de PetHealth usa esta dirección de correo.",
-      "inviteError": "No se pudo enviar la invitación. Inténtalo de nuevo."
+      "inviteHint": "Comparte un enlace de invitación personal: solo la cuenta de Google invitada podrá usarlo.",
+      "inviteCta": "Invitar con un enlace"
     },
     "create": {
       "brandHeadline": "Un hogar para toda la familia de cuatro patas.",
@@ -79,6 +74,62 @@
       "cancel": "Cancelar",
       "save": "Guardar",
       "savePending": "Guardando…"
+    }
+  },
+  "invite": {
+    "title": "Invitar a un miembro",
+    "back": "Atrás",
+    "emailLabel": "Correo autorizado a unirse",
+    "emailPlaceholder": "nombre@gmail.com",
+    "emailHint": "Debe coincidir con la cuenta de Google con la que la persona iniciará sesión. No se envía ningún correo: tú compartes el enlace.",
+    "submit": "Generar el enlace de invitación",
+    "submitPending": "Generando…",
+    "createError": "No se pudo crear la invitación. Puede que ya exista una invitación pendiente para este correo.",
+    "link": {
+      "ready": "Enlace de invitación listo",
+      "copy": "Copiar el enlace",
+      "copied": "¡Enlace copiado!",
+      "whatsapp": "Compartir por WhatsApp",
+      "shareMessage": "Únete al hogar {household} en PetHealth:",
+      "restrictedTo": "Reservado para <strong>{email}</strong> · caduca {expires}",
+      "inviteAnother": "Invitar a otra persona"
+    },
+    "list": {
+      "title": "Invitaciones",
+      "loading": "Cargando invitaciones…",
+      "error": "No se pudieron cargar las invitaciones.",
+      "empty": "Aún no hay invitaciones.",
+      "expiresIn": "Caduca {relative}",
+      "acceptedOn": "Aceptada el {date}",
+      "invitedOn": "Invitada el {date}",
+      "revoke": "Revocar",
+      "status": {
+        "PENDING": "Pendiente",
+        "ACCEPTED": "Aceptada",
+        "REVOKED": "Revocada",
+        "EXPIRED": "Caducada"
+      }
+    },
+    "accept": {
+      "pendingTitle": "Un momento…",
+      "pending": "Estamos comprobando tu invitación.",
+      "signInTitle": "¡Te han invitado!",
+      "signInText": "Inicia sesión con la cuenta de Google invitada para unirte al hogar en PetHealth.",
+      "signInCta": "Continuar con Google",
+      "successTitle": "¡Bienvenido a {household}!",
+      "successText": "Ahora compartes el historial de salud de las mascotas. Te llevamos al panel…",
+      "goToHousehold": "Ir al hogar",
+      "wrongAccountTitle": "Cuenta de Google incorrecta",
+      "wrongAccountText": "Esta invitación se emitió para {invitedEmail}, pero has iniciado sesión como {signedInEmail}. Cambia de cuenta para aceptarla.",
+      "wrongAccountTextNoEmail": "Esta invitación se emitió para otra dirección de correo, pero has iniciado sesión como {signedInEmail}. Cambia de cuenta para aceptarla.",
+      "switchAccount": "Cambiar de cuenta de Google",
+      "alreadyUsedTitle": "Invitación ya utilizada",
+      "alreadyUsedText": "Esta invitación ya fue aceptada o revocada. Pide un nuevo enlace si aún necesitas acceso.",
+      "expiredTitle": "Invitación caducada",
+      "expiredText": "Este enlace de invitación ha caducado. Pide al hogar que te envíe uno nuevo.",
+      "invalidTitle": "Invitación no válida",
+      "invalidText": "Este enlace de invitación no es válido. Comprueba que se copió el enlace completo.",
+      "goHome": "Ir a PetHealth"
     }
   },
   "pets": {

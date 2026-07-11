@@ -7,7 +7,7 @@ import {
 } from './auth.constants';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { GoogleAuthGuard, safeReturnPath } from './guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -37,7 +37,12 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: ACCESS_TOKEN_MAX_AGE_MS,
     });
-    res.redirect(process.env.FRONTEND_URL ?? 'http://localhost:3001');
+    // Google echoes our OAuth `state` back: it carries the sanitized path the
+    // flow started from (e.g. an invitation link) — see GoogleAuthGuard.
+    const returnTo = safeReturnPath(req.query.state) ?? '/';
+    res.redirect(
+      `${process.env.FRONTEND_URL ?? 'http://localhost:3001'}${returnTo}`,
+    );
   }
 
   /** Returns the currently authenticated user. Protected by the global guard. */
