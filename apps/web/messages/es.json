@@ -14,7 +14,28 @@
   },
   "account": {
     "profile": "Mi perfil",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "title": "Mi cuenta",
+    "back": "Volver al panel",
+    "google": {
+      "kicker": "Cuenta de Google",
+      "linked": "Cuenta vinculada",
+      "connected": "Conectada",
+      "privacyNote": "PetHealth solo accede a los archivos que crea en tu Drive — nunca al resto de tus documentos."
+    },
+    "delete": {
+      "title": "Eliminar mi cuenta",
+      "description": "La eliminación borra definitivamente tus mascotas, sus historiales de salud y todos los archivos creados en tu Drive. Esta acción es irreversible.",
+      "cta": "Eliminar mi cuenta",
+      "modal": {
+        "title": "¿Eliminar tu cuenta?",
+        "description": "Tus mascotas, sus historiales de salud y los archivos creados en tu Drive se eliminarán definitivamente.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "confirmPending": "Eliminando…",
+        "error": "No se pudo eliminar la cuenta. Inténtalo de nuevo."
+      }
+    }
   },
   "language": {
     "label": "Idioma",

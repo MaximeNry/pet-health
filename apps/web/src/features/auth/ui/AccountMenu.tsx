@@ -77,6 +77,10 @@ export function AccountMenu({ user }: { user: AuthUser }) {
           <button
             type="button"
             role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              router.push('/account');
+            }}
             className="flex w-full items-center gap-2.5 rounded-sm p-2.5 text-left text-sm font-medium text-fg-1 transition hover:bg-subtle"
           >
             <UserIcon className="h-[18px] w-[18px] text-fg-2" />

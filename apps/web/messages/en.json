@@ -14,7 +14,28 @@
   },
   "account": {
     "profile": "My profile",
-    "logout": "Log out"
+    "logout": "Log out",
+    "title": "My account",
+    "back": "Back to dashboard",
+    "google": {
+      "kicker": "Google account",
+      "linked": "Linked account",
+      "connected": "Connected",
+      "privacyNote": "PetHealth only accesses the files it creates in your Drive — never the rest of your documents."
+    },
+    "delete": {
+      "title": "Delete my account",
+      "description": "Deletion permanently erases your pets, their health records and every file created in your Drive. This can't be undone.",
+      "cta": "Delete my account",
+      "modal": {
+        "title": "Delete your account?",
+        "description": "Your pets, their health records and the files created in your Drive will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "confirmPending": "Deleting…",
+        "error": "The account could not be deleted. Please try again."
+      }
+    }
   },
   "language": {
     "label": "Language",

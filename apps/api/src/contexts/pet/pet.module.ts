@@ -23,5 +23,7 @@ import { PetController } from './presentation/pet.controller';
     DeletePetUseCase,
     { provide: PET_REPOSITORY, useClass: PrismaPetRepository },
   ],
+  // Exported for the user context's account-deletion flow.
+  exports: [PET_REPOSITORY],
 })
 export class PetModule {}

@@ -155,7 +155,9 @@ model Invitation {
   acceptedAt   DateTime?        @map("accepted_at")
   createdAt    DateTime         @default(now()) @map("created_at")
   household    Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  inviter      User             @relation("InvitationsSent", fields: [invitedBy], references: [id])
+  // Cascade: deleting a user account must not be blocked by invitations they
+  // sent; accepted-by simply loses the reference (default SetNull).
+  inviter      User             @relation("InvitationsSent", fields: [invitedBy], references: [id], onDelete: Cascade)
   accepter     User?            @relation("InvitationsAccepted", fields: [acceptedBy], references: [id])
 
   @@index([householdId])

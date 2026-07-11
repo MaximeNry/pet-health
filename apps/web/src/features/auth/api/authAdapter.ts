@@ -19,6 +19,11 @@ export const authAdapter = {
   async logout(): Promise<void> {
     await apiClient.post<{ success: boolean }>('/auth/logout');
   },
+
+  /** Permanently deletes the signed-in account and ends the session. */
+  async deleteAccount(): Promise<void> {
+    await apiClient.delete<void>('/auth/me');
+  },
 };
 
 /** URL that starts the Google OAuth flow (full navigation, not client-side). */

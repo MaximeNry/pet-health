@@ -50,5 +50,7 @@ const storageMode =
           : LocalDiskStorageAdapter,
     },
   ],
+  // Exported for the user context's account-deletion flow.
+  exports: [HEALTH_DOCUMENT_REPOSITORY, DOCUMENT_STORAGE],
 })
 export class HealthDocumentModule {}
