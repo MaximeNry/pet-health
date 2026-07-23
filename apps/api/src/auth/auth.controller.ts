@@ -14,6 +14,7 @@ import { DomainExceptionFilter } from '../shared/presentation/domain-exception.f
 import {
   ACCESS_TOKEN_COOKIE,
   ACCESS_TOKEN_MAX_AGE_MS,
+  sessionCookieOptions,
   type AuthenticatedUser,
 } from './auth.constants';
 import { AuthService } from './auth.service';
@@ -47,9 +48,7 @@ export class AuthController {
     const token = this.auth.issueAccessToken(user);
 
     res.cookie(ACCESS_TOKEN_COOKIE, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...sessionCookieOptions(),
       maxAge: ACCESS_TOKEN_MAX_AGE_MS,
     });
     // Google echoes our OAuth `state` back: it carries the sanitized path the
@@ -70,7 +69,7 @@ export class AuthController {
   @Public()
   @Post('logout')
   logout(@Res() res: Response): void {
-    res.clearCookie(ACCESS_TOKEN_COOKIE);
+    res.clearCookie(ACCESS_TOKEN_COOKIE, sessionCookieOptions());
     res.status(200).json({ success: true });
   }
 
@@ -82,7 +81,7 @@ export class AuthController {
   async removeMe(@Req() req: Request, @Res() res: Response): Promise<void> {
     const user = req.user as AuthenticatedUser;
     await this.deleteAccount.execute(user.userId);
-    res.clearCookie(ACCESS_TOKEN_COOKIE);
+    res.clearCookie(ACCESS_TOKEN_COOKIE, sessionCookieOptions());
     res.status(204).send();
   }
 }
