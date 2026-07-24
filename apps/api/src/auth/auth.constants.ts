@@ -8,20 +8,25 @@ export const ACCESS_TOKEN_COOKIE = 'access_token';
  * that clears it (both must agree on domain/sameSite/secure or the browser
  * won't overwrite/delete the cookie).
  *
- * When `COOKIE_DOMAIN` is set (production, where web and API live on distinct
- * subdomains of the same parent — e.g. `app.` and `api.pethealth.xyz`), the
- * cookie is scoped to that parent so both origins share it, which requires
- * `SameSite=None; Secure`. Without it (local dev on `localhost:<port>`, a
- * single site) we keep `SameSite=Lax` and no explicit domain.
+ * `COOKIE_DOMAIN` (production) is the shared parent of the web and API
+ * subdomains — e.g. `.pethealth.xyz` for `app.` / `api.pethealth.xyz`. Scoping
+ * the cookie to that parent is what makes it visible to BOTH origins: without
+ * it the cookie is host-only on the API, so the web proxy/middleware never
+ * sees it and bounces every request to `/login`.
+ *
+ * `SameSite=Lax` is enough because the two subdomains are the *same site*
+ * (same registrable domain / eTLD+1): the cross-subdomain `fetch`es from the
+ * web are same-site requests, so Lax still carries the cookie while keeping
+ * CSRF protection. In dev (localhost, no domain) the behaviour is identical.
+ * Only if web and API ever lived on *different* registrable domains would
+ * `SameSite=None; Secure` be required.
  */
 export function sessionCookieOptions(): CookieOptions {
   const domain = process.env.COOKIE_DOMAIN;
-  const crossSite = Boolean(domain);
   return {
     httpOnly: true,
-    // SameSite=None mandates Secure; in prod we serve over HTTPS anyway.
-    secure: crossSite || process.env.NODE_ENV === 'production',
-    sameSite: crossSite ? 'none' : 'lax',
+    secure: Boolean(domain) || process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     domain: domain || undefined,
     path: '/',
   };
