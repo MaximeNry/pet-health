@@ -83,6 +83,8 @@ services:
       # i18n messages are loaded at runtime by next-intl; mount them so new
       # keys hot-reload like source files instead of requiring a rebuild.
       - ./apps/web/messages:/app/apps/web/messages
+      # Static assets (PWA icons, manifest assets…) served by next dev.
+      - ./apps/web/public:/app/apps/web/public
       - ./packages/shared/src:/app/packages/shared/src
     depends_on:
       - api

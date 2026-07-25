@@ -51,5 +51,8 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Run on every path except API routes, Next.js internals and static assets.
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // `.*\\..*` skips any path with a file extension (favicon.ico, PWA manifest
+  // and icons, /brand/* assets…): those are fetched without a session (e.g. by
+  // iOS when installing the app) and must never redirect to /login.
+  matcher: ['/((?!api|_next/static|_next/image|.*\\..*).*)'],
 };

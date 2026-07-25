@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Hanken_Grotesk, Instrument_Serif } from "next/font/google";
@@ -18,11 +18,27 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
 });
 
+// Browser chrome color while the PWA loads (green-600, see globals.css).
+export const viewport: Viewport = {
+  themeColor: "#16704A",
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
   return {
     title: "PetHealth",
     description: t("description"),
+    icons: {
+      icon: "/brand/icon-192.png",
+      apple: "/apple-touch-icon.png",
+    },
+    // iOS ignores most of the manifest: these tags drive the standalone
+    // (home-screen) experience on iPhone.
+    appleWebApp: {
+      capable: true,
+      title: "PetHealth",
+      statusBarStyle: "default",
+    },
   };
 }
 
