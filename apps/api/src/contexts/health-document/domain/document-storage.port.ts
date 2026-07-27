@@ -18,9 +18,9 @@ export interface StoredFile {
 
 export interface StoredFileRef {
   /**
-   * User whose storage account is used to reach the file. Files live in the
-   * uploader's account; the requester's id is passed today, which limits
-   * download/delete to files reachable by that account.
+   * User whose storage account is used to reach the file — always the
+   * uploader (`HealthDocument.uploaderUserId`), so any household member can
+   * read a file that lives in another member's account.
    */
   ownerUserId: string;
   fileId: string;

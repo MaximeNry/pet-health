@@ -55,7 +55,7 @@ export class DeleteAccountUseCase {
 
     for (const household of await this.households.findByUserId(userId)) {
       if (household.members.length === 1) {
-        await this.tearDownHousehold(household.id, userId);
+        await this.tearDownHousehold(household.id);
       } else {
         this.handOverOwnershipIfNeeded(household, userId);
         household.removeMember(userId);
@@ -67,18 +67,15 @@ export class DeleteAccountUseCase {
   }
 
   /** Deletes a sole-member household: documents and files, pets, then the root. */
-  private async tearDownHousehold(
-    householdId: string,
-    userId: string,
-  ): Promise<void> {
+  private async tearDownHousehold(householdId: string): Promise<void> {
     for (const pet of await this.pets.findByHouseholdId(householdId)) {
       for (const document of await this.documents.findByPetId(pet.id)) {
         // Best-effort: a revoked Google token must not make the account
         // impossible to delete. An unreachable file is left behind in the
-        // user's own Drive, where they can still remove it themselves.
+        // uploader's own Drive, where they can still remove it themselves.
         try {
           await this.storage.delete({
-            ownerUserId: userId,
+            ownerUserId: document.uploaderUserId,
             fileId: document.storageFileId,
           });
         } catch (err) {

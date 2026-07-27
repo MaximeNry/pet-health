@@ -86,6 +86,9 @@ model HealthDocument {
   petId        String       @map("pet_id")
   householdId  String       @map("household_id")
   driveFileId  String       @map("drive_file_id")
+  // Member whose Google Drive holds the file: downloads/deletions always go
+  // through this user's tokens, whoever in the household asks.
+  uploaderUserId String     @map("uploader_user_id")
   documentType DocumentType @map("document_type")
   title        String
   documentDate DateTime     @map("document_date")

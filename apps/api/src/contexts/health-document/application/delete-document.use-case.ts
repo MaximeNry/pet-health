@@ -8,8 +8,6 @@ import { GetPetDocumentUseCase } from './get-pet-document.use-case';
 export interface DeleteDocumentCommand {
   petId: string;
   documentId: string;
-  /** Authenticated user — whose storage account is used to remove the file. */
-  userId: string;
 }
 
 /**
@@ -33,8 +31,10 @@ export class DeleteDocumentUseCase {
       command.petId,
       command.documentId,
     );
+    // The file lives in the uploader's storage account, whatever member asks
+    // for the deletion.
     await this.storage.delete({
-      ownerUserId: command.userId,
+      ownerUserId: document.uploaderUserId,
       fileId: document.storageFileId,
     });
     await this.documents.deleteById(document.id);

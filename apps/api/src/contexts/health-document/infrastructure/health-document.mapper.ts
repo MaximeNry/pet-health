@@ -17,6 +17,7 @@ export class HealthDocumentMapper {
       petId: record.petId,
       householdId: record.householdId,
       storageFileId: record.driveFileId,
+      uploaderUserId: record.uploaderUserId,
       documentType: record.documentType,
       title: record.title,
       documentDate: record.documentDate,
@@ -36,6 +37,7 @@ export class HealthDocumentMapper {
       petId: snapshot.petId,
       householdId: snapshot.householdId,
       driveFileId: snapshot.storageFileId,
+      uploaderUserId: snapshot.uploaderUserId,
       // The domain already guarantees a valid type (DocumentType value object).
       documentType: snapshot.documentType as PrismaDocumentType,
       title: snapshot.title,

@@ -48,6 +48,7 @@ describe('UploadDocumentUseCase', () => {
     });
     expect(repository.save).toHaveBeenCalledWith(expect.any(HealthDocument));
     expect(document.storageFileId).toBe('drive-42');
+    expect(document.uploaderUserId).toBe('user-1');
     expect(document.sizeBytes).toBe(3);
   });
 

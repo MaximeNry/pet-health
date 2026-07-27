@@ -5,6 +5,7 @@ const validProps = () => ({
   petId: 'pet-1',
   householdId: 'household-1',
   storageFileId: 'file-1',
+  uploaderUserId: 'user-1',
   documentType: 'VACCINATION',
   title: 'Rabies booster',
   documentDate: new Date('2026-06-12'),

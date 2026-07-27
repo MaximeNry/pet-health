@@ -54,6 +54,7 @@ export class UploadDocumentUseCase {
       petId: command.petId,
       householdId: command.householdId,
       storageFileId: fileId,
+      uploaderUserId: command.userId,
       documentType: command.documentType,
       title: command.title,
       documentDate: command.documentDate,

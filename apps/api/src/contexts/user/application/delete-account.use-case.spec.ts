@@ -31,10 +31,15 @@ const makePet = (householdId: string) =>
     householdId,
   });
 
-const makeDocument = (petId: string, householdId: string) =>
+const makeDocument = (
+  petId: string,
+  householdId: string,
+  uploaderUserId: string,
+) =>
   HealthDocument.create({
     petId,
     householdId,
+    uploaderUserId,
     storageFileId: 'drive-file-1',
     documentType: 'VACCINATION',
     title: 'Rabies shot',
@@ -101,7 +106,7 @@ describe('DeleteAccountUseCase', () => {
     const user = makeUser();
     const household = Household.create({ name: 'Foyer', ownerId: user.id });
     const pet = makePet(household.id);
-    const document = makeDocument(pet.id, household.id);
+    const document = makeDocument(pet.id, household.id, user.id);
 
     users.findById.mockResolvedValue(user);
     households.findByUserId.mockResolvedValue([household]);
@@ -130,7 +135,7 @@ describe('DeleteAccountUseCase', () => {
     households.findByUserId.mockResolvedValue([household]);
     pets.findByHouseholdId.mockResolvedValue([pet]);
     documents.findByPetId.mockResolvedValue([
-      makeDocument(pet.id, household.id),
+      makeDocument(pet.id, household.id, user.id),
     ]);
     storage.delete.mockRejectedValue(new Error('token revoked'));
 

@@ -22,6 +22,7 @@ describe('document detail use cases', () => {
       petId: 'pet-1',
       householdId: 'household-1',
       storageFileId: 'drive-42',
+      uploaderUserId: 'uploader-1',
       documentType: 'VACCINATION',
       title: 'Rabies booster',
       documentDate: new Date('2026-06-12'),
@@ -68,17 +69,16 @@ describe('document detail use cases', () => {
   });
 
   describe('DownloadDocumentUseCase', () => {
-    it('reads the stored file of the document', async () => {
+    it('reads the stored file with the uploader account, whoever asks', async () => {
       const useCase = new DownloadDocumentUseCase(storage, getDocument);
 
       const result = await useCase.execute({
         petId: 'pet-1',
         documentId: 'doc-1',
-        userId: 'user-1',
       });
 
       expect(storage.download).toHaveBeenCalledWith({
-        ownerUserId: 'user-1',
+        ownerUserId: 'uploader-1',
         fileId: 'drive-42',
       });
       expect(result.content).toEqual(new Uint8Array([1, 2, 3]));
@@ -125,11 +125,10 @@ describe('document detail use cases', () => {
       await useCase.execute({
         petId: 'pet-1',
         documentId: 'doc-1',
-        userId: 'user-1',
       });
 
       expect(storage.delete).toHaveBeenCalledWith({
-        ownerUserId: 'user-1',
+        ownerUserId: 'uploader-1',
         fileId: 'drive-42',
       });
       expect(repository.deleteById).toHaveBeenCalledWith('doc-1');
@@ -144,7 +143,7 @@ describe('document detail use cases', () => {
       );
 
       await expect(
-        useCase.execute({ petId: 'pet-1', documentId: 'doc-1', userId: 'u' }),
+        useCase.execute({ petId: 'pet-1', documentId: 'doc-1' }),
       ).rejects.toThrow('drive down');
       expect(repository.deleteById).not.toHaveBeenCalled();
     });

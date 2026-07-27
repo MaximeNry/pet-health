@@ -133,14 +133,11 @@ export class HealthDocumentController {
     @Param('petId') petId: string,
     @Param('documentId') documentId: string,
     @Query('download') download: string | undefined,
-    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
-    const user = req.user as AuthenticatedUser;
     const { document, content } = await this.downloadDocument.execute({
       petId,
       documentId,
-      userId: user.userId,
     });
 
     const disposition = download === '1' ? 'attachment' : 'inline';
@@ -174,13 +171,10 @@ export class HealthDocumentController {
   async remove(
     @Param('petId') petId: string,
     @Param('documentId') documentId: string,
-    @Req() req: Request,
   ): Promise<void> {
-    const user = req.user as AuthenticatedUser;
     await this.deleteDocument.execute({
       petId,
       documentId,
-      userId: user.userId,
     });
   }
 

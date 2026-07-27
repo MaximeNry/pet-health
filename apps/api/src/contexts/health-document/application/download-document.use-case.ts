@@ -7,8 +7,6 @@ import { GetPetDocumentUseCase } from './get-pet-document.use-case';
 export interface DownloadDocumentCommand {
   petId: string;
   documentId: string;
-  /** Authenticated user — whose storage account is used to read the file. */
-  userId: string;
 }
 
 export interface DownloadedDocument {
@@ -19,7 +17,9 @@ export interface DownloadedDocument {
 /**
  * Retrieves the bytes of a stored document for preview or download: resolves
  * the metadata (guarding pet ownership), then reads the file behind the
- * `DocumentStorage` port.
+ * `DocumentStorage` port. The file is read with the *uploader's* storage
+ * account (each scan lives in the Drive of the member who created it), so
+ * every household member can view every document.
  */
 @Injectable()
 export class DownloadDocumentUseCase {
@@ -35,7 +35,7 @@ export class DownloadDocumentUseCase {
       command.documentId,
     );
     const content = await this.storage.download({
-      ownerUserId: command.userId,
+      ownerUserId: document.uploaderUserId,
       fileId: document.storageFileId,
     });
     return { document, content };

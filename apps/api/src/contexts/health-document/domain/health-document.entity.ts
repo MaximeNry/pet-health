@@ -17,6 +17,8 @@ export interface CreateHealthDocumentProps extends HealthDocumentMetadata {
   petId: string;
   householdId: string;
   storageFileId: string;
+  /** User whose storage account holds the file (the member who scanned it). */
+  uploaderUserId: string;
   mimeType: string;
   sizeBytes: number;
 }
@@ -27,6 +29,7 @@ export interface HealthDocumentSnapshot {
   petId: string;
   householdId: string;
   storageFileId: string;
+  uploaderUserId: string;
   documentType: string;
   title: string;
   documentDate: Date;
@@ -47,6 +50,7 @@ export class HealthDocument extends Entity {
   private readonly _petId: string;
   private readonly _householdId: string;
   private readonly _storageFileId: string;
+  private readonly _uploaderUserId: string;
   private _documentType: DocumentType;
   private _title: string;
   private _documentDate: Date;
@@ -61,6 +65,7 @@ export class HealthDocument extends Entity {
     this._petId = props.petId;
     this._householdId = props.householdId;
     this._storageFileId = props.storageFileId;
+    this._uploaderUserId = props.uploaderUserId;
     this._documentType = DocumentType.create(props.documentType);
     this._title = props.title;
     this._documentDate = props.documentDate;
@@ -82,6 +87,10 @@ export class HealthDocument extends Entity {
       storageFileId: HealthDocument.requireId(
         props.storageFileId,
         'storageFileId',
+      ),
+      uploaderUserId: HealthDocument.requireId(
+        props.uploaderUserId,
+        'uploaderUserId',
       ),
       documentType: props.documentType,
       title: HealthDocument.normalizeTitle(props.title),
@@ -117,6 +126,7 @@ export class HealthDocument extends Entity {
       petId: this._petId,
       householdId: this._householdId,
       storageFileId: this._storageFileId,
+      uploaderUserId: this._uploaderUserId,
       documentType: this._documentType.toString(),
       title: this._title,
       documentDate: this._documentDate,
@@ -144,6 +154,10 @@ export class HealthDocument extends Entity {
 
   get storageFileId(): string {
     return this._storageFileId;
+  }
+
+  get uploaderUserId(): string {
+    return this._uploaderUserId;
   }
 
   get documentType(): string {
