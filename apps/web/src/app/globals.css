@@ -258,3 +258,19 @@ body {
 .ph-input::placeholder {
   color: var(--color-fg-3);
 }
+
+/*
+ * iOS Safari renders `input[type=date]` as a native control that ignores
+ * `width` and keeps a large intrinsic width, so in a 2-column grid it overflows
+ * its track and swallows the gap with the neighbouring field. Resetting the
+ * appearance makes it honour `width: 100%`; the tap-to-open native picker still
+ * works. Scoped to touch devices (`pointer: coarse`) so every desktop browser —
+ * including Safari on macOS — keeps its native calendar picker, which
+ * `appearance: none` would strip.
+ */
+@media (pointer: coarse) {
+  .ph-date {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}

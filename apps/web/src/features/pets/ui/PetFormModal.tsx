@@ -10,8 +10,11 @@ import { useUpdatePet } from '../model/useUpdatePet';
 const SPECIES_OPTIONS: Species[] = ['DOG', 'CAT', 'RABBIT', 'BIRD', 'OTHER'];
 
 const LABEL_CLASS = 'mb-[7px] block text-[13px] font-semibold text-fg-2';
+// `min-w-0` matters on iOS Safari: native `type=date`/`type=number` inputs have
+// a large intrinsic min-width and, inside a 2-col grid, overflow their track —
+// eating the gap between columns. Letting `width:100%` win keeps the gap.
 const INPUT_CLASS =
-  'ph-input w-full rounded-md border border-border bg-surface px-[15px] py-[13px] text-[15px] text-fg-1 outline-none transition';
+  'ph-input w-full min-w-0 rounded-md border border-border bg-surface px-[15px] py-[13px] text-[15px] text-fg-1 outline-none transition';
 
 /**
  * Create/edit pet dialog. `pet` switches the mode: absent → empty "add" form,
@@ -217,7 +220,10 @@ export function PetFormModal({
                 value={birthDate}
                 max={today}
                 onChange={(e) => setBirthDate(e.target.value)}
-                className={INPUT_CLASS}
+                // `ph-date` scopes an iOS-only appearance reset (see globals.css):
+                // the native iOS date control otherwise ignores `width` and
+                // overflows its grid column, collapsing the gap with weight.
+                className={`${INPUT_CLASS} ph-date`}
               />
             </div>
             <div className="min-w-0">
