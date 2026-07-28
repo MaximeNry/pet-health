@@ -15,11 +15,14 @@ import {
   StreamableFile,
   UploadedFile,
   UseFilters,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Response } from 'express';
 import type { AuthenticatedUser } from '../../../auth/auth.constants';
+import { HouseholdMembershipGuard } from '../../../authorization/household-membership.guard';
+import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import { ChangeDocumentTypeUseCase } from '../application/change-document-type.use-case';
 import { DeleteDocumentUseCase } from '../application/delete-document.use-case';
@@ -61,6 +64,10 @@ const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024;
  */
 @Controller('pets/:petId/documents')
 @UseFilters(DomainExceptionFilter)
+// Every route is scoped by its `:petId`; only members of that pet's household
+// may read, add or remove its documents.
+@UseGuards(HouseholdMembershipGuard)
+@HouseholdScope({ type: 'pet', location: 'param', key: 'petId' })
 export class HealthDocumentController {
   constructor(
     private readonly uploadDocument: UploadDocumentUseCase,

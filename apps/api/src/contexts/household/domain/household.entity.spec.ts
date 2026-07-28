@@ -32,6 +32,17 @@ describe('Household', () => {
     });
   });
 
+  describe('hasMember', () => {
+    it('is true for a member and false for an outsider', () => {
+      const household = make();
+      household.addMember('user-2');
+
+      expect(household.hasMember(OWNER)).toBe(true);
+      expect(household.hasMember('user-2')).toBe(true);
+      expect(household.hasMember('stranger')).toBe(false);
+    });
+  });
+
   describe('addMember', () => {
     it('adds a MEMBER by default', () => {
       const household = make();

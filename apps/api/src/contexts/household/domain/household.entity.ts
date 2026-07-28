@@ -191,6 +191,11 @@ export class Household extends Entity {
     };
   }
 
+  /** Whether the given user belongs to this household. Basis for access control. */
+  hasMember(userId: string): boolean {
+    return this.findMember(userId) !== undefined;
+  }
+
   private findMember(userId: string): HouseholdMember | undefined {
     return this._members.find((m) => m.userId === userId);
   }

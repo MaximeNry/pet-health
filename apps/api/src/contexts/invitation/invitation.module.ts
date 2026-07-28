@@ -29,5 +29,8 @@ import { InvitationController } from './presentation/invitation.controller';
       useClass: Sha256InvitationTokenAdapter,
     },
   ],
+  // Exported so the authorization layer can resolve an invitation's household
+  // when guarding the revoke route.
+  exports: [INVITATION_REPOSITORY],
 })
 export class InvitationModule {}

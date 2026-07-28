@@ -11,7 +11,10 @@ import {
   Post,
   Query,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
+import { HouseholdMembershipGuard } from '../../../authorization/household-membership.guard';
+import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import { CreatePetUseCase } from '../application/create-pet.use-case';
 import { DeletePetUseCase } from '../application/delete-pet.use-case';
@@ -29,6 +32,7 @@ import type { UpdatePetDto } from './dto/update-pet.dto';
  */
 @Controller('pets')
 @UseFilters(DomainExceptionFilter)
+@UseGuards(HouseholdMembershipGuard)
 export class PetController {
   constructor(
     private readonly createPet: CreatePetUseCase,
@@ -39,6 +43,7 @@ export class PetController {
   ) {}
 
   @Post()
+  @HouseholdScope({ type: 'householdId', location: 'body', key: 'householdId' })
   async create(@Body() dto: CreatePetDto): Promise<PetResponse> {
     const pet = await this.createPet.execute({
       name: dto.name,
@@ -53,12 +58,17 @@ export class PetController {
   }
 
   @Get()
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'query',
+    key: 'householdId',
+  })
   async list(
     @Query('householdId') householdId?: string,
   ): Promise<PetResponse[]> {
     if (!householdId) {
       throw new BadRequestException(
-        'Le paramètre de requête « householdId » est obligatoire.',
+        'The « householdId » query parameter is required.',
       );
     }
     const pets = await this.listPetsByHousehold.execute(householdId);
@@ -66,12 +76,14 @@ export class PetController {
   }
 
   @Get(':id')
+  @HouseholdScope({ type: 'pet', location: 'param', key: 'id' })
   async findOne(@Param('id') id: string): Promise<PetResponse> {
     const pet = await this.getPet.execute(id);
     return toPetResponse(pet);
   }
 
   @Patch(':id')
+  @HouseholdScope({ type: 'pet', location: 'param', key: 'id' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdatePetDto,
@@ -91,6 +103,7 @@ export class PetController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @HouseholdScope({ type: 'pet', location: 'param', key: 'id' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.deletePet.execute(id);
   }

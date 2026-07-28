@@ -9,9 +9,12 @@ import {
   Query,
   Req,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import type { AuthenticatedUser } from '../../../auth/auth.constants';
+import { HouseholdMembershipGuard } from '../../../authorization/household-membership.guard';
+import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import {
   HouseholdResponse,
@@ -37,6 +40,7 @@ import {
  */
 @Controller('invitations')
 @UseFilters(DomainExceptionFilter)
+@UseGuards(HouseholdMembershipGuard)
 export class InvitationController {
   constructor(
     private readonly createInvitation: CreateInvitationUseCase,
@@ -45,7 +49,9 @@ export class InvitationController {
     private readonly revokeInvitation: RevokeInvitationUseCase,
   ) {}
 
+  // Only members of the target household may invite to it.
   @Post()
+  @HouseholdScope({ type: 'householdId', location: 'body', key: 'householdId' })
   async create(
     @Body() dto: CreateInvitationDto,
     @Req() req: Request,
@@ -81,6 +87,11 @@ export class InvitationController {
   }
 
   @Get()
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'query',
+    key: 'householdId',
+  })
   async list(
     @Query('householdId') householdId?: string,
   ): Promise<InvitationResponse[]> {
@@ -95,6 +106,7 @@ export class InvitationController {
   }
 
   @Delete(':id')
+  @HouseholdScope({ type: 'invitation', location: 'param', key: 'id' })
   async revoke(@Param('id') id: string): Promise<InvitationResponse> {
     const invitation = await this.revokeInvitation.execute(id);
     return toInvitationResponse(invitation);

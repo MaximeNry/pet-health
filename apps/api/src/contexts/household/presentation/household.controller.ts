@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,9 +8,14 @@ import {
   Param,
   Patch,
   Post,
-  Query,
+  Req,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
+import type { AuthenticatedUser } from '../../../auth/auth.constants';
+import { HouseholdMembershipGuard } from '../../../authorization/household-membership.guard';
+import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import { AddMemberUseCase } from '../application/add-member.use-case';
 import { ChangeMemberRoleUseCase } from '../application/change-member-role.use-case';
@@ -38,6 +42,7 @@ import type { UpdateHouseholdDto } from './dto/update-household.dto';
  */
 @Controller('households')
 @UseFilters(DomainExceptionFilter)
+@UseGuards(HouseholdMembershipGuard)
 export class HouseholdController {
   constructor(
     private readonly createHousehold: CreateHouseholdUseCase,
@@ -50,33 +55,39 @@ export class HouseholdController {
     private readonly changeMemberRole: ChangeMemberRoleUseCase,
   ) {}
 
+  // Not membership-gated (no household exists yet): the founding owner is
+  // always the authenticated user, never a client-supplied id.
   @Post()
-  async create(@Body() dto: CreateHouseholdDto): Promise<HouseholdResponse> {
+  async create(
+    @Body() dto: CreateHouseholdDto,
+    @Req() req: Request,
+  ): Promise<HouseholdResponse> {
+    const user = req.user as AuthenticatedUser;
     const household = await this.createHousehold.execute({
       name: dto.name,
-      ownerId: dto.ownerId,
+      ownerId: user.userId,
     });
     return toHouseholdResponse(household);
   }
 
+  // Not membership-gated: returns only the authenticated user's own
+  // households, so a client cannot list another user's households.
   @Get()
-  async list(@Query('userId') userId?: string): Promise<HouseholdResponse[]> {
-    if (!userId) {
-      throw new BadRequestException(
-        'The « userId » query parameter is required.',
-      );
-    }
-    const households = await this.listHouseholdsByUser.execute(userId);
+  async list(@Req() req: Request): Promise<HouseholdResponse[]> {
+    const user = req.user as AuthenticatedUser;
+    const households = await this.listHouseholdsByUser.execute(user.userId);
     return households.map(toHouseholdResponse);
   }
 
   @Get(':id')
+  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
   async findOne(@Param('id') id: string): Promise<HouseholdResponse> {
     const household = await this.getHousehold.execute(id);
     return toHouseholdResponse(household);
   }
 
   @Patch(':id')
+  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateHouseholdDto,
@@ -91,11 +102,13 @@ export class HouseholdController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.deleteHousehold.execute(id);
   }
 
   @Post(':id/members')
+  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
   async addMemberToHousehold(
     @Param('id') id: string,
     @Body() dto: AddMemberDto,
@@ -109,6 +122,7 @@ export class HouseholdController {
   }
 
   @Patch(':id/members/:userId')
+  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
   async changeMemberRoleInHousehold(
     @Param('id') id: string,
     @Param('userId') userId: string,
@@ -123,6 +137,7 @@ export class HouseholdController {
   }
 
   @Delete(':id/members/:userId')
+  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
   async removeMemberFromHousehold(
     @Param('id') id: string,
     @Param('userId') userId: string,
