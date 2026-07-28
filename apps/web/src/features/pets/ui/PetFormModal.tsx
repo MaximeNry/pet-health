@@ -143,7 +143,7 @@ export function PetFormModal({
           </div>
 
           <div className="grid grid-cols-2 gap-3.5">
-            <div>
+            <div className="min-w-0">
               <label htmlFor="pet-species" className={LABEL_CLASS}>
                 {t('speciesLabel')}
               </label>
@@ -170,7 +170,7 @@ export function PetFormModal({
                 </span>
               </div>
             </div>
-            <div>
+            <div className="min-w-0">
               <label htmlFor="pet-breed" className={LABEL_CLASS}>
                 {t('breedLabel')}
               </label>
@@ -207,7 +207,7 @@ export function PetFormModal({
           </div>
 
           <div className="grid grid-cols-2 gap-3.5">
-            <div>
+            <div className="min-w-0">
               <label htmlFor="pet-birth-date" className={LABEL_CLASS}>
                 {t('birthDateLabel')}
               </label>
@@ -220,7 +220,7 @@ export function PetFormModal({
                 className={INPUT_CLASS}
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label
                 htmlFor="pet-weight"
                 className={`${LABEL_CLASS} flex items-center gap-1.5`}
