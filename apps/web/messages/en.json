@@ -94,7 +94,16 @@
       "error": "Saving failed. Please try again.",
       "cancel": "Cancel",
       "save": "Save",
-      "savePending": "Saving…"
+      "savePending": "Saving…",
+      "dangerTitle": "Danger zone",
+      "dangerHint": "Deleting this household permanently removes all its pets, their documents and stored files. This can't be undone.",
+      "deleteCta": "Delete household",
+      "confirmTitle": "Delete “{name}”?",
+      "confirmBody": "Every pet, document and stored file in this household will be permanently deleted.",
+      "confirmCancel": "Cancel",
+      "confirmDelete": "Delete permanently",
+      "deletePending": "Deleting…",
+      "deleteError": "Couldn't delete the household. Please try again."
     }
   },
   "invite": {

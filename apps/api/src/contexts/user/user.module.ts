@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { HealthDocumentModule } from '../health-document/health-document.module';
 import { HouseholdModule } from '../household/household.module';
-import { PetModule } from '../pet/pet.module';
 import { CreateUserUseCase } from './application/create-user.use-case';
 import { DeleteAccountUseCase } from './application/delete-account.use-case';
 import { DeleteUserUseCase } from './application/delete-user.use-case';
@@ -22,8 +20,9 @@ import { UserController } from './presentation/user.controller';
  * `PrismaModule`.
  */
 @Module({
-  // Other contexts' ports, needed by the account-deletion orchestration.
-  imports: [HouseholdModule, PetModule, HealthDocumentModule],
+  // The household context exposes the teardown orchestration used by the
+  // account-deletion flow (which already fans out to pets and documents).
+  imports: [HouseholdModule],
   controllers: [UserController],
   providers: [
     CreateUserUseCase,

@@ -1,13 +1,6 @@
-import type {
-  DocumentStorage,
-  StoredFileRef,
-} from '../../health-document/domain/document-storage.port';
-import { HealthDocument } from '../../health-document/domain/health-document.entity';
-import type { HealthDocumentRepository } from '../../health-document/domain/health-document.repository';
+import type { HouseholdTeardownService } from '../../household/application/household-teardown.service';
 import { Household } from '../../household/domain/household.entity';
 import type { HouseholdRepository } from '../../household/domain/household.repository';
-import { Pet } from '../../pet/domain/pet.entity';
-import type { PetRepository } from '../../pet/domain/pet.repository';
 import { Role } from '../domain/role.vo';
 import { User } from '../domain/user.entity';
 import { UserNotFoundError } from '../domain/user.errors';
@@ -21,31 +14,6 @@ const makeUser = () =>
     lastName: 'Lefèvre',
     passwordHash: 'h',
     role: Role.create('USER'),
-  });
-
-const makePet = (householdId: string) =>
-  Pet.create({
-    name: 'Nala',
-    species: 'CAT',
-    birthDate: new Date('2020-01-01'),
-    householdId,
-  });
-
-const makeDocument = (
-  petId: string,
-  householdId: string,
-  uploaderUserId: string,
-) =>
-  HealthDocument.create({
-    petId,
-    householdId,
-    uploaderUserId,
-    storageFileId: 'drive-file-1',
-    documentType: 'VACCINATION',
-    title: 'Rabies shot',
-    documentDate: new Date('2024-01-01'),
-    mimeType: 'image/jpeg',
-    sizeBytes: 1234,
   });
 
 function makeDeps() {
@@ -63,31 +31,11 @@ function makeDeps() {
     findByUserId: jest.fn().mockResolvedValue([]),
     delete: jest.fn(),
   } as jest.Mocked<HouseholdRepository>;
-  const pets = {
-    save: jest.fn(),
-    findById: jest.fn(),
-    findByHouseholdId: jest.fn().mockResolvedValue([]),
-    delete: jest.fn(),
-  } as jest.Mocked<PetRepository>;
-  const documents = {
-    save: jest.fn(),
-    findById: jest.fn(),
-    findByPetId: jest.fn().mockResolvedValue([]),
-    deleteById: jest.fn(),
-  } as jest.Mocked<HealthDocumentRepository>;
-  const storage: jest.Mocked<DocumentStorage> = {
-    upload: jest.fn(),
-    download: jest.fn(),
-    delete: jest.fn(),
-  };
-  const useCase = new DeleteAccountUseCase(
-    users,
-    households,
-    pets,
-    documents,
-    storage,
-  );
-  return { users, households, pets, documents, storage, useCase };
+  const teardown = {
+    execute: jest.fn(),
+  } as unknown as jest.Mocked<HouseholdTeardownService>;
+  const useCase = new DeleteAccountUseCase(users, households, teardown);
+  return { users, households, teardown, useCase };
 }
 
 describe('DeleteAccountUseCase', () => {
@@ -101,53 +49,23 @@ describe('DeleteAccountUseCase', () => {
     expect(users.delete).not.toHaveBeenCalled();
   });
 
-  it('tears down a sole-member household: files, documents, pets, household, user', async () => {
-    const { users, households, pets, documents, storage, useCase } = makeDeps();
+  it('tears down a sole-member household, then deletes the user', async () => {
+    const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
     const household = Household.create({ name: 'Foyer', ownerId: user.id });
-    const pet = makePet(household.id);
-    const document = makeDocument(pet.id, household.id, user.id);
 
     users.findById.mockResolvedValue(user);
     households.findByUserId.mockResolvedValue([household]);
-    pets.findByHouseholdId.mockResolvedValue([pet]);
-    documents.findByPetId.mockResolvedValue([document]);
 
     await useCase.execute(user.id);
 
-    expect(storage.delete).toHaveBeenCalledWith<[StoredFileRef]>({
-      ownerUserId: user.id,
-      fileId: document.storageFileId,
-    });
-    expect(documents.deleteById).toHaveBeenCalledWith(document.id);
-    expect(pets.delete).toHaveBeenCalledWith(pet.id);
-    expect(households.delete).toHaveBeenCalledWith(household.id);
-    expect(users.delete).toHaveBeenCalledWith(user.id);
-  });
-
-  it('still deletes the account when a stored file cannot be removed', async () => {
-    const { users, households, pets, documents, storage, useCase } = makeDeps();
-    const user = makeUser();
-    const household = Household.create({ name: 'Foyer', ownerId: user.id });
-    const pet = makePet(household.id);
-
-    users.findById.mockResolvedValue(user);
-    households.findByUserId.mockResolvedValue([household]);
-    pets.findByHouseholdId.mockResolvedValue([pet]);
-    documents.findByPetId.mockResolvedValue([
-      makeDocument(pet.id, household.id, user.id),
-    ]);
-    storage.delete.mockRejectedValue(new Error('token revoked'));
-
-    await useCase.execute(user.id);
-
-    expect(documents.deleteById).toHaveBeenCalled();
-    expect(households.delete).toHaveBeenCalledWith(household.id);
+    expect(teardown.execute).toHaveBeenCalledWith(household.id);
+    expect(households.delete).not.toHaveBeenCalled(); // teardown owns the delete
     expect(users.delete).toHaveBeenCalledWith(user.id);
   });
 
   it('leaves a shared household after handing ownership to the oldest member', async () => {
-    const { users, households, useCase } = makeDeps();
+    const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
     const household = Household.create({ name: 'Foyer', ownerId: user.id });
     household.addMember('user-other');
@@ -157,7 +75,7 @@ describe('DeleteAccountUseCase', () => {
 
     await useCase.execute(user.id);
 
-    expect(households.delete).not.toHaveBeenCalled();
+    expect(teardown.execute).not.toHaveBeenCalled();
     expect(households.save).toHaveBeenCalledWith(household);
     expect(household.members.map((m) => m.userId)).toEqual(['user-other']);
     expect(household.members[0].isOwner()).toBe(true);
@@ -165,7 +83,7 @@ describe('DeleteAccountUseCase', () => {
   });
 
   it('simply leaves a shared household that keeps another owner', async () => {
-    const { users, households, useCase } = makeDeps();
+    const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
     const household = Household.create({ name: 'Foyer', ownerId: 'user-boss' });
     household.addMember(user.id);
@@ -175,6 +93,7 @@ describe('DeleteAccountUseCase', () => {
 
     await useCase.execute(user.id);
 
+    expect(teardown.execute).not.toHaveBeenCalled();
     expect(households.save).toHaveBeenCalledWith(household);
     expect(household.members.map((m) => m.userId)).toEqual(['user-boss']);
     expect(users.delete).toHaveBeenCalledWith(user.id);

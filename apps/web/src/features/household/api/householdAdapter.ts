@@ -22,6 +22,9 @@ export const householdAdapter = {
       input,
     ),
 
+  remove: (id: string) =>
+    apiClient.delete<void>(`/households/${encodeURIComponent(id)}`),
+
   addMember: (id: string, userId: string, role: HouseholdRole) =>
     apiClient.post<Household>(
       `/households/${encodeURIComponent(id)}/members`,

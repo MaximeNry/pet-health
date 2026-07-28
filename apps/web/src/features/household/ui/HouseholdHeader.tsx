@@ -71,6 +71,7 @@ export function HouseholdHeader({
       {isManageOpen && (
         <ManageHouseholdModal
           household={household}
+          currentUserId={currentUserId}
           onClose={() => setIsManageOpen(false)}
         />
       )}

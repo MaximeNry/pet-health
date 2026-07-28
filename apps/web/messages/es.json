@@ -94,7 +94,16 @@
       "error": "No se pudo guardar. Inténtalo de nuevo.",
       "cancel": "Cancelar",
       "save": "Guardar",
-      "savePending": "Guardando…"
+      "savePending": "Guardando…",
+      "dangerTitle": "Zona de peligro",
+      "dangerHint": "Eliminar este hogar borra de forma permanente todas sus mascotas, sus documentos y los archivos almacenados. No se puede deshacer.",
+      "deleteCta": "Eliminar hogar",
+      "confirmTitle": "¿Eliminar «{name}»?",
+      "confirmBody": "Se eliminarán de forma permanente todas las mascotas, documentos y archivos almacenados de este hogar.",
+      "confirmCancel": "Cancelar",
+      "confirmDelete": "Eliminar definitivamente",
+      "deletePending": "Eliminando…",
+      "deleteError": "No se pudo eliminar el hogar. Inténtalo de nuevo."
     }
   },
   "invite": {
