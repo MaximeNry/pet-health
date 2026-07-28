@@ -15,6 +15,12 @@ export type HouseholdScopeDescriptor = {
   type: 'householdId' | 'pet' | 'invitation';
   location: 'param' | 'query' | 'body';
   key: string;
+  /**
+   * Minimum standing in the resolved household. `member` (default) lets any
+   * member through; `owner` reserves the route to owners — used for the
+   * sensitive operations (deleting the household, managing members/invitations).
+   */
+  require?: 'member' | 'owner';
 };
 
 export const HOUSEHOLD_SCOPE = 'household_scope';

@@ -196,6 +196,14 @@ export class Household extends Entity {
     return this.findMember(userId) !== undefined;
   }
 
+  /**
+   * Whether the given user is an OWNER of this household. Gates the sensitive
+   * operations (deleting the household, managing its members).
+   */
+  isOwner(userId: string): boolean {
+    return this.findMember(userId)?.isOwner() ?? false;
+  }
+
   private findMember(userId: string): HouseholdMember | undefined {
     return this._members.find((m) => m.userId === userId);
   }

@@ -100,15 +100,27 @@ export class HouseholdController {
     return toHouseholdResponse(household);
   }
 
+  // Deleting the household is owner-only.
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'param',
+    key: 'id',
+    require: 'owner',
+  })
   async remove(@Param('id') id: string): Promise<void> {
     await this.deleteHousehold.execute(id);
   }
 
+  // Member management (add / change role / remove) is owner-only.
   @Post(':id/members')
-  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'param',
+    key: 'id',
+    require: 'owner',
+  })
   async addMemberToHousehold(
     @Param('id') id: string,
     @Body() dto: AddMemberDto,
@@ -122,7 +134,12 @@ export class HouseholdController {
   }
 
   @Patch(':id/members/:userId')
-  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'param',
+    key: 'id',
+    require: 'owner',
+  })
   async changeMemberRoleInHousehold(
     @Param('id') id: string,
     @Param('userId') userId: string,
@@ -137,7 +154,12 @@ export class HouseholdController {
   }
 
   @Delete(':id/members/:userId')
-  @HouseholdScope({ type: 'householdId', location: 'param', key: 'id' })
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'param',
+    key: 'id',
+    require: 'owner',
+  })
   async removeMemberFromHousehold(
     @Param('id') id: string,
     @Param('userId') userId: string,

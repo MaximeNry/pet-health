@@ -49,9 +49,14 @@ export class InvitationController {
     private readonly revokeInvitation: RevokeInvitationUseCase,
   ) {}
 
-  // Only members of the target household may invite to it.
+  // Inviting adds a member, so it is reserved to owners of the household.
   @Post()
-  @HouseholdScope({ type: 'householdId', location: 'body', key: 'householdId' })
+  @HouseholdScope({
+    type: 'householdId',
+    location: 'body',
+    key: 'householdId',
+    require: 'owner',
+  })
   async create(
     @Body() dto: CreateInvitationDto,
     @Req() req: Request,
@@ -105,8 +110,14 @@ export class InvitationController {
     return invitations.map(toInvitationResponse);
   }
 
+  // Revoking a pending invitation is member management → owner-only.
   @Delete(':id')
-  @HouseholdScope({ type: 'invitation', location: 'param', key: 'id' })
+  @HouseholdScope({
+    type: 'invitation',
+    location: 'param',
+    key: 'id',
+    require: 'owner',
+  })
   async revoke(@Param('id') id: string): Promise<InvitationResponse> {
     const invitation = await this.revokeInvitation.execute(id);
     return toInvitationResponse(invitation);

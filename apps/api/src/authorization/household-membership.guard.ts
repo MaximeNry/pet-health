@@ -49,6 +49,16 @@ export class HouseholdMembershipGuard implements CanActivate {
     if (household === null) {
       return true;
     }
+
+    if (descriptor.require === 'owner') {
+      if (household.isOwner(user.userId)) {
+        return true;
+      }
+      throw new ForbiddenException(
+        'Only a household owner can perform this action.',
+      );
+    }
+
     if (household.hasMember(user.userId)) {
       return true;
     }
