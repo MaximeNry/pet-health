@@ -82,7 +82,13 @@
       "error": "No se pudo crear el hogar. Inténtalo de nuevo.",
       "submit": "Crear mi hogar",
       "submitPending": "Creando…",
-      "membersNote": "Podrás invitar a miembros justo después."
+      "membersNote": "Podrás invitar a miembros justo después.",
+      "orDivider": "o",
+      "joinLabel": "¿Tienes un enlace de invitación?",
+      "joinPlaceholder": "Pega tu enlace de invitación",
+      "joinHint": "Pega el enlace que te compartió un miembro del hogar.",
+      "joinSubmit": "Unirse a un hogar",
+      "joinError": "Esto no parece un enlace de invitación válido."
     },
     "modal": {
       "title": "Editar hogar",

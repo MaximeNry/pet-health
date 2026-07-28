@@ -82,7 +82,13 @@
       "error": "Creating the household failed. Please try again.",
       "submit": "Create my household",
       "submitPending": "Creating…",
-      "membersNote": "You can invite members right after."
+      "membersNote": "You can invite members right after.",
+      "orDivider": "or",
+      "joinLabel": "Got an invitation link?",
+      "joinPlaceholder": "Paste your invitation link",
+      "joinHint": "Paste the link a household member shared with you.",
+      "joinSubmit": "Join a household",
+      "joinError": "This doesn't look like a valid invitation link."
     },
     "modal": {
       "title": "Edit household",
