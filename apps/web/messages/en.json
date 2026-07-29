@@ -63,6 +63,8 @@
         "MEMBER": "Member"
       },
       "remove": "Remove from household",
+      "ownerOnly": "Only the household owner can manage members.",
+      "ownerOnlyHint": "Only the household owner can invite, remove members or change roles.",
       "error": "The change failed. Please try again.",
       "inviteTitle": "Invite a member",
       "inviteHint": "Share a personal invitation link. Only the invited Google account can use it.",

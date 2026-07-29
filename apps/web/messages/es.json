@@ -63,6 +63,8 @@
         "MEMBER": "Miembro"
       },
       "remove": "Quitar del hogar",
+      "ownerOnly": "Solo el propietario del hogar puede gestionar los miembros.",
+      "ownerOnlyHint": "Solo el propietario del hogar puede invitar, quitar miembros o cambiar roles.",
       "error": "No se pudo aplicar el cambio. Inténtalo de nuevo.",
       "inviteTitle": "Invitar a un miembro",
       "inviteHint": "Comparte un enlace de invitación personal: solo la cuenta de Google invitada podrá usarlo.",

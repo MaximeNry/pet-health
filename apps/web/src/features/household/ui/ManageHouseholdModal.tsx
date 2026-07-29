@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DOCUMENT_TYPES } from '@/entities/document';
 import type { Household } from '@/entities/household';
+import { isHouseholdOwner } from '@/entities/household';
 import { AlertTriangleIcon, CloseIcon } from '@/shared/ui/icons';
 import { useDeleteHousehold } from '../model/useDeleteHousehold';
 import { useUpdateHousehold } from '../model/useUpdateHousehold';
@@ -31,8 +32,7 @@ export function ManageHouseholdModal({
   const updateHousehold = useUpdateHousehold(household.id);
   const deleteHousehold = useDeleteHousehold(household.id);
 
-  const isOwner =
-    household.members.find((m) => m.userId === currentUserId)?.role === 'OWNER';
+  const isOwner = isHouseholdOwner(household, currentUserId);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
