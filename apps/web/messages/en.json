@@ -271,6 +271,8 @@
       "share": "Share",
       "categoryLabel": "Category",
       "changeCategory": "Change category",
+      "addPages": "Add pages",
+      "pageOf": "Page {position} of {total}",
       "dateLabel": "Document date",
       "addedOn": "Added on {date}",
       "petLabel": "Pet",
@@ -279,7 +281,8 @@
       "preview": {
         "loading": "Loading preview…",
         "expand": "Open the document fullscreen",
-        "error": "The preview could not be loaded."
+        "error": "The preview could not be loaded.",
+        "pageCount": "{count, plural, one {# page} other {# pages}}"
       },
       "picker": {
         "title": "Change category",
@@ -288,7 +291,7 @@
       },
       "deleteModal": {
         "title": "Delete this document?",
-        "description": "“{title}” and its file will be permanently deleted.",
+        "description": "“{title}” and all its pages will be permanently deleted.",
         "cancel": "Cancel",
         "confirm": "Delete",
         "confirmPending": "Deleting…",
@@ -337,6 +340,18 @@
         "retake": "Retake",
         "validate": "Confirm"
       },
+      "review": {
+        "cancel": "Cancel scanning",
+        "title": "Review pages",
+        "subtitle": "{count, plural, one {# page} other {# pages}} · {name}",
+        "pageLabel": "Page {n}",
+        "remove": "Remove page {n}",
+        "moveUp": "Move page {n} up",
+        "moveDown": "Move page {n} down",
+        "addPage": "Add another page",
+        "continueToDetails": "Continue",
+        "addToDocument": "Add to document"
+      },
       "metadata": {
         "cancel": "Cancel scanning",
         "title": "Document details",
@@ -344,7 +359,9 @@
         "thumbnailAlt": "Scanned document preview",
         "scannedDocument": "Scanned document",
         "fileInfo": "1 page · JPEG · {size} MB",
+        "pagesInfo": "{count, plural, one {# page} other {# pages}}",
         "edit": "Edit",
+        "editPages": "Edit pages",
         "typeLabel": "Document type",
         "titleLabel": "Title",
         "titlePlaceholder": "e.g. Rabies booster shot",

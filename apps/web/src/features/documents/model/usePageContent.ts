@@ -5,18 +5,24 @@ import { useQuery } from '@tanstack/react-query';
 import { documentsAdapter } from '../api/documentsAdapter';
 
 /**
- * The file bytes of a document, exposed as a `Blob` plus an object URL ready
- * for `<img>` / `<iframe>` / download links. The blob goes through the
- * authenticated API client (a plain `src` URL could not send the session
+ * The file bytes of a single document page, exposed as a `Blob` plus an object
+ * URL ready for `<img>` / `<iframe>` / download links. The blob goes through
+ * the authenticated API client (a plain `src` URL could not send the session
  * cookie reliably); the object URL is revoked when the blob changes or the
- * consumer unmounts.
+ * consumer unmounts. Pass `enabled: false` to defer the fetch.
  */
-export function useDocumentContent(petId: string, documentId: string) {
+export function usePageContent(
+  petId: string,
+  documentId: string,
+  pageId: string,
+  enabled = true,
+) {
   const query = useQuery({
-    queryKey: ['pet-document-content', petId, documentId] as const,
-    queryFn: () => documentsAdapter.getContent(petId, documentId),
-    // The bytes of a stored document never change (metadata edits aside).
+    queryKey: ['pet-document-page-content', petId, documentId, pageId] as const,
+    queryFn: () => documentsAdapter.getPageContent(petId, documentId, pageId),
+    // The bytes of a stored page never change.
     staleTime: Infinity,
+    enabled,
   });
 
   const blob = query.data;

@@ -41,18 +41,20 @@ export class HouseholdTeardownService {
   async execute(householdId: string): Promise<void> {
     for (const pet of await this.pets.findByHouseholdId(householdId)) {
       for (const document of await this.documents.findByPetId(pet.id)) {
-        // Best-effort: a revoked Google token must not block the teardown. An
-        // unreachable file is left behind in the uploader's own Drive, where
-        // they can still remove it themselves.
-        try {
-          await this.storage.delete({
-            ownerUserId: document.uploaderUserId,
-            fileId: document.storageFileId,
-          });
-        } catch (err) {
-          this.logger.warn(
-            `Could not delete stored file ${document.storageFileId}: ${String(err)}`,
-          );
+        // Best-effort: a revoked Google token must not block the teardown. Any
+        // unreachable page file is left behind in the uploader's own Drive,
+        // where they can still remove it themselves.
+        for (const page of document.pages) {
+          try {
+            await this.storage.delete({
+              ownerUserId: document.uploaderUserId,
+              fileId: page.storageFileId,
+            });
+          } catch (err) {
+            this.logger.warn(
+              `Could not delete stored file ${page.storageFileId}: ${String(err)}`,
+            );
+          }
         }
         await this.documents.deleteById(document.id);
       }

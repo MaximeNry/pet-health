@@ -18,6 +18,14 @@ export const DOCUMENT_TYPES: DocumentType[] = [
   'OTHER',
 ];
 
+/** One page of a document: a single scanned file. Ordered by `position`. */
+export interface DocumentPage {
+  id: string;
+  position: number;
+  mimeType: string;
+  sizeBytes: number;
+}
+
 /** A health document's metadata, as returned by `GET /pets/:petId/documents`. */
 export interface HealthDocument {
   id: string;
@@ -27,8 +35,8 @@ export interface HealthDocument {
   title: string;
   documentDate: string;
   tags: string[];
-  mimeType: string;
-  sizeBytes: number;
+  /** Ordered pages (by position, ascending); a document always has ≥ 1. */
+  pages: DocumentPage[];
   createdAt: string;
   updatedAt: string;
 }

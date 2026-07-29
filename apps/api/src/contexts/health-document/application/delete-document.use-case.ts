@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { DOCUMENT_STORAGE } from '../domain/document-storage.port';
 import type { DocumentStorage } from '../domain/document-storage.port';
 import { HEALTH_DOCUMENT_REPOSITORY } from '../domain/health-document.repository';
 import type { HealthDocumentRepository } from '../domain/health-document.repository';
 import { GetPetDocumentUseCase } from './get-pet-document.use-case';
+import { deleteStoredFilesBestEffort } from './page-upload';
 
 export interface DeleteDocumentCommand {
   petId: string;
@@ -11,13 +12,16 @@ export interface DeleteDocumentCommand {
 }
 
 /**
- * Deletes a document: the stored file first, then the metadata. If the
- * storage deletion fails the metadata is kept, so the document stays visible
- * and the user can retry — the opposite order could leak an orphan file with
- * no record pointing at it.
+ * Deletes a document and all its pages. Every page's stored file is removed
+ * first (best-effort — an unreachable file must not block the deletion), then
+ * the metadata; the DB cascade drops the page rows with the document. Files
+ * that could not be deleted are left as harmless orphans in the uploader's own
+ * Drive (see `deleteStoredFilesBestEffort`).
  */
 @Injectable()
 export class DeleteDocumentUseCase {
+  private readonly logger = new Logger(DeleteDocumentUseCase.name);
+
   constructor(
     @Inject(DOCUMENT_STORAGE)
     private readonly storage: DocumentStorage,
@@ -31,12 +35,14 @@ export class DeleteDocumentUseCase {
       command.petId,
       command.documentId,
     );
-    // The file lives in the uploader's storage account, whatever member asks
+    // All pages live in the document uploader's storage account, whoever asks
     // for the deletion.
-    await this.storage.delete({
-      ownerUserId: document.uploaderUserId,
-      fileId: document.storageFileId,
-    });
+    await deleteStoredFilesBestEffort(
+      this.storage,
+      document.uploaderUserId,
+      document.pages.map((page) => page.storageFileId),
+      this.logger,
+    );
     await this.documents.deleteById(document.id);
   }
 }

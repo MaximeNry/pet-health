@@ -1,17 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Pet } from '@/entities/pet';
 import type { DocumentType } from '@/entities/document';
-import { useUploadDocument } from '../model/useUploadDocument';
-import { CameraDeniedScreen } from './CameraDeniedScreen';
-import { CameraStep } from './CameraStep';
-import { CropStep } from './CropStep';
+import { useCreateDocument } from '../model/useCreateDocument';
+import { CaptureStaging } from './CaptureStaging';
 import { MetadataStep } from './MetadataStep';
 import { UploadOverlay } from './UploadOverlay';
-
-type Step = 'camera' | 'denied' | 'crop' | 'metadata';
 
 /** A captured or processed image kept as blob + displayable object URL. */
 export interface ScanImage {
@@ -36,18 +33,17 @@ function todayIso(): string {
 }
 
 /**
- * Document scan flow (design: "Capture de document mobile"): camera capture →
- * crop/rotate/contrast → metadata form → upload to storage, plus the
- * camera-permission error screen. Fullscreen, mobile-first.
+ * Document scan flow (design: "Capture de document mobile"): capture a *batch*
+ * of pages (camera → crop → staging review) → metadata form → single upload of
+ * the whole multi-page document. Fullscreen, mobile-first. Batch staging is
+ * ephemeral client state (held here, never in TanStack Query); closing the app
+ * mid-staging loses the in-progress batch by design.
  */
 export function ScanFlow({ pet }: { pet: Pet }) {
+  const t = useTranslations('documents.scan.review');
   const router = useRouter();
-  const [step, setStep] = useState<Step>('camera');
-  const [deniedReason, setDeniedReason] = useState<'denied' | 'unavailable'>(
-    'denied',
-  );
-  const [capture, setCapture] = useState<ScanImage | null>(null);
-  const [processed, setProcessed] = useState<ScanImage | null>(null);
+  const [phase, setPhase] = useState<'capture' | 'metadata'>('capture');
+  const [pages, setPages] = useState<ScanImage[]>([]);
   const [metadata, setMetadata] = useState<DocumentMetadata>({
     documentType: 'VACCINATION',
     title: '',
@@ -55,9 +51,10 @@ export function ScanFlow({ pet }: { pet: Pet }) {
     tags: [],
   });
 
-  const upload = useUploadDocument(pet.id);
+  const create = useCreateDocument(pet.id);
 
-  // Object URLs leak unless revoked; track the latest ones for unmount.
+  // Object URLs leak unless revoked; track every one created in this flow and
+  // revoke them all when the flow unmounts.
   const urlsRef = useRef<string[]>([]);
   const trackUrl = useCallback((image: ScanImage) => {
     urlsRef.current.push(image.url);
@@ -73,93 +70,63 @@ export function ScanFlow({ pet }: { pet: Pet }) {
     router.push(`/pets/${pet.id}`);
   }, [router, pet.id]);
 
-  const handleCaptured = useCallback(
-    (image: ScanImage) => {
-      trackUrl(image);
-      setCapture(image);
-      setStep('crop');
-    },
-    [trackUrl],
-  );
-
-  const handleCropDone = useCallback(
-    (image: ScanImage) => {
-      trackUrl(image);
-      setProcessed(image);
-      setStep('metadata');
-    },
-    [trackUrl],
-  );
+  const handleBatchReady = useCallback((batch: ScanImage[]) => {
+    setPages(batch);
+    setPhase('metadata');
+  }, []);
 
   const handleSubmit = useCallback(() => {
-    if (!processed) return;
-    upload.mutate({
+    if (pages.length === 0) return;
+    create.mutate({
       householdId: pet.householdId,
       documentType: metadata.documentType,
       title: metadata.title,
       documentDate: metadata.documentDate,
       tags: metadata.tags,
-      file: processed.blob,
+      files: pages.map((page) => page.blob),
     });
-  }, [processed, upload, pet.householdId, metadata]);
+  }, [pages, create, pet.householdId, metadata]);
 
   return (
     <div className="fixed inset-0 z-40 bg-stone-900">
-      {step === 'camera' && (
-        <CameraStep
+      {phase === 'capture' && (
+        <CaptureStaging
           petName={pet.name}
+          initialPages={pages}
+          continueLabel={t('continueToDetails')}
+          onComplete={handleBatchReady}
           onCancel={backToPet}
-          onCaptured={handleCaptured}
-          onUnavailable={(reason) => {
-            setDeniedReason(reason);
-            setStep('denied');
-          }}
+          onTrackUrl={trackUrl}
         />
       )}
 
-      {step === 'denied' && (
-        <CameraDeniedScreen
-          petName={pet.name}
-          reason={deniedReason}
-          onRetry={() => setStep('camera')}
-          onCancel={backToPet}
-        />
-      )}
-
-      {step === 'crop' && capture && (
-        <CropStep
-          image={capture}
-          onRetake={() => setStep('camera')}
-          onDone={handleCropDone}
-        />
-      )}
-
-      {step === 'metadata' && processed && (
+      {phase === 'metadata' && pages.length > 0 && (
         <MetadataStep
           petName={pet.name}
-          preview={processed}
+          preview={pages[0]}
+          pageCount={pages.length}
           metadata={metadata}
           onChange={setMetadata}
-          onEditImage={() => setStep('crop')}
+          onEditImage={() => setPhase('capture')}
           onCancel={backToPet}
           onSubmit={handleSubmit}
-          submitting={upload.isPending}
+          submitting={create.isPending}
         />
       )}
 
-      {(upload.isPending || upload.isSuccess || upload.isError) && (
+      {(create.isPending || create.isSuccess || create.isError) && (
         <UploadOverlay
-          progress={upload.progress}
+          progress={create.progress}
           status={
-            upload.isSuccess
+            create.isSuccess
               ? 'success'
-              : upload.isError
+              : create.isError
                 ? 'error'
                 : 'uploading'
           }
           onDone={backToPet}
           onRetry={handleSubmit}
-          onDismiss={() => upload.reset()}
+          onDismiss={() => create.reset()}
         />
       )}
     </div>

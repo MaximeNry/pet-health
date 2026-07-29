@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { AddPagesToDocumentUseCase } from './application/add-pages-to-document.use-case';
 import { ChangeDocumentTypeUseCase } from './application/change-document-type.use-case';
+import { CreateDocumentWithPagesUseCase } from './application/create-document-with-pages.use-case';
 import { DeleteDocumentUseCase } from './application/delete-document.use-case';
-import { DownloadDocumentUseCase } from './application/download-document.use-case';
+import { DownloadPageUseCase } from './application/download-page.use-case';
 import { GetPetDocumentUseCase } from './application/get-pet-document.use-case';
 import { ListPetDocumentsUseCase } from './application/list-pet-documents.use-case';
-import { UploadDocumentUseCase } from './application/upload-document.use-case';
 import { DOCUMENT_STORAGE } from './domain/document-storage.port';
 import { HEALTH_DOCUMENT_REPOSITORY } from './domain/health-document.repository';
 import { GoogleDriveStorageAdapter } from './infrastructure/google-drive-storage.adapter';
@@ -32,10 +33,11 @@ const storageMode =
 @Module({
   controllers: [HealthDocumentController],
   providers: [
-    UploadDocumentUseCase,
+    CreateDocumentWithPagesUseCase,
+    AddPagesToDocumentUseCase,
     ListPetDocumentsUseCase,
     GetPetDocumentUseCase,
-    DownloadDocumentUseCase,
+    DownloadPageUseCase,
     ChangeDocumentTypeUseCase,
     DeleteDocumentUseCase,
     {

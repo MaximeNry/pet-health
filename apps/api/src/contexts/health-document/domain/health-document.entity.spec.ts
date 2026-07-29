@@ -1,17 +1,22 @@
 import { HealthDocument } from './health-document.entity';
 import { InvalidHealthDocumentError } from './health-document.errors';
+import type { NewPageData } from './document-page.entity';
+
+const page = (id: string): NewPageData => ({
+  storageFileId: `file-${id}`,
+  mimeType: 'image/jpeg',
+  sizeBytes: 1_800_000,
+});
 
 const validProps = () => ({
   petId: 'pet-1',
   householdId: 'household-1',
-  storageFileId: 'file-1',
   uploaderUserId: 'user-1',
   documentType: 'VACCINATION',
   title: 'Rabies booster',
   documentDate: new Date('2026-06-12'),
   tags: ['rabies', 'booster'],
-  mimeType: 'image/jpeg',
-  sizeBytes: 1_800_000,
+  pages: [page('a'), page('b')],
 });
 
 describe('HealthDocument', () => {
@@ -27,6 +32,75 @@ describe('HealthDocument', () => {
     // Tags are trimmed, deduplicated case-insensitively, empties dropped.
     expect(document.tags).toEqual(['rabies', 'booster']);
     expect(document.documentType).toBe('VACCINATION');
+  });
+
+  it('assigns contiguous positions 1..N from the input order', () => {
+    const document = HealthDocument.create({
+      ...validProps(),
+      pages: [page('a'), page('b'), page('c')],
+    });
+
+    expect(document.pageCount).toBe(3);
+    expect(document.pages.map((p) => p.position)).toEqual([1, 2, 3]);
+    expect(document.pages.map((p) => p.storageFileId)).toEqual([
+      'file-a',
+      'file-b',
+      'file-c',
+    ]);
+  });
+
+  it('rejects an empty page list', () => {
+    expect(() =>
+      HealthDocument.create({ ...validProps(), pages: [] }),
+    ).toThrow(InvalidHealthDocumentError);
+  });
+
+  it('appends pages continuing at N+1', () => {
+    const document = HealthDocument.create({
+      ...validProps(),
+      pages: [page('a'), page('b')],
+    });
+
+    const appended = document.appendPages([page('c'), page('d')]);
+
+    expect(document.pageCount).toBe(4);
+    expect(document.pages.map((p) => p.position)).toEqual([1, 2, 3, 4]);
+    expect(appended.map((p) => p.position)).toEqual([3, 4]);
+    expect(appended.map((p) => p.storageFileId)).toEqual(['file-c', 'file-d']);
+  });
+
+  it('rejects appending an empty batch', () => {
+    const document = HealthDocument.create(validProps());
+    expect(() => document.appendPages([])).toThrow(InvalidHealthDocumentError);
+  });
+
+  it('rejects a snapshot with non-contiguous page positions', () => {
+    const snapshot = HealthDocument.create(validProps()).toSnapshot();
+    // Corrupt the ordering: two pages at position 1, a gap at 2.
+    snapshot.pages[1] = { ...snapshot.pages[1], position: 3 };
+
+    expect(() => HealthDocument.fromSnapshot(snapshot)).toThrow(
+      InvalidHealthDocumentError,
+    );
+  });
+
+  it('reorders pages by position when rebuilt from a snapshot', () => {
+    const snapshot = HealthDocument.create({
+      ...validProps(),
+      pages: [page('a'), page('b'), page('c')],
+    }).toSnapshot();
+    // Persistence may return rows in any order.
+    snapshot.pages.reverse();
+
+    const rebuilt = HealthDocument.fromSnapshot(snapshot);
+    expect(rebuilt.pages.map((p) => p.position)).toEqual([1, 2, 3]);
+  });
+
+  it('finds a page by id and returns undefined for a foreign one', () => {
+    const document = HealthDocument.create(validProps());
+    const first = document.pages[0];
+    expect(document.findPage(first.id)?.id).toBe(first.id);
+    expect(document.findPage('nope')).toBeUndefined();
   });
 
   it('rejects an unknown document type', () => {
@@ -48,9 +122,12 @@ describe('HealthDocument', () => {
     ).toThrow(InvalidHealthDocumentError);
   });
 
-  it('rejects a non-positive file size', () => {
+  it('rejects a non-positive page size', () => {
     expect(() =>
-      HealthDocument.create({ ...validProps(), sizeBytes: 0 }),
+      HealthDocument.create({
+        ...validProps(),
+        pages: [{ ...page('a'), sizeBytes: 0 }],
+      }),
     ).toThrow(InvalidHealthDocumentError);
   });
 

@@ -16,10 +16,11 @@ import {
   GoogleDriveIcon,
   KebabIcon,
   PencilIcon,
+  PlusIcon,
   ShareIcon,
   TrashIcon,
 } from '@/shared/ui/icons';
-import { useDocumentContent } from '../model/useDocumentContent';
+import { usePageContent } from '../model/usePageContent';
 import { usePetDocument } from '../model/usePetDocument';
 import { CategoryPickerSheet } from './CategoryPickerSheet';
 import { DeleteDocumentDialog } from './DeleteDocumentDialog';
@@ -47,7 +48,9 @@ export function DocumentDetail({
   const tCommon = useTranslations('common');
   const router = useRouter();
   const documentQuery = usePetDocument(pet.id, documentId);
-  const content = useDocumentContent(pet.id, documentId);
+  // The cover preview is the first page; the fullscreen viewer loads them all.
+  const coverPageId = documentQuery.data?.pages[0]?.id ?? '';
+  const content = usePageContent(pet.id, documentId, coverPageId, !!coverPageId);
   const [overlay, setOverlay] = useState<Overlay>(null);
   // `navigator.share` only exists in secure contexts / mobile browsers; the
   // server snapshot renders "unsupported" and the client corrects it.
@@ -80,19 +83,29 @@ export function DocumentDetail({
     );
   }
 
+  // Download/share act on the cover (first page). Multi-page export as a
+  // single file (e.g. a merged PDF) is out of scope for v1 — the fullscreen
+  // viewer is the way to read every page.
+  const coverMimeType = doc?.pages[0]?.mimeType ?? 'application/octet-stream';
+
   function download() {
     if (!content.url || !doc) return;
     const anchor = window.document.createElement('a');
     anchor.href = content.url;
-    anchor.download = documentFileName(doc);
+    anchor.download = documentFileName({
+      title: doc.title,
+      mimeType: coverMimeType,
+    });
     anchor.click();
   }
 
   async function share() {
     if (!content.blob || !doc) return;
-    const file = new File([content.blob], documentFileName(doc), {
-      type: doc.mimeType,
-    });
+    const file = new File(
+      [content.blob],
+      documentFileName({ title: doc.title, mimeType: coverMimeType }),
+      { type: coverMimeType },
+    );
     try {
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: doc.title });
@@ -126,12 +139,17 @@ export function DocumentDetail({
           </div>
           <DocumentActionsMenu
             onChangeCategory={() => setOverlay('picker')}
+            onAddPages={() =>
+              router.push(`/pets/${pet.id}/documents/${doc.id}/append`)
+            }
             onDelete={() => setOverlay('delete')}
           />
         </div>
 
         <DocumentPreview
-          document={doc}
+          title={doc.title}
+          mimeType={coverMimeType}
+          pageCount={doc.pages.length}
           contentUrl={content.url}
           isLoading={content.isLoading}
           isError={content.isError}
@@ -184,10 +202,10 @@ export function DocumentDetail({
           onClose={() => setOverlay(null)}
         />
       )}
-      {overlay === 'viewer' && content.url && (
+      {overlay === 'viewer' && (
         <DocumentViewerOverlay
+          petId={pet.id}
           document={doc}
-          contentUrl={content.url}
           onShare={canShare ? () => void share() : undefined}
           onClose={() => setOverlay(null)}
         />
@@ -211,20 +229,25 @@ export function DocumentDetail({
  * expand hint, per the mockup.
  */
 function DocumentPreview({
-  document,
+  title,
+  mimeType,
+  pageCount,
   contentUrl,
   isLoading,
   isError,
   onExpand,
 }: {
-  document: HealthDocument;
+  title: string;
+  /** Mime type of the cover (first) page. */
+  mimeType: string;
+  pageCount: number;
   contentUrl: string | null;
   isLoading: boolean;
   isError: boolean;
   onExpand: () => void;
 }) {
   const t = useTranslations('documents.detail.preview');
-  const isImage = document.mimeType.startsWith('image/');
+  const isImage = mimeType.startsWith('image/');
 
   return (
     <button
@@ -241,6 +264,13 @@ function DocumentPreview({
           Google Drive
         </span>
       </span>
+
+      {/* Multi-page badge */}
+      {pageCount > 1 && (
+        <span className="absolute right-3 top-3 z-10 flex items-center rounded-pill bg-stone-900/60 px-2.5 py-1 text-[11.5px] font-semibold text-white backdrop-blur-sm">
+          {t('pageCount', { count: pageCount })}
+        </span>
+      )}
 
       {/* Expand hint */}
       {contentUrl && (
@@ -271,7 +301,7 @@ function DocumentPreview({
         // eslint-disable-next-line @next/next/no-img-element -- blob URL preview; next/image cannot optimize it
         <img
           src={contentUrl}
-          alt={document.title}
+          alt={title}
           className="absolute inset-0 h-full w-full bg-stone-100 object-contain p-4"
         />
       )}
@@ -395,12 +425,14 @@ function DocumentDetailsCard({
   );
 }
 
-/** Kebab dropdown with the change-category / delete actions. */
+/** Kebab dropdown with the add-pages / change-category / delete actions. */
 function DocumentActionsMenu({
   onChangeCategory,
+  onAddPages,
   onDelete,
 }: {
   onChangeCategory: () => void;
+  onAddPages: () => void;
   onDelete: () => void;
 }) {
   const t = useTranslations('documents.detail');
@@ -449,6 +481,15 @@ function DocumentActionsMenu({
           role="menu"
           className="absolute right-0 top-12 z-20 w-52 rounded-md border border-border bg-surface p-1.5 shadow-lg"
         >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => pick(onAddPages)}
+            className="flex w-full cursor-pointer items-center gap-2.5 rounded-sm p-2.5 text-left text-sm font-medium text-fg-1 transition hover:bg-subtle"
+          >
+            <PlusIcon className="h-[18px] w-[18px] text-fg-2" />
+            {t('addPages')}
+          </button>
           <button
             type="button"
             role="menuitem"

@@ -13,24 +13,26 @@ import {
   Req,
   Res,
   StreamableFile,
-  UploadedFile,
+  UploadedFiles,
   UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import type { Request, Response } from 'express';
 import type { AuthenticatedUser } from '../../../auth/auth.constants';
 import { HouseholdMembershipGuard } from '../../../authorization/household-membership.guard';
 import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
+import { AddPagesToDocumentUseCase } from '../application/add-pages-to-document.use-case';
 import { ChangeDocumentTypeUseCase } from '../application/change-document-type.use-case';
+import { CreateDocumentWithPagesUseCase } from '../application/create-document-with-pages.use-case';
 import { DeleteDocumentUseCase } from '../application/delete-document.use-case';
-import { DownloadDocumentUseCase } from '../application/download-document.use-case';
+import { DownloadPageUseCase } from '../application/download-page.use-case';
 import { extensionForMime } from '../application/file-extension';
 import { GetPetDocumentUseCase } from '../application/get-pet-document.use-case';
 import { ListPetDocumentsUseCase } from '../application/list-pet-documents.use-case';
-import { UploadDocumentUseCase } from '../application/upload-document.use-case';
+import type { PageContent } from '../application/page-upload';
 import type { UpdateDocumentDto } from './dto/update-document.dto';
 import type { UploadDocumentDto } from './dto/upload-document.dto';
 import {
@@ -38,7 +40,7 @@ import {
   toHealthDocumentResponse,
 } from './dto/health-document-response.dto';
 
-/** What multer hands us for the `file` part (typed locally: the full
+/** What multer hands us for each `file` part (typed locally: the full
  * `Express.Multer.File` type would require the `@types/multer` package for
  * three fields). */
 interface UploadedScanFile {
@@ -54,13 +56,16 @@ const ACCEPTED_MIME_TYPES = [
   'application/pdf',
 ];
 
-/** Scans weigh ~1-3 MB; 15 MB leaves room for multi-page PDFs. */
+/** Scans weigh ~1-3 MB; 15 MB leaves room for larger pages. */
 const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024;
+/** Upper bound on pages in a single batch — a scanned document, not an archive. */
+const MAX_PAGES_PER_BATCH = 30;
 
 /**
  * Health documents REST API, scoped under a pet. Thin HTTP ↔ use cases
- * translation layer: multipart parsing, projection of entities into
- * `HealthDocumentResponse`. Domain errors are mapped by the filter.
+ * translation layer: multipart parsing (multiple ordered `file` parts =
+ * ordered pages), projection of aggregates into `HealthDocumentResponse`.
+ * Domain errors are mapped by the filter.
  */
 @Controller('pets/:petId/documents')
 @UseFilters(DomainExceptionFilter)
@@ -70,38 +75,34 @@ const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024;
 @HouseholdScope({ type: 'pet', location: 'param', key: 'petId' })
 export class HealthDocumentController {
   constructor(
-    private readonly uploadDocument: UploadDocumentUseCase,
+    private readonly createDocument: CreateDocumentWithPagesUseCase,
+    private readonly addPages: AddPagesToDocumentUseCase,
     private readonly listPetDocuments: ListPetDocumentsUseCase,
     private readonly getPetDocument: GetPetDocumentUseCase,
-    private readonly downloadDocument: DownloadDocumentUseCase,
+    private readonly downloadPage: DownloadPageUseCase,
     private readonly changeDocumentType: ChangeDocumentTypeUseCase,
     private readonly deleteDocument: DeleteDocumentUseCase,
   ) {}
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('file', { limits: { fileSize: MAX_FILE_SIZE_BYTES } }),
+    FilesInterceptor('file', MAX_PAGES_PER_BATCH, {
+      limits: { fileSize: MAX_FILE_SIZE_BYTES },
+    }),
   )
-  async upload(
+  async create(
     @Param('petId') petId: string,
-    @UploadedFile() file: UploadedScanFile | undefined,
+    @UploadedFiles() files: UploadedScanFile[] | undefined,
     @Body() dto: UploadDocumentDto,
     @Req() req: Request,
   ): Promise<HealthDocumentResponse> {
-    if (!file) {
-      throw new BadRequestException('The « file » part is required.');
-    }
-    if (!ACCEPTED_MIME_TYPES.includes(file.mimetype)) {
-      throw new BadRequestException(
-        `Unsupported file type « ${file.mimetype} ». Accepted: ${ACCEPTED_MIME_TYPES.join(', ')}.`,
-      );
-    }
+    const pages = this.toPages(files);
     if (!dto.householdId) {
       throw new BadRequestException('The « householdId » field is required.');
     }
 
     const user = req.user as AuthenticatedUser;
-    const document = await this.uploadDocument.execute({
+    const document = await this.createDocument.execute({
       petId,
       householdId: dto.householdId,
       userId: user.userId,
@@ -109,8 +110,28 @@ export class HealthDocumentController {
       title: dto.title,
       documentDate: new Date(dto.documentDate),
       tags: this.parseTags(dto.tags),
-      mimeType: file.mimetype,
-      content: file.buffer,
+      pages,
+    });
+    return toHealthDocumentResponse(document);
+  }
+
+  /** Appends more scanned pages to an existing document (order = file order). */
+  @Post(':documentId/pages')
+  @UseInterceptors(
+    FilesInterceptor('file', MAX_PAGES_PER_BATCH, {
+      limits: { fileSize: MAX_FILE_SIZE_BYTES },
+    }),
+  )
+  async append(
+    @Param('petId') petId: string,
+    @Param('documentId') documentId: string,
+    @UploadedFiles() files: UploadedScanFile[] | undefined,
+  ): Promise<HealthDocumentResponse> {
+    const pages = this.toPages(files);
+    const document = await this.addPages.execute({
+      petId,
+      documentId,
+      pages,
     });
     return toHealthDocumentResponse(document);
   }
@@ -131,27 +152,29 @@ export class HealthDocumentController {
   }
 
   /**
-   * Raw file bytes, served inline for the in-app preview; `?download=1`
+   * Raw bytes of one page, served inline for the in-app preview; `?download=1`
    * switches to an attachment so the browser saves the file instead.
    */
-  @Get(':documentId/content')
+  @Get(':documentId/pages/:pageId/content')
   @Header('Cache-Control', 'private, max-age=300')
-  async content(
+  async pageContent(
     @Param('petId') petId: string,
     @Param('documentId') documentId: string,
+    @Param('pageId') pageId: string,
     @Query('download') download: string | undefined,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
-    const { document, content } = await this.downloadDocument.execute({
+    const { document, page, content } = await this.downloadPage.execute({
       petId,
       documentId,
+      pageId,
     });
 
     const disposition = download === '1' ? 'attachment' : 'inline';
-    res.setHeader('Content-Type', document.mimeType);
+    res.setHeader('Content-Type', page.mimeType);
     res.setHeader(
       'Content-Disposition',
-      `${disposition}; filename*=UTF-8''${this.encodeFileName(document)}`,
+      `${disposition}; filename*=UTF-8''${this.encodeFileName(document.title, page.mimeType, page.position, document.pageCount)}`,
     );
     return new StreamableFile(content);
   }
@@ -185,14 +208,35 @@ export class HealthDocumentController {
     });
   }
 
-  /** RFC 5987 file name ("Carnet.pdf" → percent-encoded UTF-8). */
-  private encodeFileName(document: {
-    title: string;
-    mimeType: string;
-  }): string {
-    const safeTitle = document.title.trim().replace(/[\\/:*?"<>|]/g, ' ');
+  /** Validates the multipart `file` parts and turns them into ordered pages. */
+  private toPages(files: UploadedScanFile[] | undefined): PageContent[] {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('At least one « file » part is required.');
+    }
+    for (const file of files) {
+      if (!ACCEPTED_MIME_TYPES.includes(file.mimetype)) {
+        throw new BadRequestException(
+          `Unsupported file type « ${file.mimetype} ». Accepted: ${ACCEPTED_MIME_TYPES.join(', ')}.`,
+        );
+      }
+    }
+    return files.map((file) => ({
+      mimeType: file.mimetype,
+      content: file.buffer,
+    }));
+  }
+
+  /** RFC 5987 file name for a page ("Carnet (2 of 3).pdf" → percent-encoded). */
+  private encodeFileName(
+    title: string,
+    mimeType: string,
+    position: number,
+    totalPages: number,
+  ): string {
+    const safeTitle = title.trim().replace(/[\\/:*?"<>|]/g, ' ');
+    const suffix = totalPages > 1 ? ` (${position} of ${totalPages})` : '';
     return encodeURIComponent(
-      `${safeTitle}.${extensionForMime(document.mimeType)}`,
+      `${safeTitle}${suffix}.${extensionForMime(mimeType)}`,
     );
   }
 

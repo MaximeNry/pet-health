@@ -271,6 +271,8 @@
       "share": "Compartir",
       "categoryLabel": "Categoría",
       "changeCategory": "Cambiar categoría",
+      "addPages": "Añadir páginas",
+      "pageOf": "Página {position} de {total}",
       "dateLabel": "Fecha del documento",
       "addedOn": "Añadido el {date}",
       "petLabel": "Mascota",
@@ -279,7 +281,8 @@
       "preview": {
         "loading": "Cargando la vista previa…",
         "expand": "Abrir el documento a pantalla completa",
-        "error": "No se pudo cargar la vista previa."
+        "error": "No se pudo cargar la vista previa.",
+        "pageCount": "{count, plural, one {# página} other {# páginas}}"
       },
       "picker": {
         "title": "Cambiar categoría",
@@ -288,7 +291,7 @@
       },
       "deleteModal": {
         "title": "¿Eliminar este documento?",
-        "description": "“{title}” y su archivo se eliminarán definitivamente.",
+        "description": "“{title}” y todas sus páginas se eliminarán definitivamente.",
         "cancel": "Cancelar",
         "confirm": "Eliminar",
         "confirmPending": "Eliminando…",
@@ -337,6 +340,18 @@
         "retake": "Repetir",
         "validate": "Confirmar"
       },
+      "review": {
+        "cancel": "Cancelar el escaneo",
+        "title": "Revisar páginas",
+        "subtitle": "{count, plural, one {# página} other {# páginas}} · {name}",
+        "pageLabel": "Página {n}",
+        "remove": "Eliminar la página {n}",
+        "moveUp": "Subir la página {n}",
+        "moveDown": "Bajar la página {n}",
+        "addPage": "Añadir otra página",
+        "continueToDetails": "Continuar",
+        "addToDocument": "Añadir al documento"
+      },
       "metadata": {
         "cancel": "Cancelar el escaneo",
         "title": "Detalles del documento",
@@ -344,7 +359,9 @@
         "thumbnailAlt": "Vista previa del documento escaneado",
         "scannedDocument": "Documento escaneado",
         "fileInfo": "1 página · JPEG · {size} MB",
+        "pagesInfo": "{count, plural, one {# página} other {# páginas}}",
         "edit": "Editar",
+        "editPages": "Editar páginas",
         "typeLabel": "Tipo de documento",
         "titleLabel": "Título",
         "titlePlaceholder": "p. ej. Refuerzo de la vacuna antirrábica",

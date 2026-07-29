@@ -21,6 +21,15 @@ export class HealthDocumentNotFoundError extends DomainError {
   }
 }
 
+/** No page matches the requested identifier within the document. */
+export class DocumentPageNotFoundError extends DomainError {
+  readonly kind: DomainErrorKind = 'not-found';
+
+  constructor(pageId: string) {
+    super(`No document page found for the identifier « ${pageId} ».`);
+  }
+}
+
 /**
  * The user's account has no (valid) Drive authorization, so the file cannot
  * be stored. Mapped to 409: the session is fine, but the account state

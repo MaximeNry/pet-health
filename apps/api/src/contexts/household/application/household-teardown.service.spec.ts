@@ -24,12 +24,12 @@ const makeDocument = (petId: string, uploaderUserId: string) =>
     petId,
     householdId: HOUSEHOLD_ID,
     uploaderUserId,
-    storageFileId: 'drive-file-1',
     documentType: 'VACCINATION',
     title: 'Rabies shot',
     documentDate: new Date('2024-01-01'),
-    mimeType: 'image/jpeg',
-    sizeBytes: 1234,
+    pages: [
+      { storageFileId: 'drive-file-1', mimeType: 'image/jpeg', sizeBytes: 1234 },
+    ],
   });
 
 function makeDeps() {
@@ -78,7 +78,7 @@ describe('HouseholdTeardownService', () => {
 
     expect(storage.delete).toHaveBeenCalledWith<[StoredFileRef]>({
       ownerUserId: 'user-1',
-      fileId: document.storageFileId,
+      fileId: document.pages[0].storageFileId,
     });
     expect(documents.deleteById).toHaveBeenCalledWith(document.id);
     expect(pets.delete).toHaveBeenCalledWith(pet.id);

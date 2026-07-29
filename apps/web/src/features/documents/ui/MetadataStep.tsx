@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type KeyboardEvent } from 'react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { DOCUMENT_TYPES, type DocumentType } from '@/entities/document';
 import {
   CheckIcon,
@@ -18,6 +18,7 @@ import type { DocumentMetadata, ScanImage } from './ScanFlow';
 export function MetadataStep({
   petName,
   preview,
+  pageCount,
   metadata,
   onChange,
   onEditImage,
@@ -26,7 +27,10 @@ export function MetadataStep({
   submitting,
 }: {
   petName: string;
+  /** First page of the batch, shown as the cover thumbnail. */
   preview: ScanImage;
+  /** Number of staged pages (≥ 1). */
+  pageCount: number;
   metadata: DocumentMetadata;
   onChange: (metadata: DocumentMetadata) => void;
   onEditImage: () => void;
@@ -36,10 +40,8 @@ export function MetadataStep({
 }) {
   const t = useTranslations('documents.scan.metadata');
   const tTypes = useTranslations('documents.types');
-  const format = useFormatter();
   const [tagDraft, setTagDraft] = useState('');
 
-  const sizeMb = preview.blob.size / (1024 * 1024);
   const canSubmit =
     metadata.title.trim().length > 0 &&
     metadata.documentDate !== '' &&
@@ -107,9 +109,7 @@ export function MetadataStep({
               {t('scannedDocument')}
             </div>
             <div className="mt-0.5 text-[12.5px] font-medium text-fg-3">
-              {t('fileInfo', {
-                size: format.number(sizeMb, { maximumFractionDigits: 1 }),
-              })}
+              {t('pagesInfo', { count: pageCount })}
             </div>
           </div>
           <button
@@ -117,7 +117,7 @@ export function MetadataStep({
             onClick={onEditImage}
             className="cursor-pointer text-[13px] font-semibold text-brand transition hover:text-brand-hover"
           >
-            {t('edit')}
+            {t('editPages')}
           </button>
         </div>
 

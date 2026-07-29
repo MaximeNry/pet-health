@@ -44,6 +44,13 @@ const DOC_REX_CERTIFICATE = '30000000-0000-4000-8000-000000000002';
 const DOC_MIMI_PRESCRIPTION = '30000000-0000-4000-8000-000000000003';
 const DOC_PIXEL_LAB = '30000000-0000-4000-8000-000000000004';
 
+const PAGE_REX_VACCINATION_1 = '40000000-0000-4000-8000-000000000001';
+// A second page on the same document, to exercise the multi-page flow.
+const PAGE_REX_VACCINATION_2 = '40000000-0000-4000-8000-000000000002';
+const PAGE_REX_CERTIFICATE_1 = '40000000-0000-4000-8000-000000000003';
+const PAGE_MIMI_PRESCRIPTION_1 = '40000000-0000-4000-8000-000000000004';
+const PAGE_PIXEL_LAB_1 = '40000000-0000-4000-8000-000000000005';
+
 // Placeholder hash in bcrypt format. Auth is not implemented yet, so no password
 // maps to it; replace with real hashes once the auth context lands.
 const PLACEHOLDER_PASSWORD_HASH =
@@ -52,6 +59,8 @@ const PLACEHOLDER_PASSWORD_HASH =
 async function clearAll(): Promise<void> {
   // Delete in reverse dependency order. Only household_members has a real FK
   // (→ households); the rest are referenced by id only, but order stays tidy.
+  // Pages cascade on document delete, but clear them explicitly for tidiness.
+  await prisma.documentPage.deleteMany();
   await prisma.healthDocument.deleteMany();
   await prisma.householdMember.deleteMany();
   await prisma.pet.deleteMany();
@@ -148,50 +157,86 @@ async function seed(): Promise<void> {
         id: DOC_REX_VACCINATION,
         petId: PET_REX,
         householdId: HOUSEHOLD_MARTIN,
-        driveFileId: 'drive-file-rex-vaccination',
         uploaderUserId: USER_ALICE,
         documentType: DocumentType.VACCINATION,
         title: 'Rabies vaccination booster',
         documentDate: new Date('2024-01-10'),
         tags: ['rabies', 'booster'],
-        mimeType: 'image/jpeg',
-        sizeBytes: 1_842_000,
       },
       {
         id: DOC_REX_CERTIFICATE,
         petId: PET_REX,
         householdId: HOUSEHOLD_MARTIN,
-        driveFileId: 'drive-file-rex-certificate',
         uploaderUserId: USER_ALICE,
         documentType: DocumentType.CERTIFICATE,
         title: 'Good health certificate',
         documentDate: new Date('2024-02-05'),
-        mimeType: 'image/jpeg',
-        sizeBytes: 1_204_000,
       },
       {
         id: DOC_MIMI_PRESCRIPTION,
         petId: PET_MIMI,
         householdId: HOUSEHOLD_MARTIN,
-        driveFileId: 'drive-file-mimi-prescription',
         // Uploaded by the non-owner member: exercises cross-member viewing.
         uploaderUserId: USER_BOB,
         documentType: DocumentType.PRESCRIPTION,
         title: 'Antibiotics prescription',
         documentDate: new Date('2024-03-18'),
         tags: ['antibiotics'],
-        mimeType: 'image/jpeg',
-        sizeBytes: 964_000,
       },
       {
         id: DOC_PIXEL_LAB,
         petId: PET_PIXEL,
         householdId: HOUSEHOLD_DURAND,
-        driveFileId: 'drive-file-pixel-lab',
         uploaderUserId: USER_CAROL,
         documentType: DocumentType.LAB_RESULT,
         title: 'Blood panel results',
         documentDate: new Date('2024-04-22'),
+      },
+    ],
+  });
+
+  // Each document owns an ordered collection of pages (one Drive file per
+  // page). The vaccination booster has two pages to exercise the multi-page
+  // flow; every other document is a single-page document.
+  await prisma.documentPage.createMany({
+    data: [
+      {
+        id: PAGE_REX_VACCINATION_1,
+        documentId: DOC_REX_VACCINATION,
+        position: 1,
+        driveFileId: 'drive-file-rex-vaccination-1',
+        mimeType: 'image/jpeg',
+        sizeBytes: 1_842_000,
+      },
+      {
+        id: PAGE_REX_VACCINATION_2,
+        documentId: DOC_REX_VACCINATION,
+        position: 2,
+        driveFileId: 'drive-file-rex-vaccination-2',
+        mimeType: 'image/jpeg',
+        sizeBytes: 1_530_000,
+      },
+      {
+        id: PAGE_REX_CERTIFICATE_1,
+        documentId: DOC_REX_CERTIFICATE,
+        position: 1,
+        driveFileId: 'drive-file-rex-certificate',
+        mimeType: 'image/jpeg',
+        sizeBytes: 1_204_000,
+      },
+      {
+        id: PAGE_MIMI_PRESCRIPTION_1,
+        documentId: DOC_MIMI_PRESCRIPTION,
+        position: 1,
+        driveFileId: 'drive-file-mimi-prescription',
+        mimeType: 'image/jpeg',
+        sizeBytes: 964_000,
+      },
+      {
+        id: PAGE_PIXEL_LAB_1,
+        documentId: DOC_PIXEL_LAB,
+        position: 1,
+        driveFileId: 'drive-file-pixel-lab',
         mimeType: 'image/jpeg',
         sizeBytes: 2_310_000,
       },
@@ -209,6 +254,7 @@ async function main(): Promise<void> {
     householdMembers: await prisma.householdMember.count(),
     pets: await prisma.pet.count(),
     healthDocuments: await prisma.healthDocument.count(),
+    documentPages: await prisma.documentPage.count(),
   };
   console.log('Seed complete:', counts);
 }

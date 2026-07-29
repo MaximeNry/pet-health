@@ -2,27 +2,28 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import type { HealthDocument } from '@/entities/document';
+import type { DocumentPage, HealthDocument } from '@/entities/document';
 import { CloseIcon, ShareIcon } from '@/shared/ui/icons';
+import { usePageContent } from '../model/usePageContent';
 
 /**
  * Fullscreen viewer (design: "Document Detail"): dark chrome around the
- * document — the image itself, or the browser's PDF viewer in an iframe.
+ * document, its pages rendered in order and stacked vertically (page 1 at the
+ * top → N at the bottom) so the whole document scrolls as one unit.
  */
 export function DocumentViewerOverlay({
+  petId,
   document,
-  contentUrl,
   onShare,
   onClose,
 }: {
+  petId: string;
   document: HealthDocument;
-  contentUrl: string;
-  /** Omitted when the browser cannot share files. */
+  /** Omitted when the browser cannot share files. Shares the first page. */
   onShare?: () => void;
   onClose: () => void;
 }) {
   const t = useTranslations('documents.detail');
-  const isImage = document.mimeType.startsWith('image/');
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -58,22 +59,77 @@ export function DocumentViewerOverlay({
         )}
       </div>
 
-      <div className="flex flex-1 items-center justify-center overflow-hidden p-4 pb-8">
-        {isImage ? (
+      <div className="flex flex-1 flex-col items-center gap-6 overflow-y-auto p-4 pb-10">
+        {document.pages.map((page) => (
+          <ViewerPage
+            key={page.id}
+            petId={petId}
+            documentId={document.id}
+            page={page}
+            total={document.pages.length}
+            title={document.title}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** One page of the vertical stack: its image, or the browser's PDF viewer. */
+function ViewerPage({
+  petId,
+  documentId,
+  page,
+  total,
+  title,
+}: {
+  petId: string;
+  documentId: string;
+  page: DocumentPage;
+  total: number;
+  title: string;
+}) {
+  const t = useTranslations('documents.detail');
+  const content = usePageContent(petId, documentId, page.id);
+  const isImage = page.mimeType.startsWith('image/');
+
+  return (
+    <figure className="flex w-full max-w-[820px] flex-col items-center gap-2">
+      {content.isLoading && (
+        <div className="flex aspect-[3/4] w-full items-center justify-center rounded-lg bg-white/5">
+          <span
+            aria-hidden
+            className="h-8 w-8 animate-spin rounded-full border-[3.5px] border-white/20 border-t-white/70"
+          />
+        </div>
+      )}
+      {content.isError && (
+        <div className="flex aspect-[3/4] w-full items-center justify-center rounded-lg bg-white/5 px-8 text-center text-[13px] font-medium text-white/60">
+          {t('preview.error')}
+        </div>
+      )}
+      {content.url &&
+        (isImage ? (
           // eslint-disable-next-line @next/next/no-img-element -- blob URL preview; next/image cannot optimize it
           <img
-            src={contentUrl}
-            alt={document.title}
-            className="max-h-full max-w-full rounded-lg object-contain shadow-lg"
+            src={content.url}
+            alt={total > 1 ? t('pageOf', { position: page.position, total }) : title}
+            className="max-w-full rounded-lg object-contain shadow-lg"
           />
         ) : (
           <iframe
-            src={contentUrl}
-            title={document.title}
-            className="h-full w-full max-w-[820px] rounded-lg border-0 bg-white"
+            src={content.url}
+            title={
+              total > 1 ? t('pageOf', { position: page.position, total }) : title
+            }
+            className="h-[80vh] w-full rounded-lg border-0 bg-white"
           />
-        )}
-      </div>
-    </div>
+        ))}
+      {total > 1 && (
+        <figcaption className="text-[12px] font-medium text-white/50">
+          {t('pageOf', { position: page.position, total })}
+        </figcaption>
+      )}
+    </figure>
   );
 }
