@@ -11,7 +11,7 @@ import type { InvitationRepository } from '../domain/invitation.repository';
 import type { InvitationTokenService } from '../domain/invitation-token.port';
 import { AcceptInvitationUseCase } from './accept-invitation.use-case';
 
-const EMAIL = 'camila.rojas@gmail.com';
+const EMAIL = 'camila.rojas@example.com';
 const GUEST = 'user-guest';
 const TOKEN = 'raw-token';
 const TOKEN_HASH = `hashed:${TOKEN}`;
@@ -134,7 +134,7 @@ describe('AcceptInvitationUseCase', () => {
       useCase.execute({
         token: TOKEN,
         userId: 'user-intruder',
-        verifiedEmail: 'intruder@gmail.com',
+        verifiedEmail: 'intruder@example.com',
       }),
     ).rejects.toBeInstanceOf(InvitationEmailMismatchError);
 

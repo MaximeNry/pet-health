@@ -9,7 +9,7 @@ import {
 const HOUSEHOLD = 'household-1';
 const INVITER = 'user-owner';
 const ACCEPTER = 'user-guest';
-const EMAIL = 'camila.rojas@gmail.com';
+const EMAIL = 'camila.rojas@example.com';
 
 const make = (
   overrides: Partial<Parameters<typeof Invitation.create>[0]> = {},
@@ -51,7 +51,7 @@ describe('Invitation', () => {
 
     it('normalizes the invited email (trim + lowercase)', () => {
       expect(
-        make({ invitedEmail: '  Camila.Rojas@GMAIL.com ' }).invitedEmail,
+        make({ invitedEmail: '  Camila.Rojas@EXAMPLE.com ' }).invitedEmail,
       ).toBe(EMAIL);
     });
 
@@ -89,7 +89,7 @@ describe('Invitation', () => {
     it('compares emails case-insensitively', () => {
       const invitation = make();
 
-      invitation.accept(' Camila.Rojas@Gmail.com ', ACCEPTER);
+      invitation.accept(' Camila.Rojas@Example.com ', ACCEPTER);
 
       expect(invitation.status).toBe('ACCEPTED');
     });
@@ -123,7 +123,7 @@ describe('Invitation', () => {
 
       let caught: unknown;
       try {
-        invitation.accept('someone.else@gmail.com', ACCEPTER);
+        invitation.accept('someone.else@example.com', ACCEPTER);
       } catch (error) {
         caught = error;
       }
@@ -131,7 +131,7 @@ describe('Invitation', () => {
       expect(caught).toBeInstanceOf(InvitationEmailMismatchError);
       expect((caught as InvitationEmailMismatchError).details).toEqual({
         invitedEmail: EMAIL,
-        signedInEmail: 'someone.else@gmail.com',
+        signedInEmail: 'someone.else@example.com',
       });
       expect(invitation.status).toBe('PENDING');
     });
@@ -142,7 +142,7 @@ describe('Invitation', () => {
 
       // Even with a mismatching email, the decided status wins (409 over 403).
       expect(() =>
-        invitation.accept('someone.else@gmail.com', ACCEPTER),
+        invitation.accept('someone.else@example.com', ACCEPTER),
       ).toThrow(InvitationNotPendingError);
     });
   });

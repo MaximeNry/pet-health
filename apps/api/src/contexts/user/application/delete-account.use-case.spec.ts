@@ -9,7 +9,7 @@ import { DeleteAccountUseCase } from './delete-account.use-case';
 
 const makeUser = () =>
   User.create({
-    email: 'marie.lefevre@gmail.com',
+    email: 'marie.lefevre@example.com',
     firstName: 'Marie',
     lastName: 'Lefèvre',
     passwordHash: 'h',
