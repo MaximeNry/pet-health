@@ -156,9 +156,9 @@ describe('Household', () => {
       const household = make();
       jest.setSystemTime(new Date('2020-01-02T00:00:00Z'));
 
-      household.rename('Nouveau foyer');
+      household.rename('New household');
 
-      expect(household.name).toBe('Nouveau foyer');
+      expect(household.name).toBe('New household');
       expect(household.updatedAt.toISOString()).toBe(
         '2020-01-02T00:00:00.000Z',
       );

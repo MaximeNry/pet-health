@@ -5,12 +5,12 @@ dist/
 .env
 .env.*
 !.env.example
-# client Prisma généré (on le régénère, on ne le versionne pas)
+# Generated Prisma client (regenerated on demand, never versioned)
 **/generated/prisma/
 
-# Claude Design : config MCP locale + sources/working files des maquettes
-# (la source de vérité reste le projet Claude Design ; les tokens intégrés
-#  vivent dans apps/web/src + public/brand et restent versionnés)
+# Claude Design: local MCP config + mockup sources/working files
+# (the source of truth stays the Claude Design project; the integrated
+#  tokens live in apps/web/src + public/brand and are versioned)
 .mcp.json
 apps/web/design/prompts.md
 apps/web/design/

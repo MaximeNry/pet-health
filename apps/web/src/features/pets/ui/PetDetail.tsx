@@ -31,7 +31,7 @@ type Tab = 'documents' | 'history' | 'reminders';
 const TABS: Tab[] = ['documents', 'history', 'reminders'];
 
 /**
- * Pet detail screen (design: "Détail animal avec onglets", variant A):
+ * Pet detail screen (design: "Pet detail with tabs", variant A):
  * centered profile header with attribute chips, then Documents / History /
  * Reminders tabs. Documents shows its empty state until the health-document
  * context lands; the other two tabs are "coming soon" placeholders.

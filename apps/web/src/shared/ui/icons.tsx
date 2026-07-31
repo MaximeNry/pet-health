@@ -169,7 +169,7 @@ export function LogoutIcon(props: IconProps) {
   );
 }
 
-/** Sliders/adjust icon for "Gérer le foyer". */
+/** Sliders/adjust icon for "Manage household". */
 export function ManageIcon(props: IconProps) {
   return (
     <svg

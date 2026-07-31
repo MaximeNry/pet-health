@@ -11,7 +11,7 @@ const makeUser = () =>
   User.create({
     email: 'marie.lefevre@example.com',
     firstName: 'Marie',
-    lastName: 'Lefèvre',
+    lastName: 'Lefevre',
     passwordHash: 'h',
     role: Role.create('USER'),
   });
@@ -52,7 +52,7 @@ describe('DeleteAccountUseCase', () => {
   it('tears down a sole-member household, then deletes the user', async () => {
     const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
-    const household = Household.create({ name: 'Foyer', ownerId: user.id });
+    const household = Household.create({ name: 'Household', ownerId: user.id });
 
     users.findById.mockResolvedValue(user);
     households.findByUserId.mockResolvedValue([household]);
@@ -67,7 +67,7 @@ describe('DeleteAccountUseCase', () => {
   it('leaves a shared household after handing ownership to the oldest member', async () => {
     const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
-    const household = Household.create({ name: 'Foyer', ownerId: user.id });
+    const household = Household.create({ name: 'Household', ownerId: user.id });
     household.addMember('user-other');
 
     users.findById.mockResolvedValue(user);
@@ -85,7 +85,7 @@ describe('DeleteAccountUseCase', () => {
   it('simply leaves a shared household that keeps another owner', async () => {
     const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
-    const household = Household.create({ name: 'Foyer', ownerId: 'user-boss' });
+    const household = Household.create({ name: 'Household', ownerId: 'user-boss' });
     household.addMember(user.id);
 
     users.findById.mockResolvedValue(user);

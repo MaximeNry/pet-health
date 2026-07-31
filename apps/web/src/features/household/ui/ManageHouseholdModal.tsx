@@ -10,10 +10,10 @@ import { useDeleteHousehold } from '../model/useDeleteHousehold';
 import { useUpdateHousehold } from '../model/useUpdateHousehold';
 
 /**
- * "Modifier le foyer" dialog: edits the household name. Document categories
+ * "Edit household" dialog: edits the household name. Document categories
  * are the app-wide fixed set (`DOCUMENT_TYPES`), shown read-only. Saving
  * patches the household and closes on success; the households query refreshes
- * via the mutation. Owners also get a danger zone to delete the whole foyer —
+ * via the mutation. Owners also get a danger zone to delete the whole household —
  * a destructive, cascading action gated behind an explicit confirmation step.
  */
 export function ManageHouseholdModal({
@@ -126,7 +126,7 @@ export function ManageHouseholdModal({
           )}
         </div>
 
-        {/* Danger zone — owner-only. Deleting the foyer cascades to every pet
+        {/* Danger zone — owner-only. Deleting the household cascades to every pet
             and document, so it sits behind an explicit confirmation. */}
         {isOwner && (
           <div className="mx-6 mt-[22px] rounded-2xl border border-coral-100 bg-coral-50/60 p-4">

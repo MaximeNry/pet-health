@@ -5,7 +5,7 @@ import type { HouseholdRepository } from '../domain/household.repository';
 import { HouseholdTeardownService } from './household-teardown.service';
 
 /**
- * Deletes a household after ensuring it exists. Deleting the foyer cascades to
+ * Deletes a household after ensuring it exists. Deleting the household cascades to
  * everything it owns — pets, their documents and stored files — via the shared
  * teardown orchestration, so no orphaned rows or files are left behind.
  */

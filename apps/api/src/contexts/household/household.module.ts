@@ -18,7 +18,7 @@ import { HouseholdController } from './presentation/household.controller';
  * `household` bounded context (supporting). The `HouseholdRepository` port is
  * bound to its Prisma adapter via a token. `PrismaService` is provided globally
  * by `PrismaModule`. The pet and health-document modules are imported so the
- * teardown orchestration can cascade a foyer deletion through their ports.
+ * teardown orchestration can cascade a household deletion through their ports.
  */
 @Module({
   imports: [PetModule, HealthDocumentModule],

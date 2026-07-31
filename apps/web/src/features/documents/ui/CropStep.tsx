@@ -49,9 +49,9 @@ function canvasToJpeg(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 /**
- * Step 2 — preview & crop (design frame "Aperçu & recadrage"): draggable
+ * Step 2 — preview & crop (design frame "Preview & crop"): draggable
  * crop frame with corner/edge handles over the captured photo, 90° rotation,
- * contrast adjustment, rule-of-thirds grid. "Valider" bakes rotation, crop
+ * contrast adjustment, rule-of-thirds grid. Confirming bakes rotation, crop
  * and contrast into a new JPEG via canvas.
  */
 export function CropStep({

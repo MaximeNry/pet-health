@@ -23,7 +23,7 @@ const tokens: InvitationTokenService = {
 };
 
 const makeHousehold = () =>
-  Household.create({ name: 'Foyer Noury', ownerId: 'user-owner' });
+  Household.create({ name: 'Rojas household', ownerId: 'user-owner' });
 
 const makeInvitation = (household: Household) =>
   Invitation.create({

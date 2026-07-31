@@ -1,36 +1,36 @@
 FROM node:24-alpine
 
-# Corepack est livré avec Node — on active pnpm
+# Corepack ships with Node — enable pnpm through it
 RUN corepack enable pnpm
 
 WORKDIR /app
 
-# ── Couche 1 : config workspace (change quasi jamais) ──────────────
+# ── Layer 1: workspace config (almost never changes) ───────────────
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
-# ── Couche 2 : les package.json de chaque package du workspace ─────
-# On copie SEULEMENT les manifestes, pas le code source.
-# pnpm a besoin de tous les package.json du workspace pour résoudre
-# le graphe de dépendances, même si on ne lance qu'une seule app.
+# ── Layer 2: the package.json of every workspace package ───────────
+# Copy ONLY the manifests, not the source code.
+# pnpm needs every workspace package.json to resolve the dependency
+# graph, even when a single app is being started.
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY packages/shared/package.json packages/shared/
 
-# ── Couche 3 : installation des deps ──────────────────────────────
-# --frozen-lockfile = pnpm échoue si le lockfile est désynchronisé
-# avec les package.json. C'est ce qu'on veut en Docker : des builds
-# reproductibles, jamais de lockfile modifié silencieusement.
-# Cette couche est recalculée UNIQUEMENT quand un package.json ou
-# le lockfile change → c'est là que tu gagnes du temps au quotidien.
+# ── Layer 3: dependency installation ───────────────────────────────
+# --frozen-lockfile = pnpm fails if the lockfile is out of sync with
+# the package.json files. That is what we want in Docker: reproducible
+# builds, never a silently modified lockfile.
+# This layer is only recomputed when a package.json or the lockfile
+# changes → that is where the day-to-day build time is saved.
 RUN pnpm install --frozen-lockfile
 
-# ── Couche 4 : le code source (change à chaque modif) ─────────────
-# En dev, cette couche est largement court-circuitée par les bind
-# mounts de docker-compose (on y vient). Elle sert de fallback si
-# tu lances le container sans mount.
+# ── Layer 4: the source code (changes on every edit) ───────────────
+# In dev this layer is largely short-circuited by the docker-compose
+# bind mounts (see below). It acts as a fallback when the container is
+# started without mounts.
 COPY . .
 
-# ── Couche 5 : client Prisma (gitignored, régénéré à chaque build) ─
-# generate n'a pas besoin d'une DB joignable ; une URL factice suffit.
+# ── Layer 5: Prisma client (gitignored, regenerated on every build) ─
+# generate does not need a reachable database; a dummy URL is enough.
 ENV DATABASE_URL=postgresql://pethealth:pethealth_dev@postgres:5432/pethealth
 RUN pnpm --filter api exec prisma generate

@@ -11,7 +11,7 @@ import {
 import type { DocumentMetadata, ScanImage } from './ScanFlow';
 
 /**
- * Step 3 — metadata form (design frame "Métadonnées & envoi"): thumbnail of
+ * Step 3 — metadata form (design frame "Metadata & upload"): thumbnail of
  * the processed scan, document type chips, title, date and tags, with the
  * pinned "save to Google Drive" call to action.
  */

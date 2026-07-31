@@ -1,32 +1,32 @@
-# Authentification — module `auth`
+# Authentication — the `auth` module
 
-> Sous-domaine **generic** : module NestJS simple, sans couches DDD.
-> **Google est l'unique méthode de connexion.** L'app n'émet et ne vérifie
-> ensuite que sa **propre** session (JWT en cookie) — les jetons Google ne
-> servent qu'à l'identité au moment du login.
+> **Generic** subdomain: a plain NestJS module, no DDD layers.
+> **Google is the only way to sign in.** Afterwards the app issues and verifies
+> only its **own** session (a JWT in a cookie) — Google tokens only serve to
+> establish identity at login time.
 
-## Sommaire
+## Contents
 
-1. [Le pattern Strategy](#1-le-pattern-strategy)
+1. [The Strategy pattern](#1-the-strategy-pattern)
 2. [Passport + NestJS](#2-passport--nestjs)
-3. [Les fichiers](#3-les-fichiers)
-4. [Les deux scénarios](#4-les-deux-scénarios)
-5. [Modèles mentaux](#5-modèles-mentaux)
+3. [The files](#3-the-files)
+4. [The two scenarios](#4-the-two-scenarios)
+5. [Mental models](#5-mental-models)
 6. [Configuration](#6-configuration)
 
 ---
 
-## 1. Le pattern Strategy
+## 1. The Strategy pattern
 
-« Authentifier une requête » est une tâche qui peut se faire de **plusieurs
-façons interchangeables** (Google OAuth, JWT de session, mot de passe, clé
-API…). Le pattern **Strategy** isole chaque façon dans sa propre classe ; le
-code appelant en choisit une sans connaître ses détails.
+"Authenticating a request" is a task that can be done in **several interchangeable
+ways** (Google OAuth, session JWT, password, API key…). The **Strategy** pattern
+isolates each way in its own class; the calling code picks one without knowing
+its details.
 
 ```
-┌─────────────┐   délègue à   ┌──────────────────────┐
-│  Context    │ ────────────► │  Strategy (contrat)  │
-└─────────────┘               └──────────────────────┘
+┌─────────────┐   delegates to   ┌──────────────────────┐
+│  Context    │ ───────────────► │  Strategy (contract) │
+└─────────────┘                  └──────────────────────┘
                                   ▲              ▲
                           ┌───────┘              └───────┐
                   ┌──────────────┐              ┌──────────────┐
@@ -34,133 +34,135 @@ code appelant en choisit une sans connaître ses détails.
                   └──────────────┘              └──────────────┘
 ```
 
-- **Strategy** : le contrat commun (« vérifier l'identité d'une requête »).
-- **ConcreteStrategy** : chaque implémentation.
-- **Context** : délègue à *une* stratégie.
+- **Strategy**: the shared contract ("verify a request's identity").
+- **ConcreteStrategy**: each implementation.
+- **Context**: delegates to *one* strategy.
 
-Bénéfice : ajouter une méthode d'auth demain = écrire **une nouvelle stratégie**
-(+ un guard), sans toucher aux contrôleurs existants.
+Benefit: adding an auth method tomorrow means writing **one new strategy**
+(+ a guard), without touching the existing controllers.
 
 ## 2. Passport + NestJS
 
-**`passport` est le `Context`.** Il ne sait pas *comment* authentifier : il
-délègue à des **stratégies enregistrées par un nom** (`'google'`, `'jwt'`).
-Chaque stratégie expose une méthode **`validate()`**. Passport :
+**`passport` is the `Context`.** It doesn't know *how* to authenticate: it
+delegates to **strategies registered under a name** (`'google'`, `'jwt'`). Each
+strategy exposes a **`validate()`** method. Passport:
 
-1. exécute la mécanique propre à la stratégie (dialogue OAuth, ou vérif de
-   signature JWT…) ;
-2. appelle `validate()` avec le résultat brut ;
-3. pose **ce que `validate()` retourne** dans **`req.user`**.
+1. runs the mechanics specific to the strategy (the OAuth dance, or JWT signature
+   verification…);
+2. calls `validate()` with the raw result;
+3. puts **whatever `validate()` returns** into **`req.user`**.
 
-> 🔑 **Règle d'or : ce que `validate()` retourne devient `req.user`.**
+> 🔑 **Golden rule: what `validate()` returns becomes `req.user`.**
 
-NestJS ajoute deux outils :
+NestJS adds two tools:
 
-- **`PassportStrategy(Strategy, 'nom')`** — un *mixin* qui transforme une
-  stratégie Passport en classe NestJS injectable. Le `super({...})` configure la
-  stratégie ; ton `validate()` est le hook appelé par Passport.
-- **`AuthGuard('nom')`** — le guard à poser sur une route (`@UseGuards`). Il
-  déclenche la stratégie nommée ; succès → `req.user` rempli, sinon **401**.
+- **`PassportStrategy(Strategy, 'name')`** — a *mixin* turning a Passport strategy
+  into an injectable NestJS class. The `super({...})` call configures the
+  strategy; your `validate()` is the hook Passport calls.
+- **`AuthGuard('name')`** — the guard you put on a route (`@UseGuards`). It
+  triggers the named strategy; on success `req.user` is populated, otherwise
+  **401**.
 
-## 3. Les fichiers
+## 3. The files
 
-| Fichier | Rôle |
+| File | Role |
 |---|---|
-| `strategies/google.strategy.ts` | Stratégie OAuth Google (scopes `openid email profile`). Sa `validate()` **retrouve ou crée** l'utilisateur local via `FindOrCreateGoogleUserUseCase`, puis retourne `{ id, email }`. Sert à **entrer**. |
-| `strategies/jwt.strategy.ts` | Stratégie JWT. Extrait le jeton du cookie, vérifie **signature + expiration**, puis `validate(payload)` met en forme `req.user`. Sert à **rester connecté**. |
-| `guards/google-auth.guard.ts` | `AuthGuard('google')` — déclenche le flux OAuth. |
-| `guards/jwt-auth.guard.ts` | `AuthGuard('jwt')` — protège une route. |
-| `auth.service.ts` | **Signe** le JWT de session (`@nestjs/jwt`). Pendant « écriture » de `passport-jwt` (lecture). |
+| `strategies/google.strategy.ts` | Google OAuth strategy (scopes `openid email profile`). Its `validate()` **finds or creates** the local user through `FindOrCreateGoogleUserUseCase`, then returns `{ id, email }`. Used to **get in**. |
+| `strategies/jwt.strategy.ts` | JWT strategy. Extracts the token from the cookie, verifies **signature + expiration**, then `validate(payload)` shapes `req.user`. Used to **stay signed in**. |
+| `guards/google-auth.guard.ts` | `AuthGuard('google')` — kicks off the OAuth flow. |
+| `guards/jwt-auth.guard.ts` | `AuthGuard('jwt')` — protects a route. |
+| `auth.service.ts` | **Signs** the session JWT (`@nestjs/jwt`). The "write" side of `passport-jwt` (which reads). |
 | `auth.controller.ts` | Routes `GET /auth/google`, `GET /auth/google/callback`, `GET /auth/me`, `POST /auth/logout`. |
-| `auth.constants.ts` | Nom du cookie, durée de session, types `JwtPayload` / `AuthenticatedUser`. |
-| `auth.module.ts` | Enregistre stratégies + service, configure `JwtModule`, importe `UserModule`. |
+| `auth.constants.ts` | Cookie name, session lifetime, `JwtPayload` / `AuthenticatedUser` types. |
+| `auth.module.ts` | Registers strategies + service, configures `JwtModule`, imports `UserModule`. |
 
-Hors module : `cookie-parser` est branché dans `src/main.ts` (lit les cookies
-entrants → `req.cookies`).
+Outside the module: `cookie-parser` is wired in `src/main.ts` (reads incoming
+cookies → `req.cookies`).
 
-### Dépendances et rôles
+### Dependencies and their roles
 
-- `passport` — l'orchestrateur (Context).
-- `@nestjs/passport` — colle Passport ↔ NestJS (`PassportStrategy`, `AuthGuard`).
-- `passport-google-oauth20` — stratégie « entrer via Google ».
-- `passport-jwt` — stratégie « rester connecté » (lecture/vérif du JWT).
-- `@nestjs/jwt` — fabrique/signe le JWT (écriture).
-- `cookie-parser` — transporte le JWT dans un cookie httpOnly.
+- `passport` — the orchestrator (Context).
+- `@nestjs/passport` — glues Passport ↔ NestJS (`PassportStrategy`, `AuthGuard`).
+- `passport-google-oauth20` — the "get in via Google" strategy.
+- `passport-jwt` — the "stay signed in" strategy (reads/verifies the JWT).
+- `@nestjs/jwt` — builds/signs the JWT (writes).
+- `cookie-parser` — carries the JWT in an httpOnly cookie.
 
-## 4. Les deux scénarios
+## 4. The two scenarios
 
-### Connexion (Google)
+### Sign-in (Google)
 
 ```
-Navigateur            API (NestJS)                     Google
+Browser               API (NestJS)                     Google
     │  GET /auth/google     │                             │
     │──────────────────────►│ GoogleAuthGuard             │
-    │   302 redirect        │  → stratégie google redirige │
+    │   302 redirect        │  → google strategy redirects │
     │◄──────────────────────┤                             │
-    │  ────────────────────────────────────────────────► (login + consentement)
+    │  ────────────────────────────────────────────────► (login + consent)
     │   302 /auth/google/callback?code=...                │
     │◄────────────────────────────────────────────────────┤
     │  GET /callback?code=  │                             │
-    │──────────────────────►│ stratégie google :          │
-    │                       │   échange le code ─────────► tokens + profil
+    │──────────────────────►│ google strategy:            │
+    │                       │   exchanges the code ──────► tokens + profile
     │                       │   validate(profile)          │
     │                       │     find-or-create User      │
     │                       │     req.user = {id,email}    │
-    │                       │ handler: signe JWT → cookie  │
-    │   302 vers le front   │   Set-Cookie: access_token   │
+    │                       │ handler: signs JWT → cookie  │
+    │   302 to the frontend │   Set-Cookie: access_token   │
     │◄──────────────────────┤                             │
 ```
 
-### Requête authentifiée (`/auth/me`)
+### Authenticated request (`/auth/me`)
 
 ```
-Navigateur                         API
+Browser                            API
    │  GET /auth/me  (Cookie: access_token=...) │
    │──────────────────────────────────────────►│ cookie-parser → req.cookies
-   │                                           │ JwtAuthGuard → stratégie jwt :
-   │                                           │   extrait le JWT du cookie
-   │                                           │   vérifie signature + expiration
+   │                                           │ JwtAuthGuard → jwt strategy:
+   │                                           │   extracts the JWT from the cookie
+   │                                           │   verifies signature + expiration
    │                                           │   validate(payload) → req.user
    │   200 { userId, email }                   │ handler: return req.user
    │◄──────────────────────────────────────────┤
 ```
 
-## 5. Modèles mentaux
+## 5. Mental models
 
-1. **Ce que `validate()` retourne = `req.user`.** Tout tourne autour de ça.
-2. **Deux stratégies = deux moments** : Google pour **entrer** (une fois), JWT
-   pour **rester** (à chaque requête).
-3. **Le guard est l'interrupteur** : `@UseGuards(AuthGuard('x'))` = « ici, exige
-   la stratégie x ».
-4. **Séparation lecture/écriture du JWT** : `@nestjs/jwt` signe (sortie),
-   `passport-jwt` vérifie (entrée).
-5. **Ouvert à l'extension** : une nouvelle méthode d'auth = une nouvelle
-   stratégie + un guard, sans modifier l'existant.
+1. **What `validate()` returns = `req.user`.** Everything revolves around that.
+2. **Two strategies = two moments**: Google to **get in** (once), JWT to **stay
+   in** (on every request).
+3. **The guard is the switch**: `@UseGuards(AuthGuard('x'))` = "this route
+   requires strategy x".
+4. **Read/write separation for the JWT**: `@nestjs/jwt` signs (outbound),
+   `passport-jwt` verifies (inbound).
+5. **Open for extension**: a new auth method = a new strategy + a guard, without
+   modifying what exists.
 
 ## 6. Configuration
 
-Variables d'environnement (voir `.env.example` à la racine) :
+Environment variables (see `.env.example` at the repo root):
 
-| Variable | Rôle |
+| Variable | Role |
 |---|---|
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Client OAuth (Google Cloud Console). |
-| `GOOGLE_CALLBACK_URL` | URI de redirection autorisée (`/auth/google/callback`). |
-| `JWT_SECRET` | Secret de signature de la session applicative. |
-| `FRONTEND_URL` | Où rediriger le navigateur après login. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth client (Google Cloud Console). |
+| `GOOGLE_CALLBACK_URL` | Authorized redirect URI (`/auth/google/callback`). |
+| `JWT_SECRET` | Signing secret for the app session. |
+| `FRONTEND_URL` | Where to redirect the browser after login. |
 
-Sans credentials réelles, des **fallbacks de dev non vides** permettent à l'app
-de démarrer (le `clientID` vide est rejeté par `passport-oauth2`) ; le vrai login
-nécessite de renseigner `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`.
+Without real credentials, **non-empty dev fallbacks** let the app boot (an empty
+`clientID` is rejected by `passport-oauth2`); an actual login requires setting
+`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`.
 
-### Note : auth locale (argon2)
+### Note: local auth (argon2)
 
-Une auth email/mot de passe (value object `Password`, port `PasswordHasher`,
-adapter **argon2**) existe dans le contexte `user`, **testée mais non exposée**
-(pas de route d'inscription). Conservée comme démonstration ; le chemin de
-connexion actif est **Google uniquement**.
+An email/password auth path (`Password` value object, `PasswordHasher` port,
+**argon2** adapter) exists in the `user` context, **tested but not exposed** (no
+sign-up route). Kept as a demonstration; the active sign-in path is **Google
+only**.
 
-### À venir
+### Coming next
 
-- Protéger les routes des autres contextes avec `JwtAuthGuard`.
-- Avec le contexte `health-document` : ajouter le scope **`drive.file`**, l'accès
-  *offline*, et le **stockage chiffré du refresh token** (accès Google Drive).
+- Protect the other contexts' routes with `JwtAuthGuard`.
+- Along with the `health-document` context: add the **`drive.file`** scope,
+  *offline* access, and **encrypted storage of the refresh token** (Google Drive
+  access).

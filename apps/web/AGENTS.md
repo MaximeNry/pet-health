@@ -4,35 +4,35 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# Architecture Frontend - Google Drive PWA
+# Frontend Architecture — PetHealth
 
-## Principes Directeurs
+## Guiding Principles
 
-Ce document guide les décisions d'architecture et les patterns à respecter dans ce projet frontend React/TypeScript.
+This document drives the architectural decisions and the patterns to follow in this React/TypeScript frontend.
 
-### Philosophie de Base
+### Core Philosophy
 
-- **Pas de DDD côté frontend** : Le DDD et l'hexagonale sont des patterns backend. Le frontend n'a pas besoin de modéliser un domaine métier complexe.
-- **Séparation claire des couches** : Séparer business logic (métier), état (state management), et présentation (composants UI).
-- **Adapter Pattern pour les appels API** : Les composants ne communiquent jamais directement avec le serveur. Tous les appels API passent par une couche d'adaptation centralisée.
+- **No DDD on the frontend**: DDD and hexagonal architecture are backend patterns. The frontend has no complex business domain to model.
+- **Clear separation of layers**: keep business logic, state management and presentation (UI components) apart.
+- **Adapter Pattern for API calls**: components never talk to the server directly. Every API call goes through a centralized adapter layer.
 
 ---
 
-## Gestion de l'État
+## State Management
 
-### État Serveur vs État UI
+### Server State vs UI State
 
-Le frontend gère deux types d'état distincts, et c'est crucial de ne pas les mélanger.
+The frontend deals with two distinct kinds of state, and mixing them up is the mistake to avoid.
 
-#### État Serveur (TanStack Query)
-Toute donnée qui existe sur le serveur (fichiers, métadonnées utilisateur, etc.) doit être gérée par **TanStack Query**.
+#### Server State (TanStack Query)
+Any data that lives on the server (files, user metadata, etc.) must be managed by **TanStack Query**.
 
-**Quand utiliser TanStack Query :**
-- Données que tu fetchs depuis l'API
-- Données que tu dois synchroniser avec le serveur
-- Cache, invalidation, optimistic updates
+**When to use TanStack Query:**
+- Data you fetch from the API
+- Data you must keep in sync with the server
+- Caching, invalidation, optimistic updates
 
-**Exemple :**
+**Example:**
 ```typescript
 // features/files/api/useFiles.ts
 import { useQuery } from '@tanstack/react-query';
@@ -46,15 +46,15 @@ export function useFiles(folderId: string) {
 }
 ```
 
-#### État UI (Zustand / Context API)
-Seul l'état purement client doit aller dans Zustand ou Context : modales ouvertes, filtres sélectionnés, onglets actifs, etc.
+#### UI State (Zustand / Context API)
+Only purely client-side state belongs in Zustand or Context: open modals, selected filters, active tabs, etc.
 
-**Quand utiliser Zustand/Context :**
-- État de l'UI qui n'existe que côté client
-- État partagé entre plusieurs composants UI
-- Pas de synchronisation serveur requise
+**When to use Zustand/Context:**
+- UI state that only exists on the client
+- State shared across several UI components
+- No server synchronization required
 
-**Exemple :**
+**Example:**
 ```typescript
 // features/files/ui/filesPanelStore.ts
 import { create } from 'zustand';
@@ -70,18 +70,18 @@ export const useFilesPanelStore = create((set) => ({
 
 ---
 
-## Couche d'Adaptation API (Ports & Adapters)
+## API Adapter Layer (Ports & Adapters)
 
-La couche d'adaptation API est **le seul point d'entrée** vers le serveur. C'est là que réside la vraie discipline architecturale du frontend.
+The API adapter layer is **the only entry point** to the server. This is where the frontend's real architectural discipline lives.
 
-### Règles Strictes
+### Strict Rules
 
-1. **Pas d'appels directs à l'API** : Les composants ne font jamais `fetch()` ou `axios()` directement.
-2. **Adapter centralisé** : Chaque feature a un ou plusieurs adapters qui encapsulent les appels.
-3. **Types stricts** : Les adapters retournent des types TypeScript bien définis, pas des `any`.
-4. **Une source de vérité** : Si ton API change, tu modifies un adapter, et tout te cascades proprement.
+1. **No direct API calls**: components never call `fetch()` or `axios()` themselves.
+2. **Centralized adapter**: each feature has one or more adapters encapsulating its calls.
+3. **Strict types**: adapters return well-defined TypeScript types, never `any`.
+4. **One source of truth**: when the API changes, you edit one adapter and the change cascades cleanly.
 
-### Structure d'un Adapter
+### Structure of an Adapter
 
 ```typescript
 // features/files/api/filesAdapter.ts
@@ -89,12 +89,12 @@ import { apiClient } from '@/shared/api/apiClient';
 import type { FileDTO } from './types';
 
 export const filesAdapter = {
-  async getFiles(folderId: string): Promise {
+  async getFiles(folderId: string): Promise<FileDTO[]> {
     const response = await apiClient.get(`/folders/${folderId}/files`);
     return response.data;
   },
 
-  async uploadFile(folderId: string, file: File): Promise {
+  async uploadFile(folderId: string, file: File): Promise<FileDTO> {
     const formData = new FormData();
     formData.append('file', file);
     const response = await apiClient.post(
@@ -104,13 +104,13 @@ export const filesAdapter = {
     return response.data;
   },
 
-  async deleteFile(fileId: string): Promise {
+  async deleteFile(fileId: string): Promise<void> {
     await apiClient.delete(`/files/${fileId}`);
   },
 };
 ```
 
-### Types pour les Adapters
+### Types for Adapters
 
 ```typescript
 // features/files/api/types.ts
@@ -131,48 +131,49 @@ export interface UploadProgressEvent {
 
 ---
 
-## Internationalisation (i18n)
+## Internationalization (i18n)
 
-L'application est proposée en **anglais** (défaut) et en **espagnol**. L'i18n repose sur
-**next-intl** en mode cookie (pas de locale dans l'URL — l'app est derrière l'auth, pas
-d'enjeu SEO) : cookie `NEXT_LOCALE` posé par le `LanguageSwitcher`, sinon négociation
-`Accept-Language`, sinon `en`. Config dans `src/i18n/`, messages dans `messages/{en,es}.json`.
+The app ships in **English** (default) and **Spanish**. i18n relies on **next-intl** in
+cookie mode (no locale in the URL — the app sits behind auth, so there is no SEO
+concern): a `NEXT_LOCALE` cookie set by the `LanguageSwitcher`, otherwise
+`Accept-Language` negotiation, otherwise `en`. Config lives in `src/i18n/`, messages in
+`messages/{en,es}.json`.
 
-### Règles Strictes
+### Strict Rules
 
-1. **Aucun texte en dur dans les composants** : toute chaîne visible par l'utilisateur
-   (labels, placeholders, `aria-label`, messages d'erreur, états de chargement…) passe par
-   `useTranslations` (client et RSC synchrones) ou `getTranslations` (RSC async, metadata).
-2. **Chaque nouvelle clé est ajoutée dans TOUTES les langues** : `messages/en.json` **et**
-   `messages/es.json` doivent rester synchrones (mêmes clés, même structure). Une clé
-   manquante dans une langue est un bug.
-3. **Pluriels et interpolations en ICU** dans les messages, pas dans le code :
-   `"memberCount": "{count, plural, one {# member} other {# members}}"` — jamais de
-   `count > 1 ? 'members' : 'member'` dans un composant.
-4. **Les helpers ne retournent jamais de libellés** : une fonction de `entities/*/lib.ts`
-   retourne des données structurées (ex. `petAge()` → `{ unit, value }`), c'est le composant
-   qui traduit. Pour les enums, utiliser des clés dynamiques (`t(\`species.${species}\`)`).
-5. **Les données utilisateur ne se traduisent pas** : ce qui vient de l'API et a été saisi
-   par l'utilisateur (nom du foyer, types de documents…) s'affiche tel quel.
-6. **Nommage des clés par domaine** (`login.*`, `household.modal.*`, `pets.empty.*`…),
-   aligné sur les features — pas de clés fourre-tout.
+1. **No hardcoded text in components**: every user-visible string (labels, placeholders,
+   `aria-label`s, error messages, loading states…) goes through `useTranslations`
+   (client and synchronous RSC) or `getTranslations` (async RSC, metadata).
+2. **Every new key is added in ALL languages**: `messages/en.json` **and**
+   `messages/es.json` must stay in sync (same keys, same structure). A key missing from
+   one language is a bug.
+3. **Plurals and interpolations in ICU** inside the messages, not in the code:
+   `"memberCount": "{count, plural, one {# member} other {# members}}"` — never
+   `count > 1 ? 'members' : 'member'` inside a component.
+4. **Helpers never return labels**: a function in `entities/*/lib.ts` returns structured
+   data (e.g. `petAge()` → `{ unit, value }`); the component does the translating. For
+   enums, use dynamic keys (`t(\`species.${species}\`)`).
+5. **User data is never translated**: anything coming from the API that the user typed
+   in (household name, document types…) is displayed as-is.
+6. **Key naming by domain** (`login.*`, `household.modal.*`, `pets.empty.*`…), aligned
+   with the features — no catch-all keys.
 
-**Ajouter une langue** = créer `messages/<locale>.json` + ajouter la locale dans
-`src/i18n/config.ts` (`LOCALES`). Rien d'autre à toucher.
+**Adding a language** = create `messages/<locale>.json` + add the locale to
+`src/i18n/config.ts` (`LOCALES`). Nothing else to touch.
 
 ---
 
-## Organisation des Dossiers (Feature-Sliced Design)
+## Folder Organization (Feature-Sliced Design)
 
-Organise ton `src/` par feature, chaque feature étant un domaine métier self-contained.
+Organize `src/` by feature, each feature being a self-contained business domain.
 
 src/
-├── app/                       # Couche application
+├── app/                       # Application layer
 │   ├── App.tsx               # Root component
 │   ├── providers.tsx          # Providers (React Query, Zustand, etc.)
 │   └── index.tsx             # Entry point
 │
-├── pages/                     # Pages / Layouts (Next.js pages ou routes)
+├── pages/                     # Pages / Layouts (Next.js pages or routes)
 │   ├── dashboard/
 │   │   └── page.tsx
 │   ├── files/
@@ -180,21 +181,21 @@ src/
 │   └── settings/
 │       └── page.tsx
 │
-├── features/                  # Features (métier)
+├── features/                  # Features (business)
 │   ├── files/
-│   │   ├── api/              # ⭐ Adapter API + types
+│   │   ├── api/              # ⭐ API adapter + types
 │   │   │   ├── filesAdapter.ts
 │   │   │   └── types.ts
 │   │   ├── model/            # ⭐ Business logic hooks
 │   │   │   ├── useFiles.ts
 │   │   │   ├── useUploadFile.ts
 │   │   │   └── types.ts
-│   │   ├── ui/               # Composants UI de la feature
+│   │   ├── ui/               # UI components of the feature
 │   │   │   ├── FileList.tsx
 │   │   │   ├── FileItem.tsx
-│   │   │   ├── filesPanelStore.ts (state UI)
+│   │   │   ├── filesPanelStore.ts (UI state)
 │   │   │   └── styles.module.css
-│   │   └── index.ts          # Public API de la feature
+│   │   └── index.ts          # Public API of the feature
 │   │
 │   └── auth/
 │       ├── api/
@@ -202,7 +203,7 @@ src/
 │       ├── ui/
 │       └── index.ts
 │
-├── entities/                  # Domaines métier partagés (User, Folder, etc.)
+├── entities/                  # Shared business domains (User, Folder, etc.)
 │   ├── user/
 │   │   ├── types.ts
 │   │   └── index.ts
@@ -210,29 +211,29 @@ src/
 │       ├── types.ts
 │       └── index.ts
 │
-├── shared/                    # Code réutilisable
+├── shared/                    # Reusable code
 │   ├── api/
-│   │   ├── apiClient.ts      # Instance axios/fetch configurée
+│   │   ├── apiClient.ts      # Configured axios/fetch instance
 │   │   └── interceptors.ts
-│   ├── ui/                    # Composants UI génériques
+│   ├── ui/                    # Generic UI components
 │   │   ├── Button.tsx
 │   │   ├── Modal.tsx
 │   │   └── Input.tsx
-│   ├── hooks/                 # Hooks génériques (pas métier)
+│   ├── hooks/                 # Generic hooks (not business)
 │   │   ├── useAsync.ts
 │   │   └── useDebounce.ts
-│   ├── lib/                   # Utilitaires
+│   ├── lib/                   # Utilities
 │   │   ├── formatters.ts
 │   │   └── validators.ts
 │   └── styles/
 │       └── globals.css
 │
-└── types/                     # Types globaux partagés
+└── types/                     # Shared global types
 └── global.ts
 
-### Public API d'une Feature (`index.ts`)
+### Public API of a Feature (`index.ts`)
 
-Chaque feature exporte une **public API** claire. Cela signifie que les autres features savent exactement ce qu'elles peuvent utiliser.
+Each feature exposes a clear **public API**. That way other features know exactly what they are allowed to use.
 
 ```typescript
 // features/files/index.ts
@@ -240,15 +241,15 @@ export { FileList, FileItem } from './ui';
 export { useFiles, useUploadFile } from './model';
 export type { File, UploadProgressEvent } from './api/types';
 
-// ❌ N'exporte PAS les adapters directs
-// ❌ N'exporte PAS les stores UI internes
+// ❌ Do NOT export the adapters directly
+// ❌ Do NOT export internal UI stores
 ```
 
 ---
 
-## Patterns de Composants
+## Component Patterns
 
-### Composants Métier (avec logique métier)
+### Business Components (with business logic)
 
 ```typescript
 // features/files/ui/FileList.tsx
@@ -258,16 +259,20 @@ import { FileItem } from './FileItem';
 export function FileList({ folderId }: { folderId: string }) {
   const { data: files, isLoading, error } = useFiles(folderId);
 
-  if (isLoading) return ;
-  if (error) return ;
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorState error={error} />;
 
   return (
-    
+    <ul>
+      {files?.map((file) => (
+        <FileItem key={file.id} file={file} />
+      ))}
+    </ul>
   );
 }
 ```
 
-### Composants de Présentation (dumb components)
+### Presentational Components (dumb components)
 
 ```typescript
 // features/files/ui/FileItem.tsx
@@ -281,16 +286,18 @@ interface FileItemProps {
 
 export function FileItem({ file, onSelect, isSelected }: FileItemProps) {
   return (
-    
+    <li aria-selected={isSelected} onClick={() => onSelect?.(file.id)}>
+      {file.name}
+    </li>
   );
 }
 ```
 
 ---
 
-## Hooks Métier (`model/` layer)
+## Business Hooks (`model/` layer)
 
-Les hooks métier contiennent la logique métier et orchestre TanStack Query + état UI.
+Business hooks hold the business logic and orchestrate TanStack Query + UI state.
 
 ```typescript
 // features/files/model/useUploadFile.ts
@@ -303,7 +310,7 @@ export function useUploadFile(folderId: string) {
   return useMutation({
     mutationFn: (file: File) => filesAdapter.uploadFile(folderId, file),
     onSuccess: () => {
-      // Invalide le cache TanStack Query
+      // Invalidate the TanStack Query cache
       queryClient.invalidateQueries({
         queryKey: ['files', folderId],
       });
@@ -317,24 +324,24 @@ export function useUploadFile(folderId: string) {
 
 ---
 
-## Règles de Dépendance
+## Dependency Rules
 
-### Direction des imports (stricte)
+### Import direction (strict)
 
-- **Pages** importent de **Features** et **Shared**
-- **Features** importent de **Entities**, **Shared**, et (rarement) d'autres **Features**
-- **Entities** importent de **Shared** et d'autres **Entities**
-- **Shared** ne dépend de rien d'autre
+- **Pages** import from **Features** and **Shared**
+- **Features** import from **Entities**, **Shared**, and (rarely) other **Features**
+- **Entities** import from **Shared** and other **Entities**
+- **Shared** depends on nothing else
 
-### ❌ Interdictions
+### ❌ Forbidden
 
-- `features/` n'importe jamais de `pages/`
-- `features/` n'importe jamais d'autres `features/` sauf si c'est justifié (et même là, c'est un signal)
-- Les composants UI n'importent jamais d'adapters directement
+- `features/` never imports from `pages/`
+- `features/` never imports from another `features/` unless justified (and even then, it's a smell)
+- UI components never import adapters directly
 
 ---
 
-## Configuration TypeScript
+## TypeScript Configuration
 
 ```json
 // tsconfig.json (paths)
@@ -355,22 +362,22 @@ export function useUploadFile(folderId: string) {
 
 ---
 
-## Checklist pour les Nouvelles Features
+## Checklist for New Features
 
-Quand tu crées une nouvelle feature :
+When you create a new feature:
 
-- [ ] Crée le dossier `features/[name]` avec les sous-dossiers `api/`, `model/`, `ui/`
-- [ ] Définis les types DTO dans `api/types.ts`
-- [ ] Crée l'adapter dans `api/[name]Adapter.ts`
-- [ ] Crée les hooks métier dans `model/use*.ts`
-- [ ] Crée les composants UI dans `ui/`
-- [ ] Ajoute les textes dans `messages/en.json` ET `messages/es.json` (aucun texte en dur)
-- [ ] Exporte la public API dans `index.ts`
-- [ ] Documente tout comportement non évident dans le code
+- [ ] Create the `features/[name]` folder with the `api/`, `model/`, `ui/` subfolders
+- [ ] Define the DTO types in `api/types.ts`
+- [ ] Create the adapter in `api/[name]Adapter.ts`
+- [ ] Create the business hooks in `model/use*.ts`
+- [ ] Create the UI components in `ui/`
+- [ ] Add the strings to `messages/en.json` AND `messages/es.json` (no hardcoded text)
+- [ ] Export the public API in `index.ts`
+- [ ] Document any non-obvious behavior in the code
 
 ---
 
-## Références
+## References
 
 - [Feature-Sliced Design](https://feature-sliced.design/)
 - [TanStack Query Docs](https://tanstack.com/query/latest)

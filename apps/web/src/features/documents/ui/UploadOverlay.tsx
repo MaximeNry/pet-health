@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { CheckIcon, CloseIcon, GoogleDriveIcon } from '@/shared/ui/icons';
 
 /**
- * Upload status overlay (design frame "État d'envoi"): scrim over the
+ * Upload status overlay (design frame "Upload status"): scrim over the
  * metadata form with a bottom card showing the live progress, then the
  * success state. The error state (not in the design) reuses the same card
  * with retry/dismiss actions.

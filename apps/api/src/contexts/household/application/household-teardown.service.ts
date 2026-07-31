@@ -22,7 +22,7 @@ import type { HouseholdRepository } from '../domain/household.repository';
  *
  * Order matters: documents (stored files first, best-effort), then pets, then
  * the household root. The household's invitations cascade in the database.
- * Shared by `DeleteHouseholdUseCase` (owner deletes the foyer) and
+ * Shared by `DeleteHouseholdUseCase` (owner deletes the household) and
  * `DeleteAccountUseCase` (last member deletes their account).
  */
 @Injectable()

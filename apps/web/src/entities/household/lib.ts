@@ -2,7 +2,7 @@ import type { Household } from './types';
 
 /**
  * Whether the given user is an OWNER of the household. Owner-only actions
- * (managing members, deleting the foyer) gate their UI on this so the
+ * (managing members, deleting the household) gate their UI on this so the
  * frontend disables what the API would reject.
  */
 export function isHouseholdOwner(
