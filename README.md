@@ -10,13 +10,16 @@ own Google Drive, and share the follow-up with the members of your household.
 > architecture (DDD, hexagonal) as much as on the product itself.
 > See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions in detail.
 
-<!-- TODO: screenshot or demo GIF
-![PetHealth preview](docs/screenshot.png)
+<!-- Screenshots — drop the iPhone captures in docs/screenshots/ and uncomment:
+| Dashboard | Scan flow | Document detail |
+|---|---|---|
+| <img src="docs/screenshots/dashboard.png" width="240" /> | <img src="docs/screenshots/scan.png" width="240" /> | <img src="docs/screenshots/document.png" width="240" /> |
 -->
 
 ## ✨ Features
 
-- 📸 **Document scanning** — in-browser camera capture, no native app required
+- 📸 **Document scanning** — in-browser camera capture, no native app required:
+  crop, rotate and contrast adjustment before upload, multi-page documents
 - ☁️ **Google Drive storage** — files stay in the user's own Drive
   (OAuth scope `drive.file`: the app can only access files it created)
 - 🐕 **Pet profiles** — multiple pets per household, each with typed and
@@ -25,6 +28,13 @@ own Google Drive, and share the follow-up with the members of your household.
   management so several people can track the same pets
 - 🔐 **Sign in with Google** — OAuth authentication, account management and
   data deletion
+- 🛡️ **Authorization layer** — a household-membership guard scopes every
+  resource to its household; sensitive operations (member management,
+  invitations, deletion) are owner-only
+- 🌍 **Internationalized** — English and Spanish (next-intl), no hardcoded
+  user-facing string
+- 📱 **Installable (PWA)** — web app manifest and icons, "Add to Home Screen"
+  on iOS and Android
 
 ## 🏗️ Tech stack
 
@@ -78,8 +88,8 @@ in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ```bash
 # 1. Clone and install dependencies
-git clone https://github.com/<user>/pethealth.git
-cd pethealth
+git clone https://github.com/MaximeNry/pet-health.git
+cd pet-health
 pnpm install
 
 # 2. Configure the environment
@@ -105,6 +115,23 @@ pnpm --filter api exec prisma generate       # (Re)generate the Prisma client
 > ℹ️ The Prisma CLI runs on the host and expects `localhost:5432` in
 > `DATABASE_URL`, while the API inside the container uses `postgres:5432`.
 
+## 🧪 Tests
+
+```bash
+pnpm --filter api test        # 18 suites, 123 tests
+pnpm --filter api test:cov    # with coverage
+```
+
+Testing follows the dependency rule: because `domain/` depends on nothing,
+entities and value objects are tested as plain TypeScript — no database, no
+NestJS test module, no mocking framework. Use cases are covered by injecting
+in-memory fakes into their ports, which is exactly what ports and adapters buy
+you. Examples:
+
+- [`health-document.entity.spec.ts`](apps/api/src/contexts/health-document/domain/health-document.entity.spec.ts) — invariants of the aggregate root
+- [`invitation.entity.spec.ts`](apps/api/src/contexts/invitation/domain/invitation.entity.spec.ts) — expiry, single use, email matching
+- [`household-membership.guard.spec.ts`](apps/api/src/authorization/household-membership.guard.spec.ts) — access control rules
+
 ## 🗺️ Roadmap
 
 - [x] Google authentication and account management
@@ -118,4 +145,4 @@ pnpm --filter api exec prisma generate       # (Re)generate the Prisma client
 
 ## 📄 License
 
-Personal project — source available for demonstration purposes.
+[MIT](LICENSE) © Maxime Noury

@@ -17,7 +17,8 @@ device's storage, so files travel to the cloud (Google Drive).
 
 - **Monorepo**: pnpm workspaces (`apps/*`, `packages/*`)
 - **Backend**: NestJS 11, Prisma 7, PostgreSQL 17
-- **Frontend**: Next.js 16 (App Router, Turbopack, React Compiler)
+- **Frontend**: Next.js 16 (App Router, React Compiler). Dev server runs on
+  webpack, not Turbopack — see the note in `docker-compose.yml`
 - **Shared types**: `@pethealth/shared` package (referenced as `workspace:*`)
 - **Containerization**: Docker Compose (dev), `node:24-alpine` images
 
