@@ -10,11 +10,22 @@ own Google Drive, and share the follow-up with the members of your household.
 > architecture (DDD, hexagonal) as much as on the product itself.
 > See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions in detail.
 
-<!-- Screenshots — drop the iPhone captures in docs/screenshots/ and uncomment:
-| Dashboard | Scan flow | Document detail |
+| Household dashboard | Pet record | Scanned document |
 |---|---|---|
-| <img src="docs/screenshots/dashboard.png" width="240" /> | <img src="docs/screenshots/scan.png" width="240" /> | <img src="docs/screenshots/document.png" width="240" /> |
--->
+| <img src="docs/screenshots/dashboard.png" width="230" alt="Household dashboard listing the pets" /> | <img src="docs/screenshots/pet-detail.png" width="230" alt="Pet profile with its documents" /> | <img src="docs/screenshots/document-detail.png" width="230" alt="A scanned document stored in Google Drive" /> |
+
+<details>
+<summary>More screens</summary>
+
+| Scan — metadata | Household members | Invite a member |
+|---|---|---|
+| <img src="docs/screenshots/scan-metadata.png" width="230" alt="Last step of the scan flow: document type, title and date" /> | <img src="docs/screenshots/household-members.png" width="230" alt="Household members with their roles" /> | <img src="docs/screenshots/invitation.png" width="230" alt="Invitation link ready to share" /> |
+
+| Edit household | Pet form | Create a household |
+|---|---|---|
+| <img src="docs/screenshots/edit-household.png" width="230" alt="Household settings with the danger zone" /> | <img src="docs/screenshots/pet-form.png" width="230" alt="Pet creation and edition form" /> | <img src="docs/screenshots/create-household.png" width="230" alt="Household creation, first-run state" /> |
+
+</details>
 
 ## ✨ Features
 
