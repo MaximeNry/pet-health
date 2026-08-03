@@ -23,11 +23,34 @@ export const viewport: Viewport = {
   themeColor: "#16704A",
 };
 
+/**
+ * Production origin. Required by `metadataBase`: without it Next emits
+ * relative Open Graph URLs, which social crawlers (LinkedIn, Slack…) cannot
+ * resolve — the share card then renders without its image.
+ */
+const SITE_URL = "https://pethealthapp.app";
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
+  const description = t("description");
   return {
+    metadataBase: new URL(SITE_URL),
     title: "PetHealth",
-    description: t("description"),
+    description,
+    // The OG image itself comes from `app/opengraph-image.tsx`; Next appends
+    // the og:image/twitter:image tags to the objects below.
+    openGraph: {
+      type: "website",
+      siteName: "PetHealth",
+      title: "PetHealth",
+      description,
+      url: SITE_URL,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "PetHealth",
+      description,
+    },
     icons: {
       icon: "/brand/icon-192.png",
       apple: "/apple-touch-icon.png",

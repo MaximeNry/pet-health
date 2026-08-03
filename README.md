@@ -6,6 +6,8 @@ PetHealth lets you scan your pet's health documents (vaccination records,
 prescriptions, lab results…) straight from the browser, store them in your
 own Google Drive, and share the follow-up with the members of your household.
 
+**➡️ Live app: [pethealthapp.app](https://pethealthapp.app)** — sign in with Google.
+
 > 💼 Personal project built as a technical showcase: the focus is on
 > architecture (DDD, hexagonal) as much as on the product itself.
 > See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions in detail.

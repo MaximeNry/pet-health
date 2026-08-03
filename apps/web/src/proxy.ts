@@ -54,5 +54,12 @@ export const config = {
   // `.*\\..*` skips any path with a file extension (favicon.ico, PWA manifest
   // and icons, /brand/* assets…): those are fetched without a session (e.g. by
   // iOS when installing the app) and must never redirect to /login.
-  matcher: ['/((?!api|_next/static|_next/image|.*\\..*).*)'],
+  //
+  // `opengraph-image` / `twitter-image` are listed explicitly because Next
+  // serves those generated routes WITHOUT a file extension, so the rule above
+  // would not catch them. Social crawlers fetch them with no session cookie:
+  // redirecting them to /login yields a share card with no image.
+  matcher: [
+    '/((?!api|_next/static|_next/image|opengraph-image|twitter-image|.*\\..*).*)',
+  ],
 };
