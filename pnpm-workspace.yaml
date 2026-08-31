@@ -11,3 +11,26 @@ allowBuilds:
   prisma: true
   sharp: false
   unrs-resolver: false
+
+# Advisories the `audit` CI job is allowed to skip. Every entry is a high
+# severity finding on a transitive dependency that is version-pinned by an
+# upstream package, so no change in this repo can move it. The job is blocking:
+# anything NOT listed here fails CI. Re-check this list whenever Dependabot
+# bumps next or prisma — an entry that no longer applies must be deleted, not
+# left to hide a future finding.
+auditConfig:
+  ignoreGhsas:
+    # postcss 8.4.31 and sharp 0.34.5 are pinned by `next` itself (postcss to
+    # the exact version). Both only run at build time / in image optimization,
+    # never on attacker-controlled input here.
+    - GHSA-6g55-p6wh-862q # postcss — file read via sourceMappingURL
+    - GHSA-r28c-9q8g-f849 # postcss — path traversal in source map loading
+    - GHSA-f88m-g3jw-g9cj # sharp — inherited libvips CVEs
+    # The Prisma CLI chain (@prisma/dev, @prisma/config) ships its own pinned
+    # copies. None of it is part of the API's request path — it is tooling that
+    # runs at build and migration time.
+    - GHSA-88fw-hqm2-52qc # hono — CORS wildcard with credentials
+    - GHSA-v2hh-gcrm-f6hx # fast-uri — host confusion, backslash authority
+    - GHSA-7p8r-x3mc-p8w7 # fast-uri — host confusion, backslash introducer
+    - GHSA-4c8g-83qw-93j6 # fast-uri — host confusion, IDN canonicalization
+    - GHSA-ggr8-5vv4-36mx # deepmerge-ts — stack exhaustion on recursive graphs

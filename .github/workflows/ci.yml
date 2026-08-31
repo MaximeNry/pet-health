@@ -161,15 +161,14 @@ jobs:
       - name: Run the seed script
         run: pnpm --filter api exec prisma db seed
 
-  # ── Dependency advisories (informational) ────────────────────────
+  # ── Dependency advisories ────────────────────────────────────────
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Non-blocking on purpose: the advisories come from transitive dependencies
-    # of the Prisma and Nest CLIs, which no change in this repo can fix. The job
-    # reports them without turning the whole pipeline red.
-    continue-on-error: true
+    # Blocking: the findings that upstream pins and this repo cannot move are
+    # listed, one by one and with a reason, under `auditConfig.ignoreGhsas` in
+    # pnpm-workspace.yaml. Anything else is a real, actionable advisory.
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
