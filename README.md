@@ -59,6 +59,7 @@ own Google Drive, and share the follow-up with the members of your household.
 | Frontend | [Next.js 16](https://nextjs.org/) (App Router, React Compiler), Tailwind CSS, TanStack Query |
 | Monorepo | pnpm workspaces (`apps/api`, `apps/web`, `packages/shared`) |
 | Dev infra | Docker Compose, `node:24-alpine` images |
+| CI | GitHub Actions (lint, tests, builds, migrations, audit), CodeQL, Dependabot |
 | External | Google OAuth 2.0, Google Drive API |
 
 ## 📐 Architecture
@@ -137,18 +138,6 @@ pnpm --filter api test        # 18 suites, 123 tests
 pnpm --filter api test:cov    # with coverage
 ```
 
-Every push and pull request runs the same checks in GitHub Actions
-([`ci.yml`](.github/workflows/ci.yml)): lint, Prettier, `tsc --noEmit`, the unit
-tests with coverage, the production builds of both apps, and a database job that
-replays the migrations on a real PostgreSQL 17 and fails if `schema.prisma` has
-drifted from them. CodeQL and Dependabot run alongside.
-
-```bash
-pnpm lint          # ESLint on both apps, warnings included
-pnpm typecheck     # tsc --noEmit on both apps
-pnpm format:check  # Prettier, check only
-```
-
 Testing follows the dependency rule: because `domain/` depends on nothing,
 entities and value objects are tested as plain TypeScript — no database, no
 NestJS test module, no mocking framework. Use cases are covered by injecting
@@ -158,6 +147,35 @@ you. Examples:
 - [`health-document.entity.spec.ts`](apps/api/src/contexts/health-document/domain/health-document.entity.spec.ts) — invariants of the aggregate root
 - [`invitation.entity.spec.ts`](apps/api/src/contexts/invitation/domain/invitation.entity.spec.ts) — expiry, single use, email matching
 - [`household-membership.guard.spec.ts`](apps/api/src/authorization/household-membership.guard.spec.ts) — access control rules
+
+## ⚙️ Continuous integration
+
+Every push and every pull request runs five parallel jobs
+([`ci.yml`](.github/workflows/ci.yml)). Node 24 and the pnpm store cache come
+from a shared composite action, so each job installs the workspace once, from
+the lockfile.
+
+| Job | Runs | Why it earns its place |
+|---|---|---|
+| **Quality** | ESLint (without `--fix`), `prettier --check`, `tsc --noEmit` on both apps | The `lint` script fixes in place, so CI must run its own variant to avoid "passing" by rewriting files — and `tsc` covers what `ts-jest` never compiles |
+| **Tests** | `jest --ci --coverage` | The coverage summary lands in the job summary; the HTML report is kept as an artifact |
+| **Build** | Production builds of the API and the web app | `next build` catches prerender errors that neither the linter nor the tests can see |
+| **Migrations** | `prisma migrate deploy` against a real PostgreSQL 17 service, then a drift check and the seed | Proves the migration history still applies to an empty database — the very thing that runs on deploy — and fails if `schema.prisma` has drifted from it |
+| **Audit** | `pnpm audit` on the production dependencies | Blocking. Advisories pinned by upstream are listed one by one, each with the reason it is accepted, in [`pnpm-workspace.yaml`](pnpm-workspace.yaml) — so anything unlisted is by definition actionable |
+
+[CodeQL](.github/workflows/codeql.yml) analyses the codebase on every pull
+request and again weekly, since advisories land after the code is written.
+Dependabot groups its dependency updates into a weekly pull request, and
+the action versions into a monthly one.
+
+The same checks run locally, without pushing anything:
+
+```bash
+pnpm lint          # ESLint on both apps, warnings included
+pnpm typecheck     # tsc --noEmit on both apps
+pnpm format:check  # Prettier, check only
+pnpm test          # the API test suite
+```
 
 ## 🗺️ Roadmap
 
