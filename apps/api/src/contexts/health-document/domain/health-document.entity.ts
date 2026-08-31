@@ -75,7 +75,7 @@ export class HealthDocument extends Entity {
     this._documentDate = props.documentDate;
     this._tags = props.tags;
     this._pages = HealthDocument.sortAndAssertContiguous(
-      props.pages.map(DocumentPage.fromSnapshot),
+      props.pages.map((page) => DocumentPage.fromSnapshot(page)),
     );
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
@@ -229,7 +229,9 @@ export class HealthDocument extends Entity {
    * (1, 2, …, N with no gaps or duplicates). A violation means the persisted
    * data is corrupt — fail loudly rather than render a broken document.
    */
-  private static sortAndAssertContiguous(pages: DocumentPage[]): DocumentPage[] {
+  private static sortAndAssertContiguous(
+    pages: DocumentPage[],
+  ): DocumentPage[] {
     HealthDocument.assertNonEmpty(pages);
     const ordered = [...pages].sort((a, b) => a.position - b.position);
     ordered.forEach((page, index) => {

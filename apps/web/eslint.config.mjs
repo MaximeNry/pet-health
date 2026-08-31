@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Untracked design references (Claude Design exports), not app code.
+    "design/**",
   ]),
 ]);
 

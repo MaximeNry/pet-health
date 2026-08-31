@@ -85,7 +85,10 @@ describe('DeleteAccountUseCase', () => {
   it('simply leaves a shared household that keeps another owner', async () => {
     const { users, households, teardown, useCase } = makeDeps();
     const user = makeUser();
-    const household = Household.create({ name: 'Household', ownerId: 'user-boss' });
+    const household = Household.create({
+      name: 'Household',
+      ownerId: 'user-boss',
+    });
     household.addMember(user.id);
 
     users.findById.mockResolvedValue(user);

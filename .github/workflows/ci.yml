@@ -1,0 +1,191 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A new push on a branch cancels the runs still in flight for that same branch:
+# only the latest commit is worth CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Lint, formatting and types ───────────────────────────────────
+  quality:
+    name: Lint, format & types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      # The API imports the generated Prisma client. Without it, tsc and the
+      # type-aware ESLint rules both fail on unresolved modules.
+      - name: Generate the Prisma client
+        run: pnpm --filter api exec prisma generate
+
+      # `!cancelled()` keeps the following steps running after a failure, so a
+      # single run reports every problem instead of only the first one.
+      - name: Lint (api)
+        run: pnpm --filter api lint:ci
+
+      - name: Format check (api)
+        if: ${{ !cancelled() }}
+        run: pnpm --filter api format:check
+
+      - name: Typecheck (api)
+        if: ${{ !cancelled() }}
+        run: pnpm --filter api typecheck
+
+      - name: Lint (web)
+        if: ${{ !cancelled() }}
+        run: pnpm --filter web lint:ci
+
+      - name: Typecheck (web)
+        if: ${{ !cancelled() }}
+        run: pnpm --filter web typecheck
+
+  # ── Unit tests ───────────────────────────────────────────────────
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      # ts-jest compiles files that import the generated client.
+      - name: Generate the Prisma client
+        run: pnpm --filter api exec prisma generate
+
+      # --ci: never write new snapshots, fail on a missing one instead.
+      - name: Run the test suite with coverage
+        shell: bash
+        run: |
+          pnpm --filter api exec jest --ci --coverage \
+            --coverageReporters=text-summary --coverageReporters=lcov \
+            2>&1 | tee /tmp/jest.log
+
+      - name: Publish the coverage summary
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          {
+            echo '### Coverage'
+            echo '```'
+            sed -n '/Coverage summary/,$p' /tmp/jest.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: apps/api/coverage/lcov-report
+          retention-days: 7
+          if-no-files-found: error
+
+  # ── Production builds ────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      # Runs `prisma generate && nest build`.
+      - name: Build the API
+        run: pnpm --filter api build
+
+      - name: Build the web app
+        run: pnpm --filter web build
+        env:
+          # `next build` under NODE_ENV=development fails on a phantom
+          # /_global-error prerender. Set on this step only: at job level it
+          # would also reach `pnpm install`, which then skips devDependencies.
+          NODE_ENV: production
+
+  # ── Database schema and migrations ───────────────────────────────
+  database:
+    name: Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: pethealth
+          POSTGRES_PASSWORD: pethealth
+          POSTGRES_DB: pethealth
+        ports:
+          - 5432:5432
+        # Same reasoning as docker-compose.yml: wait for Postgres to accept
+        # connections, not merely for the container to exist.
+        options: >-
+          --health-cmd "pg_isready -U pethealth"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://pethealth:pethealth@localhost:5432/pethealth
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      - name: Validate the Prisma schema
+        run: pnpm --filter api exec prisma validate
+
+      - name: Generate the Prisma client
+        run: pnpm --filter api exec prisma generate
+
+      # Exactly what runs on deploy (see the `start:prod` script): proves the
+      # migration history still applies to an empty database.
+      - name: Apply the migrations
+        run: pnpm --filter api exec prisma migrate deploy
+
+      # Guards against the classic mistake: editing schema.prisma without
+      # generating the matching migration. --exit-code fails when the migrated
+      # database differs from the schema.
+      - name: Check for drift between the schema and the migrations
+        run: |
+          pnpm --filter api exec prisma migrate diff \
+            --from-config-datasource \
+            --to-schema prisma/schema.prisma \
+            --exit-code
+
+      # Smoke test: the fixtures must still match the current schema.
+      - name: Run the seed script
+        run: pnpm --filter api exec prisma db seed
+
+  # ── Dependency advisories (informational) ────────────────────────
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Non-blocking on purpose: the advisories come from transitive dependencies
+    # of the Prisma and Nest CLIs, which no change in this repo can fix. The job
+    # reports them without turning the whole pipeline red.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      - name: Audit the production dependencies
+        shell: bash
+        run: |
+          pnpm audit --prod --audit-level high 2>&1 | tee /tmp/audit.log
+
+      - name: Publish the audit summary
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          {
+            echo '### pnpm audit (production dependencies)'
+            echo '```'
+            tail -n 5 /tmp/audit.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

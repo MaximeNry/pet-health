@@ -50,9 +50,9 @@ describe('HealthDocument', () => {
   });
 
   it('rejects an empty page list', () => {
-    expect(() =>
-      HealthDocument.create({ ...validProps(), pages: [] }),
-    ).toThrow(InvalidHealthDocumentError);
+    expect(() => HealthDocument.create({ ...validProps(), pages: [] })).toThrow(
+      InvalidHealthDocumentError,
+    );
   });
 
   it('appends pages continuing at N+1', () => {

@@ -1,0 +1,22 @@
+name: Setup
+description: >-
+  Node 24 + pnpm (version pinned by `packageManager`), with a cached store and
+  the workspace dependencies installed from the lockfile.
+
+runs:
+  using: composite
+  steps:
+    # Must come before setup-node: `cache: pnpm` needs the pnpm binary to
+    # resolve the store path.
+    - uses: pnpm/action-setup@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: pnpm
+
+    # --frozen-lockfile: fail instead of silently updating pnpm-lock.yaml, so
+    # CI always installs exactly what is committed.
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash

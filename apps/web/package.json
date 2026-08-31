@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:ci": "eslint --max-warnings 0",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@pethealth/shared": "workspace:*",
