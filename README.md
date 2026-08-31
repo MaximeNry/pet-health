@@ -8,6 +8,8 @@ own Google Drive, and share the follow-up with the members of your household.
 
 **➡️ Live app: [pethealthapp.app](https://pethealthapp.app)** — sign in with Google.
 
+[![CI](https://github.com/MaximeNry/pet-health/actions/workflows/ci.yml/badge.svg)](https://github.com/MaximeNry/pet-health/actions/workflows/ci.yml)
+
 > 💼 Personal project built as a technical showcase: the focus is on
 > architecture (DDD, hexagonal) as much as on the product itself.
 > See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions in detail.
@@ -133,6 +135,18 @@ pnpm --filter api exec prisma generate       # (Re)generate the Prisma client
 ```bash
 pnpm --filter api test        # 18 suites, 123 tests
 pnpm --filter api test:cov    # with coverage
+```
+
+Every push and pull request runs the same checks in GitHub Actions
+([`ci.yml`](.github/workflows/ci.yml)): lint, Prettier, `tsc --noEmit`, the unit
+tests with coverage, the production builds of both apps, and a database job that
+replays the migrations on a real PostgreSQL 17 and fails if `schema.prisma` has
+drifted from them. CodeQL and Dependabot run alongside.
+
+```bash
+pnpm lint          # ESLint on both apps, warnings included
+pnpm typecheck     # tsc --noEmit on both apps
+pnpm format:check  # Prettier, check only
 ```
 
 Testing follows the dependency rule: because `domain/` depends on nothing,

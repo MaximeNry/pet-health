@@ -1,0 +1,28 @@
+version: 2
+
+updates:
+  # pnpm workspaces: Dependabot reads the root lockfile and covers every
+  # package under apps/* and packages/*.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # Grouped so a week of updates is one or two PRs to review, not fifteen.
+    groups:
+      production:
+        dependency-type: production
+        update-types: [minor, patch]
+      development:
+        dependency-type: development
+        update-types: [minor, patch]
+    # Majors stay ungrouped: they deserve their own PR and their own CI run.
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']

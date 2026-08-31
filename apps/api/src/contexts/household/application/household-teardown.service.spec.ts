@@ -28,7 +28,11 @@ const makeDocument = (petId: string, uploaderUserId: string) =>
     title: 'Rabies shot',
     documentDate: new Date('2024-01-01'),
     pages: [
-      { storageFileId: 'drive-file-1', mimeType: 'image/jpeg', sizeBytes: 1234 },
+      {
+        storageFileId: 'drive-file-1',
+        mimeType: 'image/jpeg',
+        sizeBytes: 1234,
+      },
     ],
   });
 
