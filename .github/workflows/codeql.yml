@@ -25,13 +25,13 @@ jobs:
       # Required to upload the results to the Security tab.
       security-events: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           # A single language covers both apps: CodeQL analyses TS as JS and
           # needs no build step for it.
           languages: javascript-typescript
           queries: security-and-quality
 
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v4

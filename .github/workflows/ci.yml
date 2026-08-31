@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
 
       # The API imports the generated Prisma client. Without it, tsc and the
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
 
       # ts-jest compiles files that import the generated client.
@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload the coverage report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: apps/api/coverage/lcov-report
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
 
       # Runs `prisma generate && nest build`.
@@ -133,7 +133,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://pethealth:pethealth@localhost:5432/pethealth
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
 
       - name: Validate the Prisma schema
@@ -170,7 +170,7 @@ jobs:
     # listed, one by one and with a reason, under `auditConfig.ignoreGhsas` in
     # pnpm-workspace.yaml. Anything else is a real, actionable advisory.
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
 
       - name: Audit the production dependencies
