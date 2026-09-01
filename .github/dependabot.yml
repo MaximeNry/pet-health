@@ -11,16 +11,45 @@ updates:
     open-pull-requests-limit: 5
     # Grouped so a week of updates is one or two PRs to review, not fifteen.
     groups:
+      # `prisma` (CLI, a devDependency) and `@prisma/client` (a dependency)
+      # must move together — the CLI is what generates the client. The
+      # production/development split put them in two separate PRs, which is
+      # how main ended up with client 7.10 and CLI 7.8. This group, listed
+      # first and excluded from the two below, keeps the pair in one PR.
+      prisma:
+        patterns: ['prisma', '@prisma/*']
       production:
         dependency-type: production
         update-types: [minor, patch]
+        exclude-patterns: ['@prisma/*']
       development:
         dependency-type: development
         update-types: [minor, patch]
+        exclude-patterns: ['prisma']
     # Majors stay ungrouped: they deserve their own PR and their own CI run.
+    # Except these three, where a major is a migration rather than a bump and
+    # an unsolicited PR only costs a triage every week:
+    ignore:
+      # ESLint 10 and TypeScript 7 need the whole lint chain (typescript-eslint,
+      # eslint-config-next, ts-jest) to follow first. Tracked separately.
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # @types/node must track the runtime, not the newest release: types ahead
+      # of Node 24 advertise APIs that do not exist at run time. Bump this by
+      # hand, together with `engines.node` and the Docker images.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
-    directory: /
+    # `directory: /` alone only scans .github/workflows. The composite action
+    # in .github/actions/ pins its own action versions and was going unwatched
+    # — which is how setup-node@v4 and pnpm/action-setup@v4 kept running on the
+    # deprecated Node 20 runtime while the workflows were up to date.
+    directories:
+      - /
+      - /.github/actions/*
     schedule:
       interval: monthly
     groups:
