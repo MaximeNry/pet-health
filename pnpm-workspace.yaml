@@ -20,12 +20,6 @@ allowBuilds:
 # left to hide a future finding.
 auditConfig:
   ignoreGhsas:
-    # postcss 8.4.31 and sharp 0.34.5 are pinned by `next` itself (postcss to
-    # the exact version). Both only run at build time / in image optimization,
-    # never on attacker-controlled input here.
-    - GHSA-6g55-p6wh-862q # postcss — file read via sourceMappingURL
-    - GHSA-r28c-9q8g-f849 # postcss — path traversal in source map loading
-    - GHSA-f88m-g3jw-g9cj # sharp — inherited libvips CVEs
     # The Prisma CLI chain (@prisma/dev, @prisma/config) ships its own pinned
     # copies. None of it is part of the API's request path — it is tooling that
     # runs at build and migration time.

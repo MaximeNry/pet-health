@@ -8,9 +8,9 @@ runs:
   steps:
     # Must come before setup-node: `cache: pnpm` needs the pnpm binary to
     # resolve the store path.
-    - uses: pnpm/action-setup@v4
+    - uses: pnpm/action-setup@v6
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v7
       with:
         node-version: 24
         cache: pnpm
