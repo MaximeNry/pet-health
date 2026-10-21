@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { HealthDocumentModule } from '../health-document/health-document.module';
 import { PetModule } from '../pet/pet.module';
 import { AddMemberUseCase } from './application/add-member.use-case';
 import { ChangeMemberRoleUseCase } from './application/change-member-role.use-case';
@@ -17,11 +16,12 @@ import { HouseholdController } from './presentation/household.controller';
 /**
  * `household` bounded context (supporting). The `HouseholdRepository` port is
  * bound to its Prisma adapter via a token. `PrismaService` is provided globally
- * by `PrismaModule`. The pet and health-document modules are imported so the
- * teardown orchestration can cascade a household deletion through their ports.
+ * by `PrismaModule`. The pet module is imported so the teardown orchestration
+ * can cascade a household deletion through it (each pet's own teardown covers
+ * its documents and reminders).
  */
 @Module({
-  imports: [PetModule, HealthDocumentModule],
+  imports: [PetModule],
   controllers: [HouseholdController],
   providers: [
     CreateHouseholdUseCase,

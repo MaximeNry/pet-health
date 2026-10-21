@@ -68,6 +68,11 @@ health-document --(DocumentStorage port)--> Google Drive  [external system]
 - Google Drive is **hidden behind a `DocumentStorage` port**. The domain doesn't
   know Drive exists; it could be swapped for S3 or Dropbox by writing another
   adapter.
+- **The app never deletes a stored file.** Files live in (and belong to) each
+  uploader's own Drive, so only that owner may remove them, by hand. Deleting a
+  document, a pet, a household or an account only removes the app's metadata;
+  the files stay in the uploader's "PetHealth" folder. The sole exception is
+  rolling back files uploaded by a request that then failed (never registered).
 
 ## Folder structure
 

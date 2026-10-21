@@ -5,6 +5,7 @@ import { HealthDocumentModule } from './contexts/health-document/health-document
 import { HouseholdModule } from './contexts/household/household.module';
 import { InvitationModule } from './contexts/invitation/invitation.module';
 import { PetModule } from './contexts/pet/pet.module';
+import { ReminderModule } from './contexts/reminder/reminder.module';
 import { UserModule } from './contexts/user/user.module';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
 
@@ -18,6 +19,7 @@ import { PrismaModule } from './infrastructure/prisma/prisma.module';
     HouseholdModule,
     InvitationModule,
     HealthDocumentModule,
+    ReminderModule,
   ],
 })
 export class AppModule {}

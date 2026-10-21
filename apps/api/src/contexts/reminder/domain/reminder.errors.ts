@@ -38,3 +38,12 @@ export class ReminderAlreadyCompletedError extends DomainError {
     super(`This reminder is already marked as done on ${doneOn}.`, { doneOn });
   }
 }
+
+/** The pet a reminder is created for does not exist. */
+export class ReminderPetNotFoundError extends DomainError {
+  readonly kind: DomainErrorKind = 'not-found';
+
+  constructor(petId: string) {
+    super(`No pet found for the identifier « ${petId} ».`);
+  }
+}

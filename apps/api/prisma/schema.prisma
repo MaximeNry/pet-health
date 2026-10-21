@@ -187,3 +187,68 @@ model Invitation {
   @@index([householdId])
   @@map("invitations")
 }
+
+enum ReminderCategory {
+  VACCINE
+  ANTIPARASITIC
+  DEWORMING
+  CHECKUP
+  OTHER
+}
+
+enum RecurrenceUnit {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+enum ReminderStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+// Aggregate root: a care to give a pet on a given day, optionally repeating.
+// References the pet, household and users by id only (no cross-context FK):
+// deleting a pet or household cascades through the application teardown.
+// Urgency (overdue, due soon) is derived from `due_date` at read time, never
+// stored. Days are DATE columns (no time, no time zone).
+model Reminder {
+  id              String               @id @default(uuid())
+  petId           String               @map("pet_id")
+  householdId     String               @map("household_id")
+  createdBy       String               @map("created_by")
+  title           String
+  category        ReminderCategory
+  dueDate         DateTime             @map("due_date") @db.Date
+  // Both null for a one-off reminder, both set for a recurring one.
+  recurrenceEvery Int?                 @map("recurrence_every")
+  recurrenceUnit  RecurrenceUnit?      @map("recurrence_unit")
+  status          ReminderStatus       @default(ACTIVE)
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  completions     ReminderCompletion[]
+
+  @@index([petId])
+  // Dashboard query: a household's active reminders by due date.
+  @@index([householdId, status, dueDate])
+  @@map("reminders")
+}
+
+// One occurrence of the care being done. Internal to the `Reminder` aggregate
+// and immutable. `health_document_id` optionally points at the scanned proof
+// (by id only — it may dangle once that document is deleted).
+model ReminderCompletion {
+  id               String   @id @default(uuid())
+  reminderId       String   @map("reminder_id")
+  reminder         Reminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  doneOn           DateTime @map("done_on") @db.Date
+  doneBy           String   @map("done_by")
+  healthDocumentId String?  @map("health_document_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Mirrors the domain rule: at most one completion per day.
+  @@unique([reminderId, doneOn])
+  @@index([reminderId])
+  @@map("reminder_completions")
+}

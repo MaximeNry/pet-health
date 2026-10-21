@@ -64,8 +64,10 @@ export async function uploadPagesInOrder(
 }
 
 /**
- * Deletes stored files, swallowing per-file errors. Used for orphan cleanup
- * after a failure and for the document-deletion flow. Orphaned Drive files are
+ * Deletes stored files, swallowing per-file errors. Used ONLY to roll back
+ * files uploaded by a request that then failed — files the app never
+ * registered. A registered file is never deleted by the app (only its owner
+ * may remove it from their Drive). Orphaned Drive files are
  * cosmetic at this scale (they sit in the uploader's own Drive, removable by
  * hand), so best-effort cleanup is intentional and sufficient — no saga,
  * outbox or 2-phase commit for something outside the transactional boundary.

@@ -25,11 +25,11 @@
     },
     "delete": {
       "title": "Eliminar mi cuenta",
-      "description": "La eliminación borra definitivamente tus mascotas, sus historiales de salud y todos los archivos creados en tu Drive. Esta acción es irreversible.",
+      "description": "La eliminación borra definitivamente tus mascotas y sus historiales de salud de PetHealth. Los archivos ya guardados en tu Google Drive se conservan: puedes eliminarlos tú mismo desde Drive. Esta acción es irreversible.",
       "cta": "Eliminar mi cuenta",
       "modal": {
         "title": "¿Eliminar tu cuenta?",
-        "description": "Tus mascotas, sus historiales de salud y los archivos creados en tu Drive se eliminarán definitivamente.",
+        "description": "Tus mascotas y sus historiales de salud se eliminarán definitivamente de PetHealth. Tus escaneos se conservan en tu Google Drive.",
         "cancel": "Cancelar",
         "confirm": "Eliminar",
         "confirmPending": "Eliminando…",
@@ -107,7 +107,7 @@
       "dangerHint": "Eliminar este hogar borra de forma permanente todas sus mascotas, sus documentos y los archivos almacenados. No se puede deshacer.",
       "deleteCta": "Eliminar hogar",
       "confirmTitle": "¿Eliminar «{name}»?",
-      "confirmBody": "Se eliminarán de forma permanente todas las mascotas, documentos y archivos almacenados de este hogar.",
+      "confirmBody": "Se eliminarán de forma permanente de PetHealth todas las mascotas y documentos de este hogar. Los archivos escaneados se conservan en el Google Drive de cada miembro.",
       "confirmCancel": "Cancelar",
       "confirmDelete": "Eliminar definitivamente",
       "deletePending": "Eliminando…",
@@ -291,7 +291,7 @@
       },
       "deleteModal": {
         "title": "¿Eliminar este documento?",
-        "description": "“{title}” y todas sus páginas se eliminarán definitivamente.",
+        "description": "“{title}” y todas sus páginas se eliminarán de PetHealth. Los archivos se conservan en el Google Drive de quien los escaneó.",
         "cancel": "Cancelar",
         "confirm": "Eliminar",
         "confirmPending": "Eliminando…",

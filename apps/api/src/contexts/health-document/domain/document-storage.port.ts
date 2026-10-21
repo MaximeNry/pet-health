@@ -34,6 +34,10 @@ export interface DocumentStorage {
   upload(params: UploadFileParams): Promise<StoredFile>;
   /** Retrieves the raw bytes of a previously uploaded file. */
   download(ref: StoredFileRef): Promise<Uint8Array>;
-  /** Permanently removes a stored file. Succeeds if the file is already gone. */
+  /**
+   * Permanently removes a stored file. Succeeds if the file is already gone.
+   * Reserved for rolling back a failed upload: files of registered documents
+   * are never deleted by the app — only by their owner, by hand.
+   */
   delete(ref: StoredFileRef): Promise<void>;
 }

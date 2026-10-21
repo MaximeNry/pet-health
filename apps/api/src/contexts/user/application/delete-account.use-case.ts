@@ -15,7 +15,7 @@ import type { UserRepository } from '../domain/user.repository';
  *
  * Semantics:
  * - Households where the user is the only member are torn down entirely via
- *   `HouseholdTeardownService` (documents and stored files, pets, then the
+ *   `HouseholdTeardownService` (documents, reminders, pets, then the
  *   household — its invitations cascade in the database).
  * - Households with other members survive: if the user is the last owner,
  *   ownership is handed to the longest-standing remaining member, then the

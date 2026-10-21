@@ -25,11 +25,11 @@
     },
     "delete": {
       "title": "Delete my account",
-      "description": "Deletion permanently erases your pets, their health records and every file created in your Drive. This can't be undone.",
+      "description": "Deletion permanently erases your pets and their health records from PetHealth. Files already saved in your Google Drive stay there — you can remove them from Drive yourself. This can't be undone.",
       "cta": "Delete my account",
       "modal": {
         "title": "Delete your account?",
-        "description": "Your pets, their health records and the files created in your Drive will be permanently deleted.",
+        "description": "Your pets and their health records will be permanently deleted from PetHealth. Your scans stay in your Google Drive.",
         "cancel": "Cancel",
         "confirm": "Delete",
         "confirmPending": "Deleting…",
@@ -107,7 +107,7 @@
       "dangerHint": "Deleting this household permanently removes all its pets, their documents and stored files. This can't be undone.",
       "deleteCta": "Delete household",
       "confirmTitle": "Delete “{name}”?",
-      "confirmBody": "Every pet, document and stored file in this household will be permanently deleted.",
+      "confirmBody": "Every pet and document in this household will be permanently deleted from PetHealth. Scanned files stay in each member's Google Drive.",
       "confirmCancel": "Cancel",
       "confirmDelete": "Delete permanently",
       "deletePending": "Deleting…",
@@ -291,7 +291,7 @@
       },
       "deleteModal": {
         "title": "Delete this document?",
-        "description": "“{title}” and all its pages will be permanently deleted.",
+        "description": "“{title}” and all its pages will be removed from PetHealth. The files stay in the Google Drive of the person who scanned them.",
         "cancel": "Cancel",
         "confirm": "Delete",
         "confirmPending": "Deleting…",
