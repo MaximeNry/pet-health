@@ -388,9 +388,180 @@
     }
   },
   "reminders": {
-    "title": "Los recordatorios de vacunas llegan pronto",
-    "withPets": "Te avisaremos en cuanto se acerque un recordatorio de una de tus mascotas.",
-    "withoutPets": "Añade una mascota para empezar a recibir sus recordatorios de vacunas."
+    "page": {
+      "back": "Volver al panel",
+      "eyebrow": "Cuidados",
+      "title": "Recordatorios",
+      "noHousehold": "Crea un hogar para empezar a añadir recordatorios."
+    },
+    "categories": {
+      "VACCINE": "Vacuna",
+      "ANTIPARASITIC": "Antiparasitario",
+      "DEWORMING": "Desparasitación interna",
+      "CHECKUP": "Revisión",
+      "OTHER": "Otro"
+    },
+    "presets": {
+      "rabies": "Refuerzo de la rabia",
+      "coreVaccines": "Vacunas anuales",
+      "antiparasitic": "Pulgas y garrapatas",
+      "deworming": "Desparasitación interna",
+      "checkup": "Revisión anual"
+    },
+    "recurrence": {
+      "none": "Una sola vez",
+      "DAY": "{count, plural, one {Cada día} other {Cada # días}}",
+      "WEEK": "{count, plural, one {Cada semana} other {Cada # semanas}}",
+      "MONTH": "{count, plural, one {Cada mes} other {Cada # meses}}",
+      "YEAR": "{count, plural, one {Cada año} other {Cada # años}}"
+    },
+    "due": {
+      "late": "{count, plural, one {# día de retraso} other {# días de retraso}}",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "inDays": "{count, plural, one {En # día} other {En # días}}"
+    },
+    "timing": {
+      "onTime": "A tiempo",
+      "late": "{count, plural, one {# día tarde} other {# días tarde}}",
+      "early": "{count, plural, one {# día antes} other {# días antes}}"
+    },
+    "row": {
+      "markDone": "Marcar {title} como hecho"
+    },
+    "board": {
+      "viewLabel": "Vista de recordatorios",
+      "upcoming": "Próximos",
+      "done": "Hechos",
+      "new": "Nuevo recordatorio",
+      "allPets": "Todas las mascotas",
+      "loading": "Cargando recordatorios…",
+      "overdue": "Atrasados · {count}",
+      "soon": "Próximos 7 días",
+      "later": "Más adelante",
+      "allCaughtUp": "Todo al día: no hay nada próximo.",
+      "nothingDone": "Todavía no hay nada marcado como hecho."
+    },
+    "empty": {
+      "title": "Nada que recordar por ahora",
+      "description": "Añade un recordatorio para una vacuna, un tratamiento o una revisión. Aparecerá aquí antes de la fecha.",
+      "descriptionPet": "Añade un recordatorio para las vacunas, tratamientos o revisiones de {name}.",
+      "cta": "Nuevo recordatorio",
+      "tip": "Consejo: abre una cartilla de vacunación o una receta para crear uno en un toque."
+    },
+    "overview": {
+      "loading": "Cargando recordatorios…",
+      "lateTitle": "{title} de {name}: {count, plural, one {# día} other {# días}} de retraso",
+      "lateHint": "¿Ya se lo diste? Márcalo como hecho.",
+      "markDone": "Marcar como hecho",
+      "view": "Ver",
+      "nothingSoon": "Nada previsto en los próximos 30 días.",
+      "noPets": "Añade una mascota para seguir sus vacunas y tratamientos.",
+      "seeAll": "Ver todos los recordatorios"
+    },
+    "detail": {
+      "loadError": "No pudimos cargar este recordatorio.",
+      "backToReminders": "Volver a los recordatorios",
+      "back": "Volver",
+      "wasDue": "Era para el {date}",
+      "isDue": "Para el {date}",
+      "archived": "Dejaste de seguir este recordatorio. Su historial se conserva.",
+      "due": "Fecha",
+      "repeats": "Se repite",
+      "basedOn": "Basado en",
+      "document": "Documento",
+      "history": "Historial",
+      "noHistory": "Todavía no se ha hecho.",
+      "doneOn": "Hecho el {date}",
+      "snooze": "Posponer",
+      "markDone": "Marcar como hecho",
+      "menu": "Acciones del recordatorio",
+      "edit": "Editar",
+      "archive": "Dejar de seguir",
+      "delete": "Eliminar",
+      "archiveModal": {
+        "title": "¿Dejar de seguir este recordatorio?",
+        "description": "«{title}» ya no aparecerá. Su historial seguirá visible.",
+        "cancel": "Cancelar",
+        "confirm": "Dejar de seguir",
+        "pending": "Guardando…",
+        "error": "No se pudo actualizar este recordatorio. Inténtalo de nuevo."
+      },
+      "deleteModal": {
+        "title": "¿Eliminar este recordatorio?",
+        "description": "«{title}» y su historial se eliminarán definitivamente.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "pending": "Eliminando…",
+        "error": "No se pudo eliminar este recordatorio. Inténtalo de nuevo."
+      }
+    },
+    "markDone": {
+      "title": "Marcar «{title}» como hecho",
+      "doneOn": "Hecho el",
+      "confirm": "Marcar como hecho",
+      "pending": "Guardando…",
+      "error": "No se pudo guardar. Inténtalo de nuevo.",
+      "doneTitle": "{title}: hecho",
+      "loggedFor": "Registrado para {name} el {date}.",
+      "nextOne": "El próximo",
+      "finished": "Este recordatorio está completo.",
+      "proofAdded": "Comprobante adjunto",
+      "proofTitle": "Guarda el comprobante en el historial de {name}",
+      "proofHint": "Adjunta el escaneo de la caja o el recibo del veterinario.",
+      "addProof": "Añadir un documento",
+      "pickProof": "Elige el comprobante",
+      "proofError": "No se pudo adjuntar el documento. Inténtalo de nuevo.",
+      "close": "Listo",
+      "back": "Volver"
+    },
+    "snooze": {
+      "title": "Posponer",
+      "subtitle": "Fecha actual: {date}.",
+      "tomorrow": "Mañana",
+      "inThreeDays": "En 3 días",
+      "nextWeek": "En una semana",
+      "pickDate": "O elige una fecha",
+      "confirm": "Posponer",
+      "error": "No se pudo mover el recordatorio. Inténtalo de nuevo."
+    },
+    "form": {
+      "newTitle": "Nuevo recordatorio",
+      "editTitle": "Editar recordatorio",
+      "cancel": "Cancelar",
+      "presets": "Inicio rápido",
+      "what": "Qué",
+      "whatPlaceholder": "p. ej. Refuerzo de la rabia",
+      "for": "Para",
+      "type": "Tipo",
+      "repeat": "Repetir",
+      "due": "Fecha",
+      "basedOn": "Basado en un documento",
+      "optional": "(opcional)",
+      "removeRecord": "Quitar el documento vinculado",
+      "linkRecord": "Vincular un documento",
+      "recordHintRecurring": "Administrado el {date}: el próximo se cuenta desde ese día.",
+      "recordHint": "El documento al que da seguimiento este recordatorio.",
+      "error": "No se pudo guardar el recordatorio. Inténtalo de nuevo.",
+      "saving": "Guardando…",
+      "save": "Guardar recordatorio",
+      "dueRequired": "Elige una fecha para guardar."
+    },
+    "documentPicker": {
+      "loading": "Cargando documentos…",
+      "empty": "Esta mascota aún no tiene documentos.",
+      "scanNew": "Escanear un documento nuevo"
+    },
+    "suggestion": {
+      "title": "Crear un recordatorio",
+      "hint": "Sigue la próxima dosis para que no se te pase.",
+      "hintExisting": "¿Es el cuidado que tenías pendiente? Márcalo como hecho el {date}.",
+      "markExisting": "Marcar «{title}» como hecho el {date}",
+      "create": "Nuevo recordatorio a partir de este documento",
+      "linkedTitle": "Recordatorio: {title}",
+      "nextDue": "Próximo: {date}",
+      "error": "No se pudo guardar. Inténtalo de nuevo."
+    }
   },
   "errors": {
     "title": "Algo salió mal",

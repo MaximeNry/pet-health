@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { AccountMenu, useSession } from '@/features/auth';
 import { PetDetail } from '@/features/pets';
+import { PetReminders } from '@/features/reminders';
 import { AppHeader } from '@/shared/ui/AppHeader';
 
 /** Pet detail route — session guard + app shell around the pets feature. */
@@ -43,7 +44,10 @@ export default function PetDetailPage({
       <AppHeader>
         <AccountMenu user={user} />
       </AppHeader>
-      <PetDetail petId={petId} />
+      <PetDetail
+        petId={petId}
+        renderReminders={(pet) => <PetReminders pet={pet} />}
+      />
     </main>
   );
 }

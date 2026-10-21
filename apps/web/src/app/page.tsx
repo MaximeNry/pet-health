@@ -9,10 +9,10 @@ import { AccountMenu, useSession } from '@/features/auth';
 import {
   CreateHouseholdCard,
   HouseholdHeader,
-  RemindersCard,
   useHouseholds,
 } from '@/features/household';
 import { EmptyPetsState, PetFormModal, PetGrid, usePets } from '@/features/pets';
+import { RemindersOverview } from '@/features/reminders';
 import { AppHeader } from '@/shared/ui/AppHeader';
 
 /**
@@ -114,7 +114,7 @@ function DashboardBody({
           {t('upcomingReminders')}
         </h2>
       </div>
-      <RemindersCard hasPets={petList.length > 0} />
+      <RemindersOverview householdId={household.id} pets={petList} />
     </div>
   );
 }
