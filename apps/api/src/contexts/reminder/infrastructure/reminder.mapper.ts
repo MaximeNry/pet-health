@@ -24,6 +24,7 @@ export interface ReminderPersistence {
     dueDate: Date;
     recurrenceEvery: number | null;
     recurrenceUnit: PrismaRecurrenceUnit | null;
+    sourceDocumentId: string | null;
     status: PrismaReminder['status'];
   };
   completions: {
@@ -32,6 +33,7 @@ export interface ReminderPersistence {
     doneOn: Date;
     doneBy: string;
     healthDocumentId: string | null;
+    dueOn: Date | null;
   }[];
 }
 
@@ -54,12 +56,16 @@ export class ReminderMapper {
         record.recurrenceEvery !== null && record.recurrenceUnit !== null
           ? { every: record.recurrenceEvery, unit: record.recurrenceUnit }
           : null,
+      sourceDocumentId: record.sourceDocumentId,
       status: record.status,
       completions: record.completions.map((completion) => ({
         id: completion.id,
         doneOn: CalendarDate.fromDate(completion.doneOn).toString(),
         doneBy: completion.doneBy,
         healthDocumentId: completion.healthDocumentId,
+        dueOn: completion.dueOn
+          ? CalendarDate.fromDate(completion.dueOn).toString()
+          : null,
         createdAt: completion.createdAt,
       })),
       createdAt: record.createdAt,
@@ -82,6 +88,7 @@ export class ReminderMapper {
         dueDate: CalendarDate.parse(snapshot.dueDate).toDate(),
         recurrenceEvery: snapshot.recurrence?.every ?? null,
         recurrenceUnit: snapshot.recurrence?.unit ?? null,
+        sourceDocumentId: snapshot.sourceDocumentId,
         status: snapshot.status,
       },
       completions: snapshot.completions.map((completion) => ({
@@ -90,6 +97,9 @@ export class ReminderMapper {
         doneOn: CalendarDate.parse(completion.doneOn).toDate(),
         doneBy: completion.doneBy,
         healthDocumentId: completion.healthDocumentId,
+        dueOn: completion.dueOn
+          ? CalendarDate.parse(completion.dueOn).toDate()
+          : null,
       })),
     };
   }

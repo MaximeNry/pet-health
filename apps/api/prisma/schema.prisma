@@ -224,6 +224,8 @@ model Reminder {
   // Both null for a one-off reminder, both set for a recurring one.
   recurrenceEvery Int?                 @map("recurrence_every")
   recurrenceUnit  RecurrenceUnit?      @map("recurrence_unit")
+  // The record the reminder follows up on (by id only, may dangle).
+  sourceDocumentId String?             @map("source_document_id")
   status          ReminderStatus       @default(ACTIVE)
   createdAt       DateTime             @default(now()) @map("created_at")
   updatedAt       DateTime             @updatedAt @map("updated_at")
@@ -245,6 +247,9 @@ model ReminderCompletion {
   doneOn           DateTime @map("done_on") @db.Date
   doneBy           String   @map("done_by")
   healthDocumentId String?  @map("health_document_id")
+  // The due date this completion fulfilled; null when unknown (first dose a
+  // reminder was created from, backfilled older care).
+  dueOn            DateTime? @map("due_on") @db.Date
   createdAt        DateTime @default(now()) @map("created_at")
 
   // Mirrors the domain rule: at most one completion per day.

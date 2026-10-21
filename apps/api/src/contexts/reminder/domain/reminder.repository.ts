@@ -13,6 +13,8 @@ export interface ReminderRepository {
   save(reminder: Reminder): Promise<void>;
   findById(id: string): Promise<Reminder | null>;
   findByPetId(petId: string): Promise<Reminder[]>;
+  /** Every reminder of the household (active and archived), soonest first. */
+  findByHouseholdId(householdId: string): Promise<Reminder[]>;
   /**
    * ACTIVE reminders of the household due on or before `dueOnOrBefore`
    * (overdue ones included), soonest first — feeds the dashboard card.

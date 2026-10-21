@@ -20,6 +20,7 @@ import { HouseholdMembershipGuard } from '../../../authorization/household-membe
 import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import { ArchiveReminderUseCase } from '../application/archive-reminder.use-case';
+import { AttachCompletionProofUseCase } from '../application/attach-completion-proof.use-case';
 import { resolveToday } from '../application/client-today';
 import { CompleteReminderUseCase } from '../application/complete-reminder.use-case';
 import { CreateReminderUseCase } from '../application/create-reminder.use-case';
@@ -30,6 +31,7 @@ import { UpdateReminderUseCase } from '../application/update-reminder.use-case';
 import type {
   CompleteReminderDto,
   CreateReminderDto,
+  UpdateCompletionDto,
   UpdateReminderDto,
 } from './dto/reminder.dto';
 import {
@@ -56,6 +58,7 @@ export class PetReminderController {
     private readonly completeReminder: CompleteReminderUseCase,
     private readonly archiveReminder: ArchiveReminderUseCase,
     private readonly deleteReminder: DeleteReminderUseCase,
+    private readonly attachCompletionProof: AttachCompletionProofUseCase,
   ) {}
 
   @Post()
@@ -66,15 +69,22 @@ export class PetReminderController {
     @Req() req: Request,
   ): Promise<ReminderResponse> {
     const user = req.user as AuthenticatedUser;
+    const day = resolveToday(today);
     const reminder = await this.createReminder.execute({
       petId,
       userId: user.userId,
       title: requireString(dto.title, 'title'),
       category: requireString(dto.category, 'category'),
-      dueDate: requireString(dto.dueDate, 'dueDate'),
+      dueDate: optionalString(dto.dueDate, 'dueDate'),
       recurrence: dto.recurrence,
+      healthDocumentId: optionalNullableString(
+        dto.healthDocumentId,
+        'healthDocumentId',
+      ),
+      lastDoneOn: optionalString(dto.lastDoneOn, 'lastDoneOn'),
+      today: day,
     });
-    return toReminderResponse(reminder, resolveToday(today));
+    return toReminderResponse(reminder, day);
   }
 
   @Get()
@@ -131,13 +141,38 @@ export class PetReminderController {
       reminderId,
       userId: user.userId,
       doneOn: optionalString(dto?.doneOn, 'doneOn'),
-      healthDocumentId:
-        dto?.healthDocumentId === null
-          ? null
-          : optionalString(dto?.healthDocumentId, 'healthDocumentId'),
+      healthDocumentId: optionalNullableString(
+        dto?.healthDocumentId,
+        'healthDocumentId',
+      ),
       today: day,
     });
     return toReminderResponse(reminder, day);
+  }
+
+  /** Attaches (or detaches, with `null`) the proof of a past completion. */
+  @Patch(':reminderId/completions/:completionId')
+  async updateCompletion(
+    @Param('petId') petId: string,
+    @Param('reminderId') reminderId: string,
+    @Param('completionId') completionId: string,
+    @Body() dto: UpdateCompletionDto,
+    @Query('today') today: string | undefined,
+  ): Promise<ReminderResponse> {
+    if (dto?.healthDocumentId === undefined) {
+      throw new BadRequestException(
+        'The « healthDocumentId » field is required (null to detach).',
+      );
+    }
+    const reminder = await this.attachCompletionProof.execute({
+      petId,
+      reminderId,
+      completionId,
+      healthDocumentId:
+        optionalNullableString(dto.healthDocumentId, 'healthDocumentId') ??
+        null,
+    });
+    return toReminderResponse(reminder, resolveToday(today));
   }
 
   @Post(':reminderId/archive')
@@ -170,4 +205,12 @@ function requireString(value: unknown, field: string): string {
 /** `undefined` passes through (PATCH semantics: field left untouched). */
 function optionalString(value: unknown, field: string): string | undefined {
   return value === undefined ? undefined : requireString(value, field);
+}
+
+/** Like `optionalString`, but an explicit `null` is kept (clear the field). */
+function optionalNullableString(
+  value: unknown,
+  field: string,
+): string | null | undefined {
+  return value === null ? null : optionalString(value, field);
 }

@@ -12,6 +12,10 @@ export interface ReminderCompletionResponse {
   doneOn: string;
   doneBy: string;
   healthDocumentId: string | null;
+  /** The due date it fulfilled (`YYYY-MM-DD`), `null` when unknown. */
+  dueOn: string | null;
+  /** Positive = late, 0 = on the day, negative = early, `null` if unknown. */
+  daysLate: number | null;
   createdAt: string;
 }
 
@@ -28,6 +32,10 @@ export interface ReminderResponse {
   category: string;
   dueDate: string;
   recurrence: RecurrenceProps | null;
+  /** The record it was created from, if any. */
+  sourceDocumentId: string | null;
+  /** What the UI shows as "Based on": latest proof, else the source. */
+  basedOnDocumentId: string | null;
   status: ReminderStatus;
   /** `null` once archived. */
   urgency: ReminderUrgency | null;
@@ -53,6 +61,8 @@ export function toReminderResponse(
     category: reminder.category,
     dueDate: reminder.dueDate.toString(),
     recurrence: reminder.recurrence?.toProps() ?? null,
+    sourceDocumentId: reminder.sourceDocumentId,
+    basedOnDocumentId: reminder.basedOnDocumentId,
     status: reminder.status,
     urgency: reminder.urgency(today),
     daysUntilDue: reminder.daysUntilDue(today),
@@ -62,6 +72,8 @@ export function toReminderResponse(
       doneOn: completion.doneOn.toString(),
       doneBy: completion.doneBy,
       healthDocumentId: completion.healthDocumentId,
+      dueOn: completion.dueOn?.toString() ?? null,
+      daysLate: completion.daysLate,
       createdAt: completion.createdAt.toISOString(),
     })),
     createdBy: reminder.createdBy,

@@ -4,12 +4,14 @@ import { Recurrence, type RecurrenceProps } from './recurrence.vo';
 import { ReminderCategory } from './reminder-category.vo';
 import {
   ReminderCompletion,
+  type NewCompletionData,
   type ReminderCompletionSnapshot,
 } from './reminder-completion.entity';
 import {
   InvalidReminderError,
   ReminderAlreadyCompletedError,
   ReminderArchivedError,
+  ReminderCompletionNotFoundError,
 } from './reminder.errors';
 
 /**
@@ -34,9 +36,20 @@ export interface CreateReminderProps {
   createdBy: string;
   title: string;
   category: string;
-  dueDate: CalendarDate;
+  /**
+   * Required, except when starting from a care already done (`lastDone`):
+   * then it defaults to the next occurrence after it.
+   */
+  dueDate?: CalendarDate | null;
   /** Omitted or null for a one-off reminder. */
   recurrence?: RecurrenceProps | null;
+  /** The record this reminder follows up on (e.g. a surgery report). */
+  sourceDocumentId?: string | null;
+  /**
+   * The care was already given once (e.g. the vaccination being scanned):
+   * recorded as the first completion. Recurring reminders only.
+   */
+  lastDone?: { doneOn: CalendarDate; healthDocumentId?: string | null } | null;
 }
 
 /** Editable fields; omitted = untouched, `recurrence: null` = make one-off. */
@@ -63,6 +76,7 @@ export interface ReminderSnapshot {
   category: string;
   dueDate: string;
   recurrence: RecurrenceProps | null;
+  sourceDocumentId: string | null;
   status: ReminderStatus;
   completions: ReminderCompletionSnapshot[];
   createdAt: Date;
@@ -88,6 +102,7 @@ export class Reminder extends Entity {
   private _category: ReminderCategory;
   private _dueDate: CalendarDate;
   private _recurrence: Recurrence | null;
+  private readonly _sourceDocumentId: string | null;
   private _status: ReminderStatus;
   private _completions: ReminderCompletion[];
   private readonly _createdAt: Date;
@@ -104,6 +119,7 @@ export class Reminder extends Entity {
     this._recurrence = snapshot.recurrence
       ? Recurrence.create(snapshot.recurrence)
       : null;
+    this._sourceDocumentId = snapshot.sourceDocumentId;
     this._status = snapshot.status;
     this._completions = snapshot.completions.map((completion) =>
       ReminderCompletion.fromSnapshot(completion),
@@ -114,26 +130,53 @@ export class Reminder extends Entity {
 
   /**
    * Creates an ACTIVE reminder. A due date in the past is allowed on purpose:
-   * the user may register a care that is already late.
+   * the user may register a care that is already late. Starting from a care
+   * already done (`lastDone`, e.g. creating the reminder from a scanned
+   * vaccination) records it as the first completion, from which the due date
+   * is derived unless one is given explicitly (the vet's own date wins).
    */
-  static create(props: CreateReminderProps): Reminder {
+  static create(
+    props: CreateReminderProps,
+    today: CalendarDate = CalendarDate.today(),
+  ): Reminder {
+    if (props.lastDone && !props.recurrence) {
+      throw new InvalidReminderError(
+        'Only a recurring reminder can start from a care already done.',
+      );
+    }
+    const initialDueDate = props.dueDate ?? props.lastDone?.doneOn;
+    if (!initialDueDate) {
+      throw new InvalidReminderError('The due date is required.');
+    }
     const now = new Date();
-    return new Reminder({
+    const reminder = new Reminder({
       id: globalThis.crypto.randomUUID(),
       petId: Reminder.requireId(props.petId, 'petId'),
       householdId: Reminder.requireId(props.householdId, 'householdId'),
       createdBy: Reminder.requireId(props.createdBy, 'createdBy'),
       title: Reminder.normalizeTitle(props.title),
       category: ReminderCategory.create(props.category).toString(),
-      dueDate: props.dueDate.toString(),
+      dueDate: initialDueDate.toString(),
       recurrence: props.recurrence
         ? Recurrence.create(props.recurrence).toProps()
         : null,
+      sourceDocumentId: props.sourceDocumentId ?? null,
       status: 'ACTIVE',
       completions: [],
       createdAt: now,
       updatedAt: now,
     });
+    if (props.lastDone) {
+      // Its due date is unknown: the reminder did not exist yet.
+      reminder.recordCompletion(
+        { ...props.lastDone, doneBy: props.createdBy, dueOn: null },
+        today,
+      );
+      if (props.dueDate) {
+        reminder._dueDate = props.dueDate;
+      }
+    }
+    return reminder;
   }
 
   /** Rebuilds an aggregate from persistence (no id generation). */
@@ -151,6 +194,7 @@ export class Reminder extends Entity {
       category: this._category.toString(),
       dueDate: this._dueDate.toString(),
       recurrence: this._recurrence?.toProps() ?? null,
+      sourceDocumentId: this._sourceDocumentId,
       status: this._status,
       completions: this._completions.map((completion) =>
         completion.toSnapshot(),
@@ -164,11 +208,39 @@ export class Reminder extends Entity {
    * Records that the care was done on `doneOn`. A recurring reminder moves
    * its due date to the next occurrence after the latest completion; a
    * one-off reminder is archived. Rejects a future day (the care cannot have
-   * been done yet) and a second completion on the same day.
+   * been done yet) and a second completion on the same day. The completion
+   * remembers the due date it fulfilled, unless it is an older care being
+   * backfilled (it fulfilled some earlier, unknown due date).
    */
   complete(
     props: CompleteReminderProps,
     today: CalendarDate = CalendarDate.today(),
+  ): ReminderCompletion {
+    const lastDoneOn = this.lastDoneOn;
+    const isBackfill = lastDoneOn !== null && props.doneOn.isBefore(lastDoneOn);
+    return this.recordCompletion(
+      { ...props, dueOn: isBackfill ? null : this._dueDate },
+      today,
+    );
+  }
+
+  /**
+   * Attaches the proof of a completion after the fact (e.g. the receipt
+   * scanned right after marking the care as done); `null` detaches it.
+   * Allowed on an archived reminder: its history stays editable.
+   */
+  attachProof(completionId: string, healthDocumentId: string | null): void {
+    const completion = this._completions.find((c) => c.id === completionId);
+    if (!completion) {
+      throw new ReminderCompletionNotFoundError();
+    }
+    completion.attachDocument(healthDocumentId);
+    this._updatedAt = new Date();
+  }
+
+  private recordCompletion(
+    props: NewCompletionData,
+    today: CalendarDate,
   ): ReminderCompletion {
     this.assertActive();
     Reminder.requireId(props.doneBy, 'doneBy');
@@ -247,6 +319,19 @@ export class Reminder extends Entity {
   /** Signed: negative when overdue, 0 when due today. */
   daysUntilDue(today: CalendarDate = CalendarDate.today()): number {
     return today.daysUntil(this._dueDate);
+  }
+
+  /**
+   * The record shown as what the reminder is "based on": the most recent
+   * proof attached to a completion, else the document it was created from.
+   */
+  get basedOnDocumentId(): string | null {
+    const withProof = this.completions.find((c) => c.healthDocumentId);
+    return withProof?.healthDocumentId ?? this._sourceDocumentId;
+  }
+
+  get sourceDocumentId(): string | null {
+    return this._sourceDocumentId;
   }
 
   /** Day of the most recent completion, if any. */

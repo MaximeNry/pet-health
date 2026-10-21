@@ -4,9 +4,14 @@ import type { RecurrenceProps } from '../../domain/recurrence.vo';
 export interface CreateReminderDto {
   title: string;
   category: string;
-  dueDate: string;
+  /** Optional when `lastDoneOn` is given (derived from it). */
+  dueDate?: string;
   /** Omitted or null for a one-off reminder. */
   recurrence?: RecurrenceProps | null;
+  /** The record the reminder is created from (one of the pet's documents). */
+  healthDocumentId?: string | null;
+  /** The care was already given that day: recorded as the first completion. */
+  lastDoneOn?: string;
 }
 
 /** JSON body of `PATCH …/:reminderId`: omitted = untouched. */
@@ -24,4 +29,10 @@ export interface CompleteReminderDto {
   doneOn?: string;
   /** The scanned proof (e.g. the vaccination certificate), if any. */
   healthDocumentId?: string | null;
+}
+
+/** JSON body of `PATCH …/:reminderId/completions/:completionId`. */
+export interface UpdateCompletionDto {
+  /** The proof to attach; `null` detaches it. */
+  healthDocumentId: string | null;
 }

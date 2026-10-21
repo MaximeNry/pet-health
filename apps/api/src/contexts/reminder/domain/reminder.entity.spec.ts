@@ -4,6 +4,7 @@ import {
   InvalidReminderError,
   ReminderAlreadyCompletedError,
   ReminderArchivedError,
+  ReminderCompletionNotFoundError,
 } from './reminder.errors';
 
 const d = (raw: string) => CalendarDate.parse(raw);
@@ -189,6 +190,126 @@ describe('Reminder', () => {
       const reminder = antiparasitic({ dueDate: d(dueDate) });
       expect(reminder.urgency(TODAY)).toBe(urgency);
       expect(reminder.daysUntilDue(TODAY)).toBe(days);
+    });
+  });
+
+  describe('create from a care already done', () => {
+    it('records the first completion and derives the due date from it', () => {
+      const reminder = Reminder.create(
+        {
+          petId: 'pet-1',
+          householdId: 'household-1',
+          createdBy: 'user-1',
+          title: 'Rabies booster',
+          category: 'VACCINE',
+          recurrence: { every: 1, unit: 'YEAR' },
+          sourceDocumentId: 'doc-1',
+          lastDone: { doneOn: d('2025-10-23'), healthDocumentId: 'doc-1' },
+        },
+        TODAY,
+      );
+
+      expect(reminder.dueDate.toString()).toBe('2026-10-23');
+      expect(reminder.completions[0].doneBy).toBe('user-1');
+      expect(reminder.completions[0].dueOn).toBeNull();
+      expect(reminder.completions[0].daysLate).toBeNull();
+    });
+
+    it("keeps an explicit due date (the vet's own date wins)", () => {
+      const reminder = antiparasitic({
+        dueDate: d('2026-12-01'),
+        lastDone: { doneOn: d('2026-10-01') },
+      });
+      expect(reminder.dueDate.toString()).toBe('2026-12-01');
+    });
+
+    it('rejects starting a one-off reminder as already done', () => {
+      expect(() =>
+        antiparasitic({
+          recurrence: null,
+          lastDone: { doneOn: d('2026-10-01') },
+        }),
+      ).toThrow(InvalidReminderError);
+    });
+
+    it('requires a due date when nothing was done yet', () => {
+      expect(() => antiparasitic({ dueDate: null })).toThrow(
+        InvalidReminderError,
+      );
+    });
+  });
+
+  describe('completion timing', () => {
+    it('remembers the due date each completion fulfilled', () => {
+      const reminder = antiparasitic({ dueDate: d('2026-10-15') });
+
+      reminder.complete(done('2026-10-19'), TODAY);
+
+      const [completion] = reminder.completions;
+      expect(completion.dueOn?.toString()).toBe('2026-10-15');
+      expect(completion.daysLate).toBe(4);
+    });
+
+    it('counts a care given early as negative lateness', () => {
+      const reminder = antiparasitic({ dueDate: d('2026-10-25') });
+      reminder.complete(done('2026-10-20'), TODAY);
+      expect(reminder.completions[0].daysLate).toBe(-5);
+    });
+
+    it('does not guess the due date of a backfilled older care', () => {
+      const reminder = antiparasitic();
+      reminder.complete(done('2026-10-10'), TODAY);
+
+      reminder.complete(done('2026-07-10'), TODAY);
+
+      const backfilled = reminder.completions[1];
+      expect(backfilled.doneOn.toString()).toBe('2026-07-10');
+      expect(backfilled.dueOn).toBeNull();
+    });
+  });
+
+  describe('attachProof', () => {
+    it('attaches a proof after the fact, even once archived', () => {
+      const reminder = antiparasitic({ title: 'Checkup', recurrence: null });
+      const completion = reminder.complete(done('2026-10-20'), TODAY);
+
+      reminder.attachProof(completion.id, 'receipt-1');
+
+      expect(reminder.status).toBe('ARCHIVED');
+      expect(reminder.completions[0].healthDocumentId).toBe('receipt-1');
+    });
+
+    it('detaches a proof with null', () => {
+      const reminder = antiparasitic();
+      const completion = reminder.complete(
+        { ...done('2026-10-20'), healthDocumentId: 'doc-1' },
+        TODAY,
+      );
+
+      reminder.attachProof(completion.id, null);
+
+      expect(reminder.completions[0].healthDocumentId).toBeNull();
+    });
+
+    it('rejects an unknown completion', () => {
+      expect(() => antiparasitic().attachProof('nope', 'doc-1')).toThrow(
+        ReminderCompletionNotFoundError,
+      );
+    });
+  });
+
+  describe('basedOnDocumentId', () => {
+    it('is the latest proof, else the source document', () => {
+      const reminder = antiparasitic({ sourceDocumentId: 'source' });
+      expect(reminder.basedOnDocumentId).toBe('source');
+
+      reminder.complete(
+        { ...done('2026-10-10'), healthDocumentId: 'proof-oct' },
+        TODAY,
+      );
+      reminder.complete(done('2026-07-10'), TODAY);
+
+      expect(reminder.basedOnDocumentId).toBe('proof-oct');
     });
   });
 

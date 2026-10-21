@@ -11,6 +11,7 @@ import { HouseholdMembershipGuard } from '../../../authorization/household-membe
 import { HouseholdScope } from '../../../authorization/household-scope.decorator';
 import { DomainExceptionFilter } from '../../../shared/presentation/domain-exception.filter';
 import { resolveToday } from '../application/client-today';
+import { ListHouseholdRemindersUseCase } from '../application/list-household-reminders.use-case';
 import { ListUpcomingHouseholdRemindersUseCase } from '../application/list-upcoming-household-reminders.use-case';
 import {
   ReminderResponse,
@@ -25,7 +26,19 @@ import {
 export class HouseholdReminderController {
   constructor(
     private readonly listUpcoming: ListUpcomingHouseholdRemindersUseCase,
+    private readonly listAll: ListHouseholdRemindersUseCase,
   ) {}
+
+  /** Every reminder of the household (active and archived) with history. */
+  @Get()
+  async list(
+    @Param('householdId') householdId: string,
+    @Query('today') today: string | undefined,
+  ): Promise<ReminderResponse[]> {
+    const day = resolveToday(today);
+    const reminders = await this.listAll.execute(householdId);
+    return reminders.map((reminder) => toReminderResponse(reminder, day));
+  }
 
   /**
    * Active reminders overdue or due within `?days=` (default 30), soonest

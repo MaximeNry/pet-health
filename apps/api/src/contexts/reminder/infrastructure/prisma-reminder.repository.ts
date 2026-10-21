@@ -7,8 +7,9 @@ import { ReminderMapper } from './reminder.mapper';
 
 /**
  * Prisma adapter for the `ReminderRepository` port. `save` persists the whole
- * aggregate in one transaction. Completions are immutable and only ever
- * added, so `createMany({ skipDuplicates })` inserts just the new ones.
+ * aggregate in one transaction. Completions are only ever added, and only
+ * their proof document can change afterwards: each one is upserted on that
+ * single field (a reminder holds a handful of them).
  */
 @Injectable()
 export class PrismaReminderRepository implements ReminderRepository {
@@ -31,10 +32,13 @@ export class PrismaReminderRepository implements ReminderRepository {
           status: data.status,
         },
       });
-      await tx.reminderCompletion.createMany({
-        data: completions,
-        skipDuplicates: true,
-      });
+      for (const completion of completions) {
+        await tx.reminderCompletion.upsert({
+          where: { id: completion.id },
+          create: completion,
+          update: { healthDocumentId: completion.healthDocumentId },
+        });
+      }
     });
   }
 
@@ -49,6 +53,15 @@ export class PrismaReminderRepository implements ReminderRepository {
   async findByPetId(petId: string): Promise<Reminder[]> {
     const records = await this.prisma.reminder.findMany({
       where: { petId },
+      include: { completions: true },
+      orderBy: { dueDate: 'asc' },
+    });
+    return records.map((record) => ReminderMapper.toDomain(record));
+  }
+
+  async findByHouseholdId(householdId: string): Promise<Reminder[]> {
+    const records = await this.prisma.reminder.findMany({
+      where: { householdId },
       include: { completions: true },
       orderBy: { dueDate: 'asc' },
     });

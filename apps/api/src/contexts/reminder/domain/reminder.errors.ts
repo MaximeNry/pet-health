@@ -39,6 +39,24 @@ export class ReminderAlreadyCompletedError extends DomainError {
   }
 }
 
+/** No completion of this reminder matches the requested identifier. */
+export class ReminderCompletionNotFoundError extends DomainError {
+  readonly kind: DomainErrorKind = 'not-found';
+
+  constructor() {
+    super('No completion of this reminder matches this identifier.');
+  }
+}
+
+/** The referenced health document does not exist or belongs to another pet. */
+export class ReminderDocumentNotFoundError extends DomainError {
+  readonly kind: DomainErrorKind = 'validation';
+
+  constructor(documentId: string) {
+    super(`No document « ${documentId} » found for this pet.`);
+  }
+}
+
 /** The pet a reminder is created for does not exist. */
 export class ReminderPetNotFoundError extends DomainError {
   readonly kind: DomainErrorKind = 'not-found';

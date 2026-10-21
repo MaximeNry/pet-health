@@ -1,8 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CalendarDate } from '../domain/calendar-date.vo';
+import { HEALTH_DOCUMENT_DIRECTORY } from '../domain/health-document-directory.port';
+import type { HealthDocumentDirectory } from '../domain/health-document-directory.port';
 import { Reminder } from '../domain/reminder.entity';
 import { REMINDER_REPOSITORY } from '../domain/reminder.repository';
 import type { ReminderRepository } from '../domain/reminder.repository';
+import { assertDocumentOfPet } from './assert-document-of-pet';
 import { GetPetReminderUseCase } from './get-pet-reminder.use-case';
 
 export interface CompleteReminderCommand {
@@ -24,6 +27,8 @@ export class CompleteReminderUseCase {
   constructor(
     @Inject(REMINDER_REPOSITORY)
     private readonly reminders: ReminderRepository,
+    @Inject(HEALTH_DOCUMENT_DIRECTORY)
+    private readonly documents: HealthDocumentDirectory,
     private readonly getReminder: GetPetReminderUseCase,
   ) {}
 
@@ -31,6 +36,11 @@ export class CompleteReminderUseCase {
     const reminder = await this.getReminder.execute(
       command.petId,
       command.reminderId,
+    );
+    await assertDocumentOfPet(
+      this.documents,
+      command.petId,
+      command.healthDocumentId,
     );
     reminder.complete(
       {
