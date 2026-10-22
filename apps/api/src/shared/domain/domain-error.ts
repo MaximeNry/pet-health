@@ -4,11 +4,7 @@
  * families via `kind` to enable that mapping without coupling the domain.
  */
 export type DomainErrorKind =
-  | 'validation'
-  | 'not-found'
-  | 'conflict'
-  | 'forbidden'
-  | 'gone';
+  'validation' | 'not-found' | 'conflict' | 'forbidden' | 'gone';
 
 export abstract class DomainError extends Error {
   abstract readonly kind: DomainErrorKind;
