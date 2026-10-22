@@ -145,36 +145,13 @@ describe('document detail use cases', () => {
   });
 
   describe('DeleteDocumentUseCase', () => {
-    it('best-effort deletes every page file before the metadata', async () => {
-      const useCase = new DeleteDocumentUseCase(
-        storage,
-        repository,
-        getDocument,
-      );
+    it('removes the metadata but never deletes the stored files', async () => {
+      const useCase = new DeleteDocumentUseCase(repository, getDocument);
 
       await useCase.execute({ petId: 'pet-1', documentId: 'doc-1' });
 
-      expect(storage.delete).toHaveBeenCalledWith({
-        ownerUserId: 'uploader-1',
-        fileId: 'drive-42',
-      });
-      expect(storage.delete).toHaveBeenCalledWith({
-        ownerUserId: 'uploader-1',
-        fileId: 'drive-43',
-      });
       expect(repository.deleteById).toHaveBeenCalledWith('doc-1');
-    });
-
-    it('still removes the metadata when a page file cannot be deleted', async () => {
-      storage.delete.mockRejectedValue(new Error('drive down'));
-      const useCase = new DeleteDocumentUseCase(
-        storage,
-        repository,
-        getDocument,
-      );
-
-      await useCase.execute({ petId: 'pet-1', documentId: 'doc-1' });
-      expect(repository.deleteById).toHaveBeenCalledWith('doc-1');
+      expect(storage.delete).not.toHaveBeenCalled();
     });
   });
 });

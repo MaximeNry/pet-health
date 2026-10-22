@@ -33,10 +33,17 @@ const TABS: Tab[] = ['documents', 'history', 'reminders'];
 /**
  * Pet detail screen (design: "Pet detail with tabs", variant A):
  * centered profile header with attribute chips, then Documents / History /
- * Reminders tabs. Documents shows its empty state until the health-document
- * context lands; the other two tabs are "coming soon" placeholders.
+ * Reminders tabs. The Reminders tab is slotted in by the page; History is
+ * still a "coming soon" placeholder.
  */
-export function PetDetail({ petId }: { petId: string }) {
+export function PetDetail({
+  petId,
+  renderReminders,
+}: {
+  petId: string;
+  /** Reminders tab content, provided by the page (reminders feature). */
+  renderReminders?: (pet: Pet) => ReactNode;
+}) {
   const t = useTranslations('pets');
   const tCommon = useTranslations('common');
   const router = useRouter();
@@ -141,14 +148,17 @@ export function PetDetail({ petId }: { petId: string }) {
             description={t('detail.historySoon', { name: pet.name })}
           />
         )}
-        {tab === 'reminders' && (
-          <TabPlaceholder
-            icon={<BellIcon className="h-9 w-9 text-accent" />}
-            iconBg="bg-accent-tint"
-            title={t('detail.comingSoon')}
-            description={t('detail.remindersSoon', { name: pet.name })}
-          />
-        )}
+        {tab === 'reminders' &&
+          (renderReminders ? (
+            renderReminders(pet)
+          ) : (
+            <TabPlaceholder
+              icon={<BellIcon className="h-9 w-9 text-accent" />}
+              iconBg="bg-accent-tint"
+              title={t('detail.comingSoon')}
+              description={t('detail.remindersSoon', { name: pet.name })}
+            />
+          ))}
       </div>
 
       {dialog === 'edit' && (

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import type { Pet } from '@/entities/pet';
 import type { DocumentType } from '@/entities/document';
+import { presetsForDocumentType } from '@/entities/reminder';
 import { useCreateDocument } from '../model/useCreateDocument';
 import { CaptureStaging } from './CaptureStaging';
 import { MetadataStep } from './MetadataStep';
@@ -70,6 +71,18 @@ export function ScanFlow({ pet }: { pet: Pet }) {
     router.push(`/pets/${pet.id}`);
   }, [router, pet.id]);
 
+  // A record that can carry a next due date (vaccination, prescription)
+  // opens on its detail, where the reminder suggestion lives; anything else
+  // goes back to the pet.
+  const openSavedDocument = useCallback(() => {
+    const saved = create.data;
+    if (saved && presetsForDocumentType(saved.documentType).length > 0) {
+      router.push(`/pets/${pet.id}/documents/${saved.id}`);
+    } else {
+      backToPet();
+    }
+  }, [create.data, router, pet.id, backToPet]);
+
   const handleBatchReady = useCallback((batch: ScanImage[]) => {
     setPages(batch);
     setPhase('metadata');
@@ -124,7 +137,7 @@ export function ScanFlow({ pet }: { pet: Pet }) {
                 ? 'error'
                 : 'uploading'
           }
-          onDone={backToPet}
+          onDone={openSavedDocument}
           onRetry={handleSubmit}
           onDismiss={() => create.reset()}
         />

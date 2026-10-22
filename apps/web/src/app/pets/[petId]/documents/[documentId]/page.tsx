@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { AccountMenu, useSession } from '@/features/auth';
 import { DocumentDetail } from '@/features/documents';
 import { usePet } from '@/features/pets';
+import { DocumentReminderSuggestion } from '@/features/reminders';
 import { AppHeader } from '@/shared/ui/AppHeader';
 
 /**
@@ -68,7 +69,13 @@ export default function DocumentDetailPage({
       <AppHeader>
         <AccountMenu user={user} />
       </AppHeader>
-      <DocumentDetail pet={pet} documentId={documentId} />
+      <DocumentDetail
+        pet={pet}
+        documentId={documentId}
+        renderAside={(document) => (
+          <DocumentReminderSuggestion pet={pet} document={document} />
+        )}
+      />
     </main>
   );
 }

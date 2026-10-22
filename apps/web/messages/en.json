@@ -25,11 +25,11 @@
     },
     "delete": {
       "title": "Delete my account",
-      "description": "Deletion permanently erases your pets, their health records and every file created in your Drive. This can't be undone.",
+      "description": "Deletion permanently erases your pets and their health records from PetHealth. Files already saved in your Google Drive stay there — you can remove them from Drive yourself. This can't be undone.",
       "cta": "Delete my account",
       "modal": {
         "title": "Delete your account?",
-        "description": "Your pets, their health records and the files created in your Drive will be permanently deleted.",
+        "description": "Your pets and their health records will be permanently deleted from PetHealth. Your scans stay in your Google Drive.",
         "cancel": "Cancel",
         "confirm": "Delete",
         "confirmPending": "Deleting…",
@@ -107,7 +107,7 @@
       "dangerHint": "Deleting this household permanently removes all its pets, their documents and stored files. This can't be undone.",
       "deleteCta": "Delete household",
       "confirmTitle": "Delete “{name}”?",
-      "confirmBody": "Every pet, document and stored file in this household will be permanently deleted.",
+      "confirmBody": "Every pet and document in this household will be permanently deleted from PetHealth. Scanned files stay in each member's Google Drive.",
       "confirmCancel": "Cancel",
       "confirmDelete": "Delete permanently",
       "deletePending": "Deleting…",
@@ -291,7 +291,7 @@
       },
       "deleteModal": {
         "title": "Delete this document?",
-        "description": "“{title}” and all its pages will be permanently deleted.",
+        "description": "“{title}” and all its pages will be removed from PetHealth. The files stay in the Google Drive of the person who scanned them.",
         "cancel": "Cancel",
         "confirm": "Delete",
         "confirmPending": "Deleting…",
@@ -388,9 +388,180 @@
     }
   },
   "reminders": {
-    "title": "Vaccine reminders are coming soon",
-    "withPets": "We'll let you know as soon as a reminder is due for one of your pets.",
-    "withoutPets": "Add a pet to start receiving their vaccine reminders."
+    "page": {
+      "back": "Back to dashboard",
+      "eyebrow": "Care",
+      "title": "Reminders",
+      "noHousehold": "Create a household to start adding reminders."
+    },
+    "categories": {
+      "VACCINE": "Vaccine",
+      "ANTIPARASITIC": "Antiparasitic",
+      "DEWORMING": "Deworming",
+      "CHECKUP": "Check-up",
+      "OTHER": "Other"
+    },
+    "presets": {
+      "rabies": "Rabies booster",
+      "coreVaccines": "Annual vaccines",
+      "antiparasitic": "Flea & tick treatment",
+      "deworming": "Deworming",
+      "checkup": "Annual check-up"
+    },
+    "recurrence": {
+      "none": "One-time",
+      "DAY": "{count, plural, one {Every day} other {Every # days}}",
+      "WEEK": "{count, plural, one {Every week} other {Every # weeks}}",
+      "MONTH": "{count, plural, one {Every month} other {Every # months}}",
+      "YEAR": "{count, plural, one {Every year} other {Every # years}}"
+    },
+    "due": {
+      "late": "{count, plural, one {# day late} other {# days late}}",
+      "today": "Due today",
+      "tomorrow": "Tomorrow",
+      "inDays": "{count, plural, one {In # day} other {In # days}}"
+    },
+    "timing": {
+      "onTime": "On time",
+      "late": "{count, plural, one {# day late} other {# days late}}",
+      "early": "{count, plural, one {# day early} other {# days early}}"
+    },
+    "row": {
+      "markDone": "Mark {title} as done"
+    },
+    "board": {
+      "viewLabel": "Reminders view",
+      "upcoming": "Upcoming",
+      "done": "Done",
+      "new": "New reminder",
+      "allPets": "All pets",
+      "loading": "Loading reminders…",
+      "overdue": "Overdue · {count}",
+      "soon": "Next 7 days",
+      "later": "Later",
+      "allCaughtUp": "All caught up — nothing is coming up.",
+      "nothingDone": "Nothing marked as done yet."
+    },
+    "empty": {
+      "title": "Nothing to remember yet",
+      "description": "Add a reminder for a vaccine, a treatment or a check-up. We'll show it here before it's due.",
+      "descriptionPet": "Add a reminder for {name}'s vaccines, treatments or check-ups.",
+      "cta": "New reminder",
+      "tip": "Tip: open a vaccination record or a prescription to set one up in a tap."
+    },
+    "overview": {
+      "loading": "Loading reminders…",
+      "lateTitle": "{name}'s {title} is {count, plural, one {# day} other {# days}} late",
+      "lateHint": "Already given? Mark it as done.",
+      "markDone": "Mark as done",
+      "view": "View",
+      "nothingSoon": "Nothing due in the next 30 days.",
+      "noPets": "Add a pet to start tracking their vaccines and treatments.",
+      "seeAll": "See all reminders"
+    },
+    "detail": {
+      "loadError": "We couldn't load this reminder.",
+      "backToReminders": "Back to reminders",
+      "back": "Back",
+      "wasDue": "Was due {date}",
+      "isDue": "Due {date}",
+      "archived": "You stopped following this reminder. Its history is kept.",
+      "due": "Due",
+      "repeats": "Repeats",
+      "basedOn": "Based on",
+      "document": "Document",
+      "history": "History",
+      "noHistory": "Not done yet.",
+      "doneOn": "Done on {date}",
+      "snooze": "Snooze",
+      "markDone": "Mark as done",
+      "menu": "Reminder actions",
+      "edit": "Edit",
+      "archive": "Stop following",
+      "delete": "Delete",
+      "archiveModal": {
+        "title": "Stop following this reminder?",
+        "description": "“{title}” won't come up anymore. Its history stays visible.",
+        "cancel": "Cancel",
+        "confirm": "Stop following",
+        "pending": "Saving…",
+        "error": "This reminder could not be updated. Please try again."
+      },
+      "deleteModal": {
+        "title": "Delete this reminder?",
+        "description": "“{title}” and its history will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "pending": "Deleting…",
+        "error": "This reminder could not be deleted. Please try again."
+      }
+    },
+    "markDone": {
+      "title": "Mark “{title}” as done",
+      "doneOn": "Done on",
+      "confirm": "Mark as done",
+      "pending": "Saving…",
+      "error": "This could not be saved. Please try again.",
+      "doneTitle": "{title} done",
+      "loggedFor": "Logged for {name} on {date}.",
+      "nextOne": "Next one",
+      "finished": "This reminder is complete.",
+      "proofAdded": "Proof attached",
+      "proofTitle": "Keep the proof with {name}'s records",
+      "proofHint": "Attach the scan of the box or the vet's receipt.",
+      "addProof": "Add a document",
+      "pickProof": "Choose the proof",
+      "proofError": "The document could not be attached. Please try again.",
+      "close": "Done",
+      "back": "Back"
+    },
+    "snooze": {
+      "title": "Snooze",
+      "subtitle": "Currently due {date}.",
+      "tomorrow": "Tomorrow",
+      "inThreeDays": "In 3 days",
+      "nextWeek": "In a week",
+      "pickDate": "Or pick a date",
+      "confirm": "Snooze",
+      "error": "The reminder could not be moved. Please try again."
+    },
+    "form": {
+      "newTitle": "New reminder",
+      "editTitle": "Edit reminder",
+      "cancel": "Cancel",
+      "presets": "Quick start",
+      "what": "What",
+      "whatPlaceholder": "e.g. Rabies booster",
+      "for": "For",
+      "type": "Type",
+      "repeat": "Repeat",
+      "due": "Due",
+      "basedOn": "Based on a record",
+      "optional": "(optional)",
+      "removeRecord": "Remove the linked record",
+      "linkRecord": "Link a record",
+      "recordHintRecurring": "Given on {date} — the next one is counted from that day.",
+      "recordHint": "The record this reminder follows up on.",
+      "error": "The reminder could not be saved. Please try again.",
+      "saving": "Saving…",
+      "save": "Save reminder",
+      "dueRequired": "Pick a due date to save."
+    },
+    "documentPicker": {
+      "loading": "Loading documents…",
+      "empty": "No documents for this pet yet.",
+      "scanNew": "Scan a new document"
+    },
+    "suggestion": {
+      "title": "Set a reminder",
+      "hint": "Keep track of the next dose so it doesn't slip by.",
+      "hintExisting": "Is this the care you were reminded of? Mark it as done on {date}.",
+      "markExisting": "Mark “{title}” as done on {date}",
+      "create": "New reminder from this document",
+      "linkedTitle": "Reminder: {title}",
+      "nextDue": "Next due {date}",
+      "error": "This could not be saved. Please try again."
+    }
   },
   "errors": {
     "title": "Something went wrong",

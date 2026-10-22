@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -34,15 +40,21 @@ const subscribeNever = () => () => {};
 /**
  * Document detail screen (design: "Document Detail"): file preview opening a
  * fullscreen viewer, download/share actions, then a details card (category +
- * tags, dates, pet). The note and reminder blocks of the mockup are left out
- * until their backend exists.
+ * tags, dates, pet). The page may slot the reminder suggestion in; the note
+ * block of the mockup is left out until its backend exists.
  */
 export function DocumentDetail({
   pet,
   documentId,
+  renderAside,
 }: {
   pet: Pet;
   documentId: string;
+  /**
+   * Slot under the actions, filled by the page (e.g. the reminder
+   * suggestion) so this feature does not depend on others.
+   */
+  renderAside?: (document: HealthDocument) => ReactNode;
 }) {
   const t = useTranslations('documents.detail');
   const tCommon = useTranslations('common');
@@ -179,6 +191,8 @@ export function DocumentDetail({
             </button>
           )}
         </div>
+
+        {renderAside?.(doc)}
 
         <DocumentDetailsCard
           document={doc}
