@@ -18,15 +18,23 @@ updates:
       # first and excluded from the two below, keeps the pair in one PR.
       prisma:
         patterns: ['prisma', '@prisma/*']
+      # The @nestjs/* packages are released in lockstep and peer-depend on one
+      # another: a major bump of one of them alone cannot pass CI (that is how
+      # @nestjs/core, /common and /jwt 12 sat red as three separate PRs). One
+      # group for every update type, majors included, so a Nest major arrives
+      # as a single migration PR.
+      nestjs:
+        patterns: ['@nestjs/*']
       production:
         dependency-type: production
         update-types: [minor, patch]
-        exclude-patterns: ['@prisma/*']
+        exclude-patterns: ['@prisma/*', '@nestjs/*']
       development:
         dependency-type: development
         update-types: [minor, patch]
-        exclude-patterns: ['prisma']
-    # Majors stay ungrouped: they deserve their own PR and their own CI run.
+        exclude-patterns: ['prisma', '@nestjs/*']
+    # Majors stay ungrouped (Nest aside): they deserve their own PR and their
+    # own CI run.
     # Except these three, where a major is a migration rather than a bump and
     # an unsolicited PR only costs a triage every week:
     ignore:
